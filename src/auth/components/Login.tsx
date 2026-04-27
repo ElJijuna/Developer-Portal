@@ -28,7 +28,7 @@ export function Login() {
   if (authLoading) return null
 
   return (
-    <WrapBox justify="center" align="center" style={{ height: '100vh', overflow: 'hidden' }}>
+    <WrapBox justify="center" align="center" style={{ height: '100dvh', overflow: 'hidden' }}>
       <Card>
         <Box spacing={16}>
           <Box align="center" spacing={8}>
