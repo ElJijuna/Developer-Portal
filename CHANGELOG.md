@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.6](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.5...v1.0.6) (2026-04-27)
+
+### Bug Fixes
+
+* use pathname instead of href for login redirect to prevent URL accumulation ([f9e16e5](https://github.com/ElJijuna/Developer-Portal/commit/f9e16e56b7c5eb863404d2e3a3caa806b7da1a6d))
+
 ## [1.0.5](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.4...v1.0.5) (2026-04-27)
 
 ### Bug Fixes
