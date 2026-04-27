@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.4](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.3...v1.0.4) (2026-04-27)
+
+### Bug Fixes
+
+* add GitHub Pages SPA redirect to support deep link reloads ([a29a5d5](https://github.com/ElJijuna/Developer-Portal/commit/a29a5d5620ed04ee96dff3e9909f2f41c98a3926))
+
 ## [1.0.3](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.2...v1.0.3) (2026-04-27)
 
 ### Bug Fixes
