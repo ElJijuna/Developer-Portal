@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.8](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.7...v1.0.8) (2026-04-27)
+
+### Bug Fixes
+
+* change wallpaper from body to html. ([0a172b9](https://github.com/ElJijuna/Developer-Portal/commit/0a172b94774637ae5cd6d2769f0821f833c9a4cb))
+* use 100dvh for correct viewport height on mobile Safari. ([9090dca](https://github.com/ElJijuna/Developer-Portal/commit/9090dcae00c47a8e3b1fa6f4400217ba7e0493d6))
+
 ## [1.0.7](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.6...v1.0.7) (2026-04-27)
 
 ### Bug Fixes
