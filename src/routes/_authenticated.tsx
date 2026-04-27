@@ -18,7 +18,7 @@ export const Route = createFileRoute('/_authenticated')({
     if (auth) await auth.authStateReady()
     const currentUser = auth?.currentUser ?? null
     if (!currentUser) {
-      throw redirect({ to: '/login', search: { redirect: location.href } })
+      throw redirect({ to: '/login', search: { redirect: location.pathname } })
     }
   },
   component: AuthenticatedLayout,
