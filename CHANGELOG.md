@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.7](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.6...v1.0.7) (2026-04-27)
+
+### Bug Fixes
+
+* remove double slash in SPA redirect path restoration ([2a93d16](https://github.com/ElJijuna/Developer-Portal/commit/2a93d16f03db51eafb73d6710ef06b5161efce0e))
+
 ## [1.0.6](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.5...v1.0.6) (2026-04-27)
 
 ### Bug Fixes
