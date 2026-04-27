@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.2...v1.0.3) (2026-04-27)
+
+### Bug Fixes
+
+* exclude TanStack Router DevTools from production build. ([9f782aa](https://github.com/ElJijuna/Developer-Portal/commit/9f782aa8297afefe7a6037f18b686a5199b35af9))
+
 ## [1.0.2](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.1...v1.0.2) (2026-04-27)
 
 ### Bug Fixes
