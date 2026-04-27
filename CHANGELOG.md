@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.0...v1.0.1) (2026-04-27)
+
+### Bug Fixes
+
+* **ci:** generate TanStack Router route tree before build in Pages workflow. ([70dd567](https://github.com/ElJijuna/Developer-Portal/commit/70dd567700fa6d710273b56d3fbace50ee05a51d))
+
 ## 1.0.0 (2026-04-27)
 
 ### Features
