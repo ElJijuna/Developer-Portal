@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.5](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.4...v1.0.5) (2026-04-27)
+
+### Bug Fixes
+
+* update redirection from 404 ([bfa1a9e](https://github.com/ElJijuna/Developer-Portal/commit/bfa1a9e9654901e01ce02ae0ea4863cf313a42cc))
+
 ## [1.0.4](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.3...v1.0.4) (2026-04-27)
 
 ### Bug Fixes
