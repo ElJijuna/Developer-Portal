@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.9...v1.1.0) (2026-04-28)
+
+### Features
+
+* configure PWA with service worker and web manifest ([15f2d11](https://github.com/ElJijuna/Developer-Portal/commit/15f2d11ced0ad2a79f7ce95d34c44fb6eaee704c))
+
 ## [1.0.9](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.8...v1.0.9) (2026-04-28)
 
 ### Bug Fixes
