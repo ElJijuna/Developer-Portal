@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.9](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.8...v1.0.9) (2026-04-28)
+
+### Bug Fixes
+
+* apply safe-area insets only to authenticated layout, login stays full screen. ([346338d](https://github.com/ElJijuna/Developer-Portal/commit/346338dbf46813455ea953b7a3157585e817acdd))
+
 ## [1.0.8](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.7...v1.0.8) (2026-04-27)
 
 ### Bug Fixes
