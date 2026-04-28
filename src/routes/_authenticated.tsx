@@ -73,6 +73,14 @@ function AuthenticatedLayout() {
   const AppLogo: FC<{ size?: number }> = ({ size }) => <Box align="center" padding={6}><DeveloperPortalLogo size={size} /></Box>;
 
   return (
+    <div style={{
+      paddingTop: 'env(safe-area-inset-top)',
+      paddingBottom: 'env(safe-area-inset-bottom)',
+      paddingLeft: 'env(safe-area-inset-left)',
+      paddingRight: 'env(safe-area-inset-right)',
+      height: '100dvh',
+      boxSizing: 'border-box',
+    }}>
     <AdaptiveLayout
       items={NAV_ITEMS}
       value={pathname}
@@ -103,5 +111,6 @@ function AuthenticatedLayout() {
         <Outlet />
       </Box>
     </AdaptiveLayout>
+    </div>
   )
 }
