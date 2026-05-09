@@ -3,10 +3,7 @@
   "private": false,
   "version": "1.1.0",
   "type": "module",
-  "author": {
-    "name": "pilmee",
-    "email": "pilmee@gmail.com"
-  },
+  "author": "pilmee <pilmee@gmail.com> (https://github.com/ElJijuna)",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -48,5 +45,6 @@
   },
   "overrides": {
     "vite": "8.0.7"
-  }
+  },
+  "license": "MIT"
 }
