@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.1.0...v1.2.0) (2026-05-13)
+
+### Features
+
+* update dependencies ([b3f8eee](https://github.com/ElJijuna/Developer-Portal/commit/b3f8eee48cc9f209c20f83488316ffbb94f55d69))
+
 ## [1.1.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.0.9...v1.1.0) (2026-04-28)
 
 ### Features
