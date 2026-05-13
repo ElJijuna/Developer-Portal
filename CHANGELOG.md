@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.2.0...v1.3.0) (2026-05-13)
+
+### Features
+
+* update dashboard view ([9b52313](https://github.com/ElJijuna/Developer-Portal/commit/9b523131eee64b3c49d476a283c1c9af6c9981cf))
+
 ## [1.2.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.1.0...v1.2.0) (2026-05-13)
 
 ### Features
