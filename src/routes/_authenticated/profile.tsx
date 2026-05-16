@@ -1,10 +1,20 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { Text } from '@gnome-ui/react/components/Text'
+import { createFileRoute } from '@tanstack/react-router';
+import { DashboardGrid } from '@gnome-ui/layout';
+import { PageHeader } from '../../components/PageHeader';
 
 export const Route = createFileRoute('/_authenticated/profile')({
   component: Profile,
 })
 
 function Profile() {
-  return <Text variant="body" color="dim">En construcción</Text>
+  return (
+    <>
+      <PageHeader
+        title="Profile"
+        segments={[{ label: 'Profile', path: '/profile' }]}
+      />
+      <DashboardGrid>
+      </DashboardGrid>
+    </>
+  )
 }

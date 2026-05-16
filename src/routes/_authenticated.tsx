@@ -14,11 +14,11 @@ import { WrapBox } from '@gnome-ui/react/components/WrapBox';
 import { Button } from '@gnome-ui/react/components/Button';
 
 export const Route = createFileRoute('/_authenticated')({
-  async beforeLoad({ location }) {
+  async beforeLoad() {
     if (auth) await auth.authStateReady()
     const currentUser = auth?.currentUser ?? null
     if (!currentUser) {
-      throw redirect({ to: '/login', search: { redirect: location.pathname } })
+      throw redirect({ to: '/login' })
     }
   },
   component: AuthenticatedLayout,
