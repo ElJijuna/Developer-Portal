@@ -73,42 +73,34 @@ function AuthenticatedLayout() {
   const AppLogo: FC<{ size?: number }> = ({ size }) => <Box align="center" padding={6}><DeveloperPortalLogo size={size} /></Box>;
 
   return (
-    <div style={{
-      paddingTop: 'env(safe-area-inset-top)',
-      paddingBottom: 'env(safe-area-inset-bottom)',
-      height: '100dvh',
-      boxSizing: 'border-box',
-    }}>
-    <AdaptiveLayout
-      items={NAV_ITEMS}
-      value={pathname}
-      onValueChange={(id) => navigate({ to: id })}
-      sidebarHeader={<AppLogo />}
-      sidebarHeaderCollapsed={<AppLogo size={32} />}
-      sidebarFooter={User}
-      sidebarFooterCollapsed={UserCollapsed}
-      sidebarPlacement="full"
-      showHeaderSeparator={false}
-      showFooterSeparator={false}
-      showCollapseButtonSeparator={true}
-      topBar={topBar}
-      bgColor="white"
-      bgOpacity={3}
-      bgShade={3}
-      footer={
-        <WrapBox justify="space-between">
-          <Text color="dim" variant="caption">© {new Date().getFullYear()} Developer Portal</Text>
-          <WrapBox>
-            <Button variant="flat" size="sm" disabled>Privacy</Button>
-            <Button variant="flat" size="sm" disabled>Terms</Button>
+    <div className="main">
+      <AdaptiveLayout
+        items={NAV_ITEMS}
+        value={pathname}
+        onValueChange={(id) => navigate({ to: id })}
+        sidebarHeader={<AppLogo />}
+        sidebarHeaderCollapsed={<AppLogo size={32} />}
+        sidebarFooter={User}
+        sidebarFooterCollapsed={UserCollapsed}
+        sidebarPlacement="full"
+        showHeaderSeparator={false}
+        showFooterSeparator={false}
+        showCollapseButtonSeparator={true}
+        topBar={topBar}
+        footer={
+          <WrapBox justify="space-between">
+            <Text color="dim" variant="caption">© {new Date().getFullYear()} Developer Portal</Text>
+            <WrapBox>
+              <Button variant="flat" size="sm" disabled>Privacy</Button>
+              <Button variant="flat" size="sm" disabled>Terms</Button>
+            </WrapBox>
           </WrapBox>
-        </WrapBox>
-      }
-    >
-      <Box padding={16}>
-        <Outlet />
-      </Box>
-    </AdaptiveLayout>
+        }
+      >
+        <Box padding={16}>
+          <Outlet />
+        </Box>
+      </AdaptiveLayout>
     </div>
   )
 }
