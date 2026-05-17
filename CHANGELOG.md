@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.4.0...v1.5.0) (2026-05-17)
+
+### Features
+
+* update classes to transparent layout. ([8bb6d53](https://github.com/ElJijuna/Developer-Portal/commit/8bb6d53098b00c73b28ad7c252f44e14ab623d1f))
+* update profile page ([35ec1e6](https://github.com/ElJijuna/Developer-Portal/commit/35ec1e6b38cebd7509e82740fb56bd2932ac7450))
+
 ## [1.4.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.3.0...v1.4.0) (2026-05-16)
 
 ### Features
