@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, useMemo } from 'react'
 import {
   DashboardGrid,
@@ -36,6 +36,7 @@ type TabType = 'followers' | 'following'
 function Following() {
   const { user } = useAuth()
   const token = user?.githubToken || ''
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<TabType>('followers')
   const [searchQuery, setSearchQuery] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
@@ -235,9 +236,7 @@ function Following() {
                   description={ghUser.bio ?? undefined}
                   meta={[ghUser.location ?? undefined]}
                   interactive
-                  onClick={() =>
-                    window.open(ghUser.html_url, '_blank', 'noopener,noreferrer')
-                  }
+                  onClick={() => navigate({ to: '/profile/$login', params: { login: ghUser.login } })}
                 />
               ))}
             </MasonryGrid>
