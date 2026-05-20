@@ -6,6 +6,8 @@ import type { AuthUser } from '../domain'
 const provider = new GithubAuthProvider()
 provider.addScope('gist')
 provider.addScope('read:user')
+provider.addScope('notifications')
+provider.addScope('repo')
 
 export async function signInWithGitHub(): Promise<AuthUser> {
   if (!auth) throw new Error('Firebase is not configured')

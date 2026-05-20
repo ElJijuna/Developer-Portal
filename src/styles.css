@@ -28,26 +28,3 @@ body {
     );
   }
 }
-
-.main {
-  padding-top: 'env(safe-area-inset-top)';
-  padding-bottom: 'env(safe-area-inset-bottom)';
-  height: '100dvh';
-  box-sizing: 'border-box';
-
-  > div {
-    background: color-mix(in srgb, var(--gnome-window-bg-color) 80%, transparent);
-
-    nav {
-      background: transparent;
-    }
-
-    > div {
-      background: transparent;
-
-      > div header {
-        background: transparent;
-      }
-    }
-  }
-}
