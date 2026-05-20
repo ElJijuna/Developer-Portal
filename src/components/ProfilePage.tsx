@@ -67,10 +67,10 @@ function eventDescription(type: string, repoName: string): string {
 
 interface ProfileContentProps {
   login: string
-  token: string
+  token?: string
 }
 
-export function ProfileContent({ login, token }: ProfileContentProps) {
+export function ProfileContent({ login }: ProfileContentProps) {
   const [activeTab, setActiveTab] = useState<'repos' | 'activity'>('repos')
 
   const { data: ghUser, isLoading: userLoading, error: userError } = useGhUser(login, {
@@ -87,13 +87,13 @@ export function ProfileContent({ login, token }: ProfileContentProps) {
   } = useGhUserReposInfinite(
     login,
     { sort: 'updated', per_page: 30 },
-    { token: token || undefined, enabled: !!login },
+    { enabled: !!login },
   )
 
   const { data: eventsData, isLoading: eventsLoading } = useGhUserPublicEvents(
     login,
     { per_page: 30 },
-    { token: token || undefined, enabled: !!login },
+    { enabled: !!login },
   )
 
   const repos = useMemo(() => reposData?.pages.flatMap((p) => p.values) ?? [], [reposData])
@@ -227,11 +227,10 @@ export function ProfileContent({ login, token }: ProfileContentProps) {
               <MasonryGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="md" fresh>
                 {repos.map((repo) => {
                   const langColor = repo.language ? LANGUAGE_COLORS[repo.language] : undefined
-                  const meta: (string | undefined)[] = []
-                  if (repo.language) meta.push(repo.language)
-                  meta.push(`★ ${repo.stargazers_count}`)
-                  meta.push(`⑂ ${repo.forks_count}`)
-                  if (repo.updated_at) meta.push(`Updated ${relativeTime(repo.updated_at)}`)
+                  const meta: [string?, string?] = [
+                    repo.language ?? undefined,
+                    `★ ${repo.stargazers_count} · ⑂ ${repo.forks_count}`,
+                  ]
 
                   return (
                     <EntityCard

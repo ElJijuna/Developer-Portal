@@ -42,7 +42,6 @@ function Following() {
   const [searchOpen, setSearchOpen] = useState(false)
 
   const { data: currentUser, isLoading: profileLoading } = useGhCurrentUser({
-    token,
     enabled: !!token,
   })
 
@@ -58,7 +57,7 @@ function Following() {
   } = useGhUserFollowersInfinite(
     login,
     { per_page: 30 },
-    { token: token || undefined, enabled: !!login },
+    { enabled: !!login },
   )
 
   const {
@@ -71,7 +70,7 @@ function Following() {
   } = useGhUserFollowingInfinite(
     login,
     { per_page: 30 },
-    { token: token || undefined, enabled: !!login },
+    { enabled: !!login },
   )
 
   const followers = useMemo(
@@ -146,6 +145,7 @@ function Following() {
             value={currentUser?.followers ?? 0}
             icon={Heart}
             loading={profileLoading}
+            loadingType="skeleton"
             color="#e01b24"
           />
           <CounterCard
@@ -153,6 +153,7 @@ function Following() {
             value={currentUser?.following ?? 0}
             icon={Person}
             loading={profileLoading}
+            loadingType="skeleton"
             color="#3584e4"
           />
         </DashboardGrid>
@@ -234,7 +235,7 @@ function Following() {
                   title={ghUser.name || ghUser.login}
                   subtitle={`@${ghUser.login}`}
                   description={ghUser.bio ?? undefined}
-                  meta={[ghUser.location ?? undefined]}
+                  meta={[ghUser.location ?? undefined] as [string?]}
                   interactive
                   onClick={() => navigate({ to: '/profile/$login', params: { login: ghUser.login } })}
                 />

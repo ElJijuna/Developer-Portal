@@ -20,7 +20,6 @@ function OwnProfile() {
   const token = user?.githubToken || ''
 
   const { data: currentUser, isLoading } = useGhCurrentUser({
-    token,
     enabled: !!token,
   })
 

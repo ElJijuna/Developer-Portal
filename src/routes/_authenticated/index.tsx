@@ -22,19 +22,19 @@ function Dashboard() {
   const navigate = useNavigate()
   const token = user?.githubToken ?? ''
 
-  const { data: ghUser } = useGhCurrentUser({ token, enabled: !!token })
+  const { data: ghUser } = useGhCurrentUser({ enabled: !!token })
   const login = ghUser?.login ?? ''
 
   const { data: repos } = useGhUserRepos(
     login,
     { per_page: 100, sort: 'pushed' },
-    { token, enabled: !!login },
+    { enabled: !!login },
   )
 
   const { data: contributionData, isLoading: contribLoading } = useGhUserContributionMap(
     login,
     {},
-    { token, enabled: !!login && !!token },
+    { enabled: !!login && !!token },
   )
 
   if (!token) {

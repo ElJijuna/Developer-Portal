@@ -5,13 +5,15 @@ import { AdaptiveLayout, type AdaptiveNavItem } from '@gnome-ui/layout/component
 import { UserCard } from '@gnome-ui/layout/components/UserCard';
 import { HeaderBar } from '@gnome-ui/react/components/HeaderBar';
 import { Avatar } from '@gnome-ui/react/components/Avatar';
-import { GoHome, Heart, Applications, Settings, Person } from '@gnome-ui/icons';
+import { GoHome, Heart, Applications, Settings, Person, Notifications, Warning, Document, Check, Information } from '@gnome-ui/icons';
 import { DeveloperPortalLogo } from '../components/DeveloperPortalLogo';
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { Box } from '@gnome-ui/react/components/Box';
 import { Text } from '@gnome-ui/react/components/Text';
 import { WrapBox } from '@gnome-ui/react/components/WrapBox';
 import { Button } from '@gnome-ui/react/components/Button';
+import { GhClientProvider } from '@api-hooks/gh';
+import { GitHubClient } from 'gh-api-client';
 
 export const Route = createFileRoute('/_authenticated')({
   async beforeLoad() {
@@ -27,7 +29,12 @@ export const Route = createFileRoute('/_authenticated')({
 const NAV_ITEMS: AdaptiveNavItem[] = [
   { id: '/', label: 'Dashboard', icon: GoHome },
   { id: '/my-apps', label: 'My Apps', icon: Applications, group: 'Develop' },
+  { id: '/cicd', label: 'CI/CD', icon: Check, group: 'Develop' },
+  { id: '/inbox', label: 'Inbox', icon: Notifications, group: 'Activity' },
+  { id: '/issues', label: 'Issues', icon: Warning, group: 'Activity' },
+  { id: '/pull-requests', label: 'Pull Requests', icon: Document, group: 'Activity' },
   { id: '/following', label: 'Following', icon: Heart },
+  { id: '/insights', label: 'Insights', icon: Information },
   { id: '/settings', label: 'Settings', icon: Settings },
   { id: '/profile', label: 'Profile', icon: Person },
 ]
@@ -36,6 +43,8 @@ function AuthenticatedLayout() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const token = user?.githubToken ?? ''
+  const ghClient = useMemo(() => new GitHubClient({ token: token || undefined }), [token])
 
   const topBar = (
     <HeaderBar
@@ -73,6 +82,7 @@ function AuthenticatedLayout() {
   const AppLogo: FC<{ size?: number }> = ({ size }) => <Box align="center" padding={6}><DeveloperPortalLogo size={size} /></Box>;
 
   return (
+    <GhClientProvider client={ghClient}>
     <div className="main">
       <AdaptiveLayout
         items={NAV_ITEMS}
@@ -102,5 +112,6 @@ function AuthenticatedLayout() {
         </Box>
       </AdaptiveLayout>
     </div>
+    </GhClientProvider>
   )
 }
