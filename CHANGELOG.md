@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.5.0...v1.6.0) (2026-05-20)
+
+### Features
+
+* add appearance settings — theme, accent color, glass effect ([de51028](https://github.com/ElJijuna/Developer-Portal/commit/de5102855983441816759637c5cd20bebabce062))
+* implement gitdeck features — Inbox, Issues, PRs, CI/CD, Insights ([c769efe](https://github.com/ElJijuna/Developer-Portal/commit/c769efeb6b9f863112fdbb394e1f1b925a237e24))
+* remove local cofig to glass theme and update scope to access from github ([426525f](https://github.com/ElJijuna/Developer-Portal/commit/426525f96a9d1ec453706e006f55976817b8bc56))
+
 ## [1.5.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.4.0...v1.5.0) (2026-05-17)
 
 ### Features
