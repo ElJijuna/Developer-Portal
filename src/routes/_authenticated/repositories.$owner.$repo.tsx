@@ -1,7 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
-import { useGhRepo, useGhRepoTopics, useGhRepoCommits, useGhRepoAdvisories } from '@api-hooks/gh'
-import type { GitHubCommit, GitHubRepositoryAdvisory } from 'gh-api-client'
+import {
+  useGhRepo,
+  useGhRepoTopics,
+  useGhRepoCommits,
+  useGhRepoAdvisories,
+  useGhRepoPullRequests,
+  useGhRepoWorkflowRuns,
+} from '@api-hooks/gh'
+import type { GitHubCommit, GitHubRepositoryAdvisory, GitHubPullRequest, GitHubWorkflowRun, WorkflowRunConclusion } from 'gh-api-client'
 import { api } from 'code-languages'
 import type { LocalizedLanguage, LanguageSlug } from 'code-languages'
 import { CounterCard, EntityCard, EmptyState, ErrorState } from '@gnome-ui/layout'
@@ -16,13 +23,16 @@ import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { Chip } from '@gnome-ui/react/components/Chip'
 import { WrapBox } from '@gnome-ui/react/components/WrapBox'
 import { TabBar, TabItem } from '@gnome-ui/react/components/Tabs'
-import { Folder, Lock, Warning, Share, Star } from '@gnome-ui/icons'
+import { StatusBadge } from '@gnome-ui/react/components/StatusBadge'
+import { Folder, Lock, Warning, Share, Star, Check, Document } from '@gnome-ui/icons'
 import { PageHeader } from '../../components/PageHeader'
 import { useAuth } from '../../auth/AuthProvider'
 
 export const Route = createFileRoute('/_authenticated/repositories/$owner/$repo')({
   component: RepoDetail,
 })
+
+type TabId = 'overview' | 'commits' | 'pull-requests' | 'workflows' | 'security'
 
 const LANGUAGE_COLORS: Record<string, string> = {
   TypeScript: '#3178c6',
@@ -60,6 +70,17 @@ const GH_LANG_TO_SLUG: Record<string, string> = {
   'Visual Basic .NET': 'visual-basic',
 }
 
+function conclusionColor(conclusion: WorkflowRunConclusion): string {
+  switch (conclusion) {
+    case 'success': return '#26a269'
+    case 'failure': return '#e01b24'
+    case 'cancelled': return '#77767b'
+    case 'timed_out': return '#e66100'
+    case 'action_required': return '#e5a50a'
+    default: return '#77767b'
+  }
+}
+
 function relativeTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime()
   const days = Math.floor(diff / 86_400_000)
@@ -75,27 +96,29 @@ function RepoDetail() {
   const { owner, repo: repoName } = Route.useParams()
   const { user } = useAuth()
   const token = user?.githubToken ?? ''
-  const [activeTab, setActiveTab] = useState('overview')
+  const [activeTab, setActiveTab] = useState<TabId>('overview')
   const [langInfo, setLangInfo] = useState<LocalizedLanguage | null>(null)
 
-  const enabled = !!owner && !!repoName
+  const enabled = !!owner && !!repoName && !!token
 
   const { data: repo, isLoading: repoLoading, error: repoError } = useGhRepo(owner, repoName, { enabled })
   const { data: topics } = useGhRepoTopics(owner, repoName, { enabled })
   const { data: commitsData, isLoading: commitsLoading } = useGhRepoCommits(
-    owner,
-    repoName,
-    { per_page: 10 },
-    { enabled },
+    owner, repoName, { per_page: 10 }, { enabled },
+  )
+  const { data: prsData, isLoading: prsLoading } = useGhRepoPullRequests(
+    owner, repoName, { state: 'open', per_page: 20 }, { enabled },
+  )
+  const { data: workflowsData, isLoading: workflowsLoading } = useGhRepoWorkflowRuns(
+    owner, repoName, { per_page: 15 }, { enabled },
   )
   const { data: advisoriesData, isLoading: advisoriesLoading } = useGhRepoAdvisories(
-    owner,
-    repoName,
-    {},
-    { enabled: enabled && !!token },
+    owner, repoName, {}, { enabled },
   )
 
   const commits: GitHubCommit[] = commitsData?.values ?? []
+  const prs: GitHubPullRequest[] = prsData?.values ?? []
+  const runs: GitHubWorkflowRun[] = workflowsData?.workflow_runs ?? []
   const advisories: GitHubRepositoryAdvisory[] = advisoriesData?.values ?? []
 
   useEffect(() => {
@@ -166,11 +189,7 @@ function RepoDetail() {
         {/* Hero */}
         <Card padding="lg">
           <Box orientation="horizontal" spacing={16} align="flex-start">
-            <Avatar
-              src={repo.owner.avatar_url}
-              name={repo.owner.login}
-              size="lg"
-            />
+            <Avatar src={repo.owner.avatar_url} name={repo.owner.login} size="lg" />
             <Box orientation="vertical" spacing={8} style={{ flex: 1, minWidth: 0 }}>
               <Text variant="title-2" style={{ fontWeight: 700, wordBreak: 'break-word' }}>
                 {repo.full_name}
@@ -179,19 +198,13 @@ function RepoDetail() {
                 <Text variant="body" color="dim">{repo.description}</Text>
               )}
               {repo.homepage && (
-                <Button
-                  variant="flat"
-                  size="sm"
-                  onClick={() => window.open(repo.homepage!, '_blank')}
-                >
+                <Button variant="flat" size="sm" onClick={() => window.open(repo.homepage!, '_blank')}>
                   {repo.homepage}
                 </Button>
               )}
               {topics && topics.length > 0 && (
                 <WrapBox spacing={4}>
-                  {topics.map((topic) => (
-                    <Chip key={topic} label={topic} />
-                  ))}
+                  {topics.map((topic) => <Chip key={topic} label={topic} />)}
                 </WrapBox>
               )}
             </Box>
@@ -208,13 +221,15 @@ function RepoDetail() {
 
         {/* Tabs */}
         <Box orientation="vertical" spacing={12}>
-          <TabBar value={activeTab} onValueChange={setActiveTab}>
-            <TabItem name="overview" label="Overview" />
-            <TabItem name="commits" label="Commits" />
-            <TabItem name="security" label={`Security${advisories.length > 0 ? ` (${advisories.length})` : ''}`} />
+          <TabBar aria-label="Repository tabs" inline>
+            <TabItem name="overview" label="Overview" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} />
+            <TabItem name="commits" label="Commits" active={activeTab === 'commits'} onClick={() => setActiveTab('commits')} />
+            <TabItem name="pull-requests" label={`Pull Requests${prs.length > 0 ? ` (${prs.length})` : ''}`} active={activeTab === 'pull-requests'} onClick={() => setActiveTab('pull-requests')} />
+            <TabItem name="workflows" label="Workflows" active={activeTab === 'workflows'} onClick={() => setActiveTab('workflows')} />
+            <TabItem name="security" label={`Security${advisories.length > 0 ? ` (${advisories.length})` : ''}`} active={activeTab === 'security'} onClick={() => setActiveTab('security')} />
           </TabBar>
 
-          {/* Overview tab */}
+          {/* Overview */}
           {activeTab === 'overview' && (
             <Box orientation="vertical" spacing={12}>
               {repo.language ? (
@@ -228,33 +243,25 @@ function RepoDetail() {
                         {langInfo?.name ?? repo.language}
                       </Text>
                     </Box>
-
                     {langInfo ? (
                       <Box orientation="vertical" spacing={8}>
                         <Text variant="body" color="dim">{langInfo.description}</Text>
-
                         {langInfo.extensions.length > 0 && (
                           <Box orientation="vertical" spacing={4}>
                             <Text variant="caption" color="dim">File extensions</Text>
                             <WrapBox spacing={4}>
-                              {langInfo.extensions.map((ext) => (
-                                <Chip key={ext} label={ext} />
-                              ))}
+                              {langInfo.extensions.map((ext) => <Chip key={ext} label={ext} />)}
                             </WrapBox>
                           </Box>
                         )}
-
                         {langInfo.paradigms.length > 0 && (
                           <Box orientation="vertical" spacing={4}>
                             <Text variant="caption" color="dim">Paradigms</Text>
                             <WrapBox spacing={4}>
-                              {langInfo.paradigms.map((p) => (
-                                <Chip key={p} label={p} />
-                              ))}
+                              {langInfo.paradigms.map((p) => <Chip key={p} label={p} />)}
                             </WrapBox>
                           </Box>
                         )}
-
                         {langInfo.author && (
                           <Text variant="caption" color="dim">Created by {langInfo.author}</Text>
                         )}
@@ -271,84 +278,133 @@ function RepoDetail() {
                   description="GitHub has not detected a primary language for this repository."
                 />
               )}
-
-              <Box orientation="horizontal" spacing={8} style={{ flexWrap: 'wrap' }}>
+              <WrapBox spacing={4}>
                 {repo.fork && <Chip label="Fork" />}
                 {repo.archived && <Chip label="Archived" />}
                 {repo.disabled && <Chip label="Disabled" />}
                 {repo.is_template && <Chip label="Template" />}
                 {repo.license?.name && <Chip label={repo.license.name} />}
-              </Box>
+              </WrapBox>
             </Box>
           )}
 
-          {/* Commits tab */}
+          {/* Commits */}
           {activeTab === 'commits' && (
             <Box orientation="vertical" spacing={8}>
               {commitsLoading ? (
                 <Box align="center" justify="center" padding={48}><Spinner /></Box>
               ) : commits.length === 0 ? (
-                <EmptyState
-                  icon={<Icon icon={Folder} size="lg" />}
-                  title="No commits"
-                  description="No commits found for this repository."
+                <EmptyState icon={<Icon icon={Folder} size="lg" />} title="No commits" description="No commits found." />
+              ) : commits.map((commit) => (
+                <EntityCard
+                  key={commit.sha}
+                  avatar={
+                    commit.author?.avatar_url
+                      ? <Avatar src={commit.author.avatar_url} name={commit.author.login} size="sm" />
+                      : <Icon icon={Folder} size="md" />
+                  }
+                  title={commit.commit.message.split('\n')[0]}
+                  subtitle={commit.sha.slice(0, 7)}
+                  meta={[commit.commit.author.name, relativeTime(commit.commit.author.date)]}
+                  interactive
+                  onClick={() => window.open(commit.html_url, '_blank')}
                 />
-              ) : (
-                commits.map((commit) => (
-                  <EntityCard
-                    key={commit.sha}
-                    avatar={
-                      commit.author?.avatar_url
-                        ? <Avatar src={commit.author.avatar_url} name={commit.author.login} size="sm" />
-                        : <Icon icon={Folder} size="md" />
-                    }
-                    title={commit.commit.message.split('\n')[0]}
-                    subtitle={commit.sha.slice(0, 7)}
-                    meta={[
-                      commit.commit.author.name,
-                      relativeTime(commit.commit.author.date),
-                    ]}
-                    interactive
-                    onClick={() => window.open(commit.html_url, '_blank')}
-                  />
-                ))
-              )}
+              ))}
             </Box>
           )}
 
-          {/* Security tab */}
+          {/* Pull Requests */}
+          {activeTab === 'pull-requests' && (
+            <Box orientation="vertical" spacing={8}>
+              {prsLoading ? (
+                <Box align="center" justify="center" padding={48}><Spinner /></Box>
+              ) : prs.length === 0 ? (
+                <EmptyState icon={<Icon icon={Document} size="lg" />} title="No open pull requests" description="There are no open pull requests in this repository." />
+              ) : prs.map((pr) => (
+                <EntityCard
+                  key={pr.id}
+                  avatar={
+                    pr.user?.avatar_url
+                      ? <Avatar src={pr.user.avatar_url} name={pr.user.login} size="sm" />
+                      : <Icon icon={Document} size="md" />
+                  }
+                  title={pr.title}
+                  subtitle={`#${pr.number} · ${pr.user?.login ?? 'unknown'}`}
+                  description={
+                    pr.draft
+                      ? <StatusBadge variant="neutral">Draft</StatusBadge> as unknown as string
+                      : undefined
+                  }
+                  meta={[`${pr.state}`, relativeTime(pr.updated_at)]}
+                  interactive
+                  onClick={() => window.open(pr.html_url, '_blank')}
+                />
+              ))}
+            </Box>
+          )}
+
+          {/* Workflows */}
+          {activeTab === 'workflows' && (
+            <Box orientation="vertical" spacing={8}>
+              {workflowsLoading ? (
+                <Box align="center" justify="center" padding={48}><Spinner /></Box>
+              ) : runs.length === 0 ? (
+                <EmptyState icon={<Icon icon={Check} size="lg" />} title="No workflow runs" description="No workflow runs found for this repository." />
+              ) : runs.map((run) => (
+                <EntityCard
+                  key={run.id}
+                  avatar={
+                    <Box align="center" justify="center" style={{ width: 36, height: 36 }}>
+                      <div style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: '50%',
+                        backgroundColor: run.status === 'in_progress'
+                          ? '#3584e4'
+                          : conclusionColor(run.conclusion),
+                      }} />
+                    </Box>
+                  }
+                  title={run.name ?? `Run #${run.run_number}`}
+                  subtitle={`#${run.run_number} · ${run.event} · ${run.head_branch ?? 'unknown branch'}`}
+                  meta={[
+                    run.status === 'in_progress' ? 'running' : (run.conclusion ?? run.status),
+                    relativeTime(run.created_at),
+                  ]}
+                  interactive
+                  onClick={() => window.open(run.html_url, '_blank')}
+                />
+              ))}
+            </Box>
+          )}
+
+          {/* Security */}
           {activeTab === 'security' && (
             <Box orientation="vertical" spacing={8}>
               {advisoriesLoading ? (
                 <Box align="center" justify="center" padding={48}><Spinner /></Box>
               ) : advisories.length === 0 ? (
-                <EmptyState
-                  icon={<Icon icon={Lock} size="lg" />}
-                  title="No known vulnerabilities"
-                  description="No security advisories have been published for this repository."
+                <EmptyState icon={<Icon icon={Lock} size="lg" />} title="No known vulnerabilities" description="No security advisories have been published for this repository." />
+              ) : advisories.map((adv) => (
+                <EntityCard
+                  key={adv.ghsa_id}
+                  avatar={
+                    <Box align="center" justify="center" style={{ width: 36, height: 36 }}>
+                      <div style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: '50%',
+                        backgroundColor: SEVERITY_COLOR[adv.severity] ?? SEVERITY_COLOR.unknown,
+                      }} />
+                    </Box>
+                  }
+                  title={adv.summary}
+                  subtitle={adv.cve_id ? `${adv.ghsa_id} · ${adv.cve_id}` : adv.ghsa_id}
+                  meta={[adv.severity, relativeTime(adv.published_at ?? adv.updated_at)]}
+                  interactive
+                  onClick={() => window.open(adv.html_url, '_blank')}
                 />
-              ) : (
-                advisories.map((adv) => (
-                  <EntityCard
-                    key={adv.ghsa_id}
-                    avatar={
-                      <Box align="center" justify="center" style={{ width: 36, height: 36 }}>
-                        <div style={{
-                          width: 12,
-                          height: 12,
-                          borderRadius: '50%',
-                          backgroundColor: SEVERITY_COLOR[adv.severity] ?? SEVERITY_COLOR.unknown,
-                        }} />
-                      </Box>
-                    }
-                    title={adv.summary}
-                    subtitle={adv.cve_id ? `${adv.ghsa_id} · ${adv.cve_id}` : adv.ghsa_id}
-                    meta={[adv.severity, relativeTime(adv.published_at ?? adv.updated_at)]}
-                    interactive
-                    onClick={() => window.open(adv.html_url, '_blank')}
-                  />
-                ))
-              )}
+              ))}
             </Box>
           )}
         </Box>
