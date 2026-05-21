@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.6.0...v1.7.0) (2026-05-21)
+
+### Features
+
+* add pages github advisory and repositories page. ([0fff636](https://github.com/ElJijuna/Developer-Portal/commit/0fff63657595da43004dd5fd0593af57033255f8))
+
+### Bug Fixes
+
+* correct tab navigation and add pull requests and workflows tabs to repository detail ([8def731](https://github.com/ElJijuna/Developer-Portal/commit/8def731fe361821b43b283a1cc10ed8de6eeb76a))
+
 ## [1.6.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.5.0...v1.6.0) (2026-05-20)
 
 ### Features
