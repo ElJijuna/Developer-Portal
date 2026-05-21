@@ -2,7 +2,6 @@ import { createFileRoute, redirect, Outlet, useNavigate, useRouterState } from '
 import { auth } from '../auth/proxy/firebase';
 import { useAuth } from '../auth/AuthProvider';
 import { AdaptiveLayout, type AdaptiveNavItem } from '@gnome-ui/layout/components/AdaptiveLayout';
-import { UserCard } from '@gnome-ui/layout/components/UserCard';
 import { HeaderBar } from '@gnome-ui/react/components/HeaderBar';
 import { Avatar } from '@gnome-ui/react/components/Avatar';
 import { GoHome, Heart, Applications, Settings, Person, Notifications, GitIssueOpened, GitPullRequest, Check, Information, Folder, Lock } from '@gnome-ui/icons';
@@ -16,6 +15,7 @@ import { Button } from '@gnome-ui/react/components/Button';
 import { GhClientProvider } from '@api-hooks/gh';
 import { GitHubClient } from 'gh-api-client';
 import { AppSettingsContext, useAppSettingsState } from '../lib/appSettings';
+import { PwaUpdateControl } from '../components/PwaUpdateControl';
 
 export const Route = createFileRoute('/_authenticated')({
   async beforeLoad() {
@@ -65,64 +65,44 @@ function AuthenticatedLayout() {
     />
   )
 
-  const User = (
-    <UserCard
-      avatarSrc={user?.photoURL ?? undefined}
-      name={user?.displayName ?? ''}
-      email={user?.email ?? ''}
-      orientation="horizontal"
-      avatarSize="sm"
-    />
-  )
-
-  const UserCollapsed = (
-    <div style={{ display: 'flex', justifyContent: 'center', padding: 8 }}>
-      <Avatar
-        name={user?.displayName ?? ''}
-        src={user?.photoURL ?? undefined}
-        size="sm"
-      />
-    </div>
-  )
-
   const AppLogo: FC<{ size?: number }> = ({ size }) => <Box align="center" padding={6}><DeveloperPortalLogo size={size} /></Box>;
 
   return (
     <GnomeProvider colorScheme={settings.theme} accentColor={settings.accentColor}>
-    <AppSettingsContext.Provider value={appSettings}>
-      <GhClientProvider client={ghClient}>
-        <div className="main">
-          <AdaptiveLayout
-            items={NAV_ITEMS}
-            value={pathname}
-            onValueChange={(id) => navigate({ to: id })}
-            sidebarHeader={<AppLogo />}
-            sidebarHeaderCollapsed={<AppLogo size={32} />}
-            sidebarFooter={User}
-            sidebarFooterCollapsed={UserCollapsed}
-            sidebarPlacement="full"
-            showHeaderSeparator={false}
-            showFooterSeparator={false}
-            showCollapseButtonSeparator={true}
-            topBar={topBar}
-            glass={settings.glass}
-            footer={
-              <WrapBox justify="space-between">
-                <Text color="dim" variant="caption">© {new Date().getFullYear()} Developer Portal</Text>
-                <WrapBox>
-                  <Button variant="flat" size="sm" disabled>Privacy</Button>
-                  <Button variant="flat" size="sm" disabled>Terms</Button>
+      <AppSettingsContext.Provider value={appSettings}>
+        <GhClientProvider client={ghClient}>
+          <div className="main">
+            <AdaptiveLayout
+              items={NAV_ITEMS}
+              value={pathname}
+              onValueChange={(id) => navigate({ to: id })}
+              sidebarHeader={<AppLogo />}
+              sidebarHeaderCollapsed={<AppLogo size={32} />}
+              sidebarFooter={<PwaUpdateControl />}
+              sidebarFooterCollapsed={<PwaUpdateControl collapsed />}
+              sidebarPlacement="full"
+              showHeaderSeparator={false}
+              showFooterSeparator={false}
+              showCollapseButtonSeparator={true}
+              topBar={topBar}
+              glass={settings.glass}
+              footer={
+                <WrapBox justify="space-between">
+                  <Text color="dim" variant="caption">© {new Date().getFullYear()} Developer Portal</Text>
+                  <WrapBox>
+                    <Button variant="flat" size="sm" disabled>Privacy</Button>
+                    <Button variant="flat" size="sm" disabled>Terms</Button>
+                  </WrapBox>
                 </WrapBox>
-              </WrapBox>
-            }
-          >
-            <Box padding={16}>
-              <Outlet />
-            </Box>
-          </AdaptiveLayout>
-        </div>
-      </GhClientProvider>
-    </AppSettingsContext.Provider>
+              }
+            >
+              <Box padding={16}>
+                <Outlet />
+              </Box>
+            </AdaptiveLayout>
+          </div>
+        </GhClientProvider>
+      </AppSettingsContext.Provider>
     </GnomeProvider>
   )
 }

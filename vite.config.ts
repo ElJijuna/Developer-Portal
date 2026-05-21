@@ -28,6 +28,22 @@ export default defineConfig(({ command }) => {
             client_mode: 'navigate-existing',
           },
           categories: ['developer-tools', 'utilities'],
+          shortcuts: [
+            {
+              name: 'Dashboard',
+              short_name: 'Dashboard',
+              description: 'Go to the main dashboard',
+              url: base,
+              icons: [{ src: 'pwa-192x192.png', sizes: '192x192' }],
+            },
+            {
+              name: 'Repositories',
+              short_name: 'Repos',
+              description: 'Open tracked repositories',
+              url: `${base.replace(/\/$/, '')}/repositories`,
+              icons: [{ src: 'pwa-192x192.png', sizes: '192x192' }],
+            },
+          ],
           icons: [
             {
               src: 'pwa-192x192.png',
@@ -48,9 +64,33 @@ export default defineConfig(({ command }) => {
           ],
         },
         workbox: {
-          maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+          maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
           runtimeCaching: [
+            {
+              urlPattern: /^https:\/\/registry\.npmjs\.org\/.*/i,
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 'npm-registry-cache',
+                expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 },
+              },
+            },
+            {
+              urlPattern: /^https:\/\/api\.npmjs\.org\/.*/i,
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 'npm-downloads-cache',
+                expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 },
+              },
+            },
+            {
+              urlPattern: /^https:\/\/bundlephobia\.com\/.*/i,
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 'bundlephobia-cache',
+                expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 },
+              },
+            },
             {
               urlPattern: /^https:\/\/api\.github\.com\/.*/i,
               handler: 'StaleWhileRevalidate',
