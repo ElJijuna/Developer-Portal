@@ -202,8 +202,7 @@ function Advisory() {
                   }
                   meta={[
                     ecosystems.join(', ') || 'unknown ecosystem',
-                    advisory.cvss?.score != null ? `CVSS ${advisory.cvss.score.toFixed(1)}` : advisory.severity,
-                    relativeTime(advisory.published_at),
+                    `${advisory.cvss?.score != null ? `CVSS ${advisory.cvss.score.toFixed(1)}` : advisory.severity} · ${relativeTime(advisory.published_at)}`,
                   ]}
                   interactive
                   onClick={() => window.open(advisory.html_url, '_blank')}

@@ -6,9 +6,10 @@ import {
   useGhRepoCommits,
   useGhRepoAdvisories,
   useGhRepoPullRequests,
+  useGhRepoReleases,
   useGhRepoWorkflowRuns,
 } from '@api-hooks/gh'
-import type { GitHubCommit, GitHubRepositoryAdvisory, GitHubPullRequest, GitHubWorkflowRun, WorkflowRunConclusion } from 'gh-api-client'
+import type { GitHubCommit, GitHubRepositoryAdvisory, GitHubPullRequest, GitHubRelease, GitHubWorkflowRun, WorkflowRunConclusion } from 'gh-api-client'
 import { api } from 'code-languages'
 import type { LocalizedLanguage, LanguageSlug } from 'code-languages'
 import { CounterCard, EntityCard, EmptyState, ErrorState } from '@gnome-ui/layout'
@@ -24,7 +25,7 @@ import { Chip } from '@gnome-ui/react/components/Chip'
 import { WrapBox } from '@gnome-ui/react/components/WrapBox'
 import { TabBar, TabItem } from '@gnome-ui/react/components/Tabs'
 import { StatusBadge } from '@gnome-ui/react/components/StatusBadge'
-import { Folder, Lock, Warning, Share, Star, Check, GitPullRequest, GitIssueOpened, GitWorkflow } from '@gnome-ui/icons'
+import { Folder, Lock, Warning, Share, Star, Check, GitPullRequest, GitIssueOpened, GitWorkflow, GitTag } from '@gnome-ui/icons'
 import { SparkAreaChart, SparkBarChart } from '@gnome-ui/charts'
 import { PageHeader } from '../../components/PageHeader'
 import { useAuth } from '../../auth/AuthProvider'
@@ -33,7 +34,7 @@ export const Route = createFileRoute('/_authenticated/repositories/$owner/$repo'
   component: RepoDetail,
 })
 
-type TabId = 'overview' | 'commits' | 'pull-requests' | 'workflows' | 'security'
+type TabId = 'overview' | 'commits' | 'pull-requests' | 'releases' | 'workflows' | 'security'
 
 const LANGUAGE_COLORS: Record<string, string> = {
   TypeScript: '#3178c6',
@@ -69,6 +70,12 @@ const GH_LANG_TO_SLUG: Record<string, string> = {
   'Objective-C': 'objective-c',
   'Jupyter Notebook': 'jupyter',
   'Visual Basic .NET': 'visual-basic',
+}
+
+type RepoDetailExtras = {
+  homepage?: string | null
+  is_template?: boolean
+  license?: { name: string } | null
 }
 
 function conclusionColor(conclusion: WorkflowRunConclusion): string {
@@ -110,6 +117,9 @@ function RepoDetail() {
   const { data: prsData, isLoading: prsLoading } = useGhRepoPullRequests(
     owner, repoName, { state: 'open', per_page: 20 }, { enabled },
   )
+  const { data: releasesData, isLoading: releasesLoading } = useGhRepoReleases(
+    owner, repoName, { per_page: 20 }, { enabled },
+  )
   const { data: workflowsData, isLoading: workflowsLoading } = useGhRepoWorkflowRuns(
     owner, repoName, { per_page: 15 }, { enabled },
   )
@@ -119,6 +129,7 @@ function RepoDetail() {
 
   const commits: GitHubCommit[] = commitsData?.values ?? []
   const prs: GitHubPullRequest[] = prsData?.values ?? []
+  const releases: GitHubRelease[] = releasesData?.values ?? []
   const runs: GitHubWorkflowRun[] = workflowsData?.workflow_runs ?? []
   const advisories: GitHubRepositoryAdvisory[] = advisoriesData?.values ?? []
 
@@ -143,7 +154,7 @@ function RepoDetail() {
     if (!repo?.language) return
     const rawSlug = GH_LANG_TO_SLUG[repo.language] ?? repo.language.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
     api.language(rawSlug as LanguageSlug).locale('en-US').load()
-      .then(setLangInfo)
+      .then((language) => setLangInfo(language ?? null))
       .catch(() => setLangInfo(null))
   }, [repo?.language])
 
@@ -191,6 +202,7 @@ function RepoDetail() {
   }
 
   const langColor = repo.language ? (LANGUAGE_COLORS[repo.language] ?? '#77767b') : null
+  const repoExtras = repo as typeof repo & RepoDetailExtras
 
   return (
     <>
@@ -206,7 +218,7 @@ function RepoDetail() {
       <Box orientation="vertical" spacing={16}>
         {/* Hero */}
         <Card padding="lg">
-          <Box orientation="horizontal" spacing={16} align="flex-start">
+          <Box orientation="horizontal" spacing={16} align="start">
             <Avatar src={repo.owner.avatar_url} name={repo.owner.login} size="lg" />
             <Box orientation="vertical" spacing={8} style={{ flex: 1, minWidth: 0 }}>
               <Text variant="title-2" style={{ fontWeight: 700, wordBreak: 'break-word' }}>
@@ -215,13 +227,13 @@ function RepoDetail() {
               {repo.description && (
                 <Text variant="body" color="dim">{repo.description}</Text>
               )}
-              {repo.homepage && (
-                <Button variant="flat" size="sm" onClick={() => window.open(repo.homepage!, '_blank')}>
-                  {repo.homepage}
+              {repoExtras.homepage && (
+                <Button variant="flat" size="sm" onClick={() => window.open(repoExtras.homepage!, '_blank')}>
+                  {repoExtras.homepage}
                 </Button>
               )}
               {topics && topics.length > 0 && (
-                <WrapBox spacing={4}>
+                <WrapBox childSpacing={4}>
                   {topics.map((topic) => <Chip key={topic} label={topic} />)}
                 </WrapBox>
               )}
@@ -243,6 +255,7 @@ function RepoDetail() {
             <TabItem name="overview" label="Overview" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} />
             <TabItem name="commits" label="Commits" active={activeTab === 'commits'} onClick={() => setActiveTab('commits')} />
             <TabItem name="pull-requests" label={`Pull Requests${prs.length > 0 ? ` (${prs.length})` : ''}`} active={activeTab === 'pull-requests'} onClick={() => setActiveTab('pull-requests')} />
+            <TabItem name="releases" label={`Releases${releases.length > 0 ? ` (${releases.length})` : ''}`} active={activeTab === 'releases'} onClick={() => setActiveTab('releases')} />
             <TabItem name="workflows" label="Workflows" active={activeTab === 'workflows'} onClick={() => setActiveTab('workflows')} />
             <TabItem name="security" label={`Security${advisories.length > 0 ? ` (${advisories.length})` : ''}`} active={activeTab === 'security'} onClick={() => setActiveTab('security')} />
           </TabBar>
@@ -267,7 +280,7 @@ function RepoDetail() {
                         {langInfo.extensions.length > 0 && (
                           <Box orientation="vertical" spacing={4}>
                             <Text variant="caption" color="dim">File extensions</Text>
-                            <WrapBox spacing={4}>
+                            <WrapBox childSpacing={4}>
                               {langInfo.extensions.map((ext) => <Chip key={ext} label={ext} />)}
                             </WrapBox>
                           </Box>
@@ -275,7 +288,7 @@ function RepoDetail() {
                         {langInfo.paradigms.length > 0 && (
                           <Box orientation="vertical" spacing={4}>
                             <Text variant="caption" color="dim">Paradigms</Text>
-                            <WrapBox spacing={4}>
+                            <WrapBox childSpacing={4}>
                               {langInfo.paradigms.map((p) => <Chip key={p} label={p} />)}
                             </WrapBox>
                           </Box>
@@ -296,12 +309,12 @@ function RepoDetail() {
                   description="GitHub has not detected a primary language for this repository."
                 />
               )}
-              <WrapBox spacing={4}>
+              <WrapBox childSpacing={4}>
                 {repo.fork && <Chip label="Fork" />}
                 {repo.archived && <Chip label="Archived" />}
                 {repo.disabled && <Chip label="Disabled" />}
-                {repo.is_template && <Chip label="Template" />}
-                {repo.license?.name && <Chip label={repo.license.name} />}
+                {repoExtras.is_template && <Chip label="Template" />}
+                {repoExtras.license?.name && <Chip label={repoExtras.license.name} />}
               </WrapBox>
             </Box>
           )}
@@ -356,6 +369,41 @@ function RepoDetail() {
                   meta={[`${pr.state}`, relativeTime(pr.updated_at)]}
                   interactive
                   onClick={() => window.open(pr.html_url, '_blank')}
+                />
+              ))}
+            </Box>
+          )}
+
+          {/* Releases */}
+          {activeTab === 'releases' && (
+            <Box orientation="vertical" spacing={8}>
+              {releasesLoading ? (
+                <Box align="center" justify="center" padding={48}><Spinner /></Box>
+              ) : releases.length === 0 ? (
+                <EmptyState icon={<Icon icon={GitTag} size="lg" />} title="No releases" description="No releases have been published for this repository." />
+              ) : releases.map((release) => (
+                <EntityCard
+                  key={release.id}
+                  avatar={
+                    release.author?.avatar_url
+                      ? <Avatar src={release.author.avatar_url} name={release.author.login} size="sm" />
+                      : <Icon icon={GitTag} size="md" />
+                  }
+                  title={release.name ?? release.tag_name}
+                  subtitle={`${release.tag_name} · ${release.author?.login ?? 'unknown'}`}
+                  description={
+                    release.draft
+                      ? <StatusBadge variant="neutral">Draft</StatusBadge> as unknown as string
+                      : release.prerelease
+                        ? <StatusBadge variant="warning">Pre-release</StatusBadge> as unknown as string
+                        : undefined
+                  }
+                  meta={[
+                    `${release.assets.length} asset${release.assets.length === 1 ? '' : 's'}`,
+                    relativeTime(release.published_at ?? release.created_at),
+                  ]}
+                  interactive
+                  onClick={() => window.open(release.html_url, '_blank')}
                 />
               ))}
             </Box>
