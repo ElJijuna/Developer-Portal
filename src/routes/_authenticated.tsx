@@ -2,12 +2,14 @@ import { createFileRoute, redirect, Outlet, useNavigate, useRouterState } from '
 import { auth } from '../auth/proxy/firebase';
 import { useAuth } from '../auth/AuthProvider';
 import { AdaptiveLayout, type AdaptiveNavItem } from '@gnome-ui/layout/components/AdaptiveLayout';
+import { UserCard } from '@gnome-ui/layout/components/UserCard';
 import { HeaderBar } from '@gnome-ui/react/components/HeaderBar';
 import { Avatar } from '@gnome-ui/react/components/Avatar';
-import { GoHome, Heart, Applications, Settings, Person, Notifications, GitIssueOpened, GitPullRequest, Check, Information, Folder, Lock } from '@gnome-ui/icons';
+import { Popover } from '@gnome-ui/react/components/Popover';
+import { GoHome, Heart, Applications, Notifications, GitIssueOpened, GitPullRequest, Check, Information, Folder, Lock } from '@gnome-ui/icons';
 import { GnomeProvider } from '@gnome-ui/react';
 import { DeveloperPortalLogo } from '../components/DeveloperPortalLogo';
-import { FC, useMemo } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { Box } from '@gnome-ui/react/components/Box';
 import { Text } from '@gnome-ui/react/components/Text';
 import { WrapBox } from '@gnome-ui/react/components/WrapBox';
@@ -16,6 +18,7 @@ import { GhClientProvider } from '@api-hooks/gh';
 import { GitHubClient } from 'gh-api-client';
 import { AppSettingsContext, useAppSettingsState } from '../lib/appSettings';
 import { PwaUpdateControl } from '../components/PwaUpdateControl';
+import { useSignOut } from '../auth/hooks';
 
 export const Route = createFileRoute('/_authenticated')({
   async beforeLoad() {
@@ -39,28 +42,69 @@ const NAV_ITEMS: AdaptiveNavItem[] = [
   { id: '/pull-requests', label: 'Pull Requests', icon: GitPullRequest, group: 'Activity' },
   { id: '/following', label: 'Following', icon: Heart },
   { id: '/insights', label: 'Insights', icon: Information },
-  { id: '/settings', label: 'Settings', icon: Settings },
-  { id: '/profile', label: 'Profile', icon: Person },
 ]
 
 function AuthenticatedLayout() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const token = user?.githubToken ?? ''
   const ghClient = useMemo(() => new GitHubClient({ token: token || undefined }), [token])
   const appSettings = useAppSettingsState()
   const { settings } = appSettings
+  const { mutate: signOut, isPending: signOutPending } = useSignOut()
+
+  function go(to: '/profile' | '/settings') {
+    setUserMenuOpen(false)
+    void navigate({ to })
+  }
+
+  function handleSignOut() {
+    setUserMenuOpen(false)
+    signOut(undefined, { onSuccess: () => void navigate({ to: '/login' }) })
+  }
 
   const topBar = (
     <HeaderBar
       title="Developer Portal"
       end={
-        <Avatar
-          name={user?.displayName ?? ''}
-          src={user?.photoURL ?? undefined}
-          size="sm"
-        />
+        <Popover
+          placement="bottom"
+          open={userMenuOpen}
+          onClose={() => setUserMenuOpen(false)}
+          onOpenChange={setUserMenuOpen}
+          content={
+            <UserCard
+              avatarSrc={user?.photoURL ?? undefined}
+              name={user?.displayName ?? user?.email ?? 'Profile'}
+              email={user?.email ?? undefined}
+              avatarSize="md"
+              actions={[
+                { label: 'Profile', onClick: () => go('/profile') },
+                { label: 'Settings', onClick: () => go('/settings') },
+                {
+                  label: signOutPending ? 'Signing out...' : 'Sign out',
+                  variant: 'destructive',
+                  onClick: handleSignOut,
+                },
+              ]}
+            />
+          }
+        >
+          <Button
+            variant="flat"
+            size="sm"
+            aria-label="User menu"
+            style={{ minWidth: 0, padding: 4 }}
+          >
+            <Avatar
+              name={user?.displayName ?? user?.email ?? ''}
+              src={user?.photoURL ?? undefined}
+              size="sm"
+            />
+          </Button>
+        </Popover>
       }
     />
   )
