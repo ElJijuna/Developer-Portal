@@ -5,7 +5,7 @@ import { AdaptiveLayout, type AdaptiveNavItem } from '@gnome-ui/layout/component
 import { UserCard } from '@gnome-ui/layout/components/UserCard';
 import { HeaderBar } from '@gnome-ui/react/components/HeaderBar';
 import { Avatar } from '@gnome-ui/react/components/Avatar';
-import { GoHome, Heart, Applications, Settings, Person, Notifications, Warning, Document, Check, Information } from '@gnome-ui/icons';
+import { GoHome, Heart, Applications, Settings, Person, Notifications, Warning, Document, Check, Information, Folder, Lock } from '@gnome-ui/icons';
 import { DeveloperPortalLogo } from '../components/DeveloperPortalLogo';
 import { FC, useMemo, useEffect } from 'react';
 import { Box } from '@gnome-ui/react/components/Box';
@@ -31,6 +31,8 @@ const NAV_ITEMS: AdaptiveNavItem[] = [
   { id: '/', label: 'Dashboard', icon: GoHome },
   { id: '/my-apps', label: 'My Apps', icon: Applications, group: 'Develop' },
   { id: '/cicd', label: 'CI/CD', icon: Check, group: 'Develop' },
+  { id: '/repositories', label: 'Repositories', icon: Folder, group: 'Develop' },
+  { id: '/advisory', label: 'Advisory', icon: Lock, group: 'Security' },
   { id: '/inbox', label: 'Inbox', icon: Notifications, group: 'Activity' },
   { id: '/issues', label: 'Issues', icon: Warning, group: 'Activity' },
   { id: '/pull-requests', label: 'Pull Requests', icon: Document, group: 'Activity' },

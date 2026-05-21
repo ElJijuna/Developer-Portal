@@ -22,6 +22,7 @@
     "@gnome-ui/layout": "^1.25.0",
     "@gnome-ui/react": "^1.42.0",
     "@tanstack/react-router": "^1.114.0",
+    "code-languages": "^1.21.0",
     "firebase": "^12.12.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
