@@ -126,6 +126,7 @@ function Insights() {
     [repos],
   )
 
+
   if (!token) {
     return (
       <>
@@ -148,7 +149,21 @@ function Insights() {
 
   return (
     <>
-      <PageHeader title="Insights" segments={[{ label: 'Insights', path: '/insights' }]} />
+      <PageHeader
+        title="Insights"
+        segments={[{ label: 'Insights', path: '/insights' }]}
+        actions={activeTab === 'digest' ? (
+          <ToggleGroup
+            value={period}
+            onValueChange={(v) => v && setPeriod(v as DigestPeriod)}
+            aria-label="Period"
+          >
+            <ToggleGroupItem name="day" label="Day" aria-label="Day" />
+            <ToggleGroupItem name="week" label="Week" aria-label="Week" />
+            <ToggleGroupItem name="month" label="Month" aria-label="Month" />
+          </ToggleGroup>
+        ) : undefined}
+      />
 
       <Box orientation="vertical" spacing={12}>
         <TabBar aria-label="Insights tabs" inline>
@@ -168,39 +183,42 @@ function Insights() {
               description="Push some code to see repo health insights."
             />
           ) : (
-            <DashboardGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="md">
-              {topByHealth.map(({ repo, score }) => (
-                <DashboardGrid.Item key={repo.id}>
-                  <StatCard
-                    label={repo.name}
-                    value={score}
-                    unit="/100"
-                    icon={<span style={{ color: healthColor(score), fontWeight: 700, fontSize: 18 }}>●</span>}
-                    trend={
-                      repo.pushed_at
-                        ? {
-                            direction: score >= 70 ? 'up' : score >= 40 ? 'neutral' : 'down',
-                            value: score,
-                            period: repo.pushed_at.slice(0, 10),
-                          }
-                        : undefined
-                    }
+            <Box orientation="vertical" spacing={12}>
+              <Card padding="md">
+                <Box orientation="vertical" spacing={6}>
+                  <Text variant="caption" color="dim">Health score por repo (top {topByHealth.length})</Text>
+                  <SparkBarChart
+                    data={topByHealth.map(({ score }) => score)}
+                    height={56}
+                    aria-label="Health scores de repositorios"
                   />
-                </DashboardGrid.Item>
-              ))}
-            </DashboardGrid>
+                </Box>
+              </Card>
+              <DashboardGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="md">
+                {topByHealth.map(({ repo, score }) => (
+                  <DashboardGrid.Item key={repo.id}>
+                    <StatCard
+                      label={repo.name}
+                      value={score}
+                      unit="/100"
+                      icon={<span style={{ color: healthColor(score), fontWeight: 700, fontSize: 18 }}>●</span>}
+                      trend={
+                        repo.pushed_at
+                          ? {
+                              direction: score >= 70 ? 'up' : score >= 40 ? 'neutral' : 'down',
+                              value: score,
+                              period: repo.pushed_at.slice(0, 10),
+                            }
+                          : undefined
+                      }
+                    />
+                  </DashboardGrid.Item>
+                ))}
+              </DashboardGrid>
+            </Box>
           )
         ) : (
           <Box orientation="vertical" spacing={12}>
-            <ToggleGroup
-              value={period}
-              onValueChange={(v) => v && setPeriod(v as DigestPeriod)}
-              aria-label="Period"
-            >
-              <ToggleGroupItem name="day" label="Day" aria-label="Day" />
-              <ToggleGroupItem name="week" label="Week" aria-label="Week" />
-              <ToggleGroupItem name="month" label="Month" aria-label="Month" />
-            </ToggleGroup>
 
             {deltas.length === 0 ? (
               <EmptyState

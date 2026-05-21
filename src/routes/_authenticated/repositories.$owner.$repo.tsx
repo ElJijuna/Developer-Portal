@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   useGhRepo,
   useGhRepoTopics,
@@ -24,7 +24,8 @@ import { Chip } from '@gnome-ui/react/components/Chip'
 import { WrapBox } from '@gnome-ui/react/components/WrapBox'
 import { TabBar, TabItem } from '@gnome-ui/react/components/Tabs'
 import { StatusBadge } from '@gnome-ui/react/components/StatusBadge'
-import { Folder, Lock, Warning, Share, Star, Check, Document } from '@gnome-ui/icons'
+import { Folder, Lock, Warning, Share, Star, Check, GitPullRequest, GitIssueOpened, GitWorkflow } from '@gnome-ui/icons'
+import { SparkAreaChart, SparkBarChart } from '@gnome-ui/charts'
 import { PageHeader } from '../../components/PageHeader'
 import { useAuth } from '../../auth/AuthProvider'
 
@@ -121,6 +122,23 @@ function RepoDetail() {
   const runs: GitHubWorkflowRun[] = workflowsData?.workflow_runs ?? []
   const advisories: GitHubRepositoryAdvisory[] = advisoriesData?.values ?? []
 
+  const workflowChartData = useMemo(() => {
+    const chronological = [...runs].reverse()
+    const completed = chronological.filter(r => r.run_started_at && r.conclusion !== null)
+    const durations = completed.map(r =>
+      Math.max(1, Math.round((new Date(r.updated_at).getTime() - new Date(r.run_started_at!).getTime()) / 1000))
+    )
+    const outcomes = chronological.map(r => r.conclusion === 'success' ? 1 : 0)
+    const finishedRuns = runs.filter(r => r.conclusion !== null)
+    const successRate = finishedRuns.length > 0
+      ? finishedRuns.filter(r => r.conclusion === 'success').length / finishedRuns.length
+      : 0
+    const avgDuration = durations.length > 0
+      ? durations.reduce((a, b) => a + b, 0) / durations.length
+      : 0
+    return { durations, outcomes, successRate, avgDuration }
+  }, [runs])
+
   useEffect(() => {
     if (!repo?.language) return
     const rawSlug = GH_LANG_TO_SLUG[repo.language] ?? repo.language.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
@@ -216,7 +234,7 @@ function RepoDetail() {
           <CounterCard label="Stars" value={repo.stargazers_count} icon={Star} color="#e5a50a" />
           <CounterCard label="Forks" value={repo.forks_count} icon={Folder} />
           <CounterCard label="Watchers" value={repo.watchers_count} icon={Warning} />
-          <CounterCard label="Open Issues" value={repo.open_issues_count} icon={Warning} color={repo.open_issues_count > 0 ? '#e5a50a' : undefined} />
+          <CounterCard label="Open Issues" value={repo.open_issues_count} icon={GitIssueOpened} color={repo.open_issues_count > 0 ? '#e5a50a' : undefined} />
         </DashboardGrid>
 
         {/* Tabs */}
@@ -319,14 +337,14 @@ function RepoDetail() {
               {prsLoading ? (
                 <Box align="center" justify="center" padding={48}><Spinner /></Box>
               ) : prs.length === 0 ? (
-                <EmptyState icon={<Icon icon={Document} size="lg" />} title="No open pull requests" description="There are no open pull requests in this repository." />
+                <EmptyState icon={<Icon icon={GitPullRequest} size="lg" />} title="No open pull requests" description="There are no open pull requests in this repository." />
               ) : prs.map((pr) => (
                 <EntityCard
                   key={pr.id}
                   avatar={
                     pr.user?.avatar_url
                       ? <Avatar src={pr.user.avatar_url} name={pr.user.login} size="sm" />
-                      : <Icon icon={Document} size="md" />
+                      : <Icon icon={GitPullRequest} size="md" />
                   }
                   title={pr.title}
                   subtitle={`#${pr.number} · ${pr.user?.login ?? 'unknown'}`}
@@ -345,36 +363,80 @@ function RepoDetail() {
 
           {/* Workflows */}
           {activeTab === 'workflows' && (
-            <Box orientation="vertical" spacing={8}>
+            <Box orientation="vertical" spacing={12}>
               {workflowsLoading ? (
                 <Box align="center" justify="center" padding={48}><Spinner /></Box>
               ) : runs.length === 0 ? (
-                <EmptyState icon={<Icon icon={Check} size="lg" />} title="No workflow runs" description="No workflow runs found for this repository." />
-              ) : runs.map((run) => (
-                <EntityCard
-                  key={run.id}
-                  avatar={
-                    <Box align="center" justify="center" style={{ width: 36, height: 36 }}>
-                      <div style={{
-                        width: 12,
-                        height: 12,
-                        borderRadius: '50%',
-                        backgroundColor: run.status === 'in_progress'
-                          ? '#3584e4'
-                          : conclusionColor(run.conclusion),
-                      }} />
+                <EmptyState icon={<Icon icon={GitWorkflow} size="lg" />} title="No workflow runs" description="No workflow runs found for this repository." />
+              ) : (
+                <>
+                  <DashboardGrid columns={{ xs: 2, sm: 2 }} gap="md">
+                    <CounterCard
+                      label="Success rate"
+                      value={Math.round(workflowChartData.successRate * 100)}
+                      suffix="%"
+                      color={workflowChartData.successRate >= 0.7 ? '#26a269' : workflowChartData.successRate >= 0.4 ? '#e5a50a' : '#e01b24'}
+                      icon={GitWorkflow}
+                    />
+                    <CounterCard
+                      label="Avg duration"
+                      value={workflowChartData.avgDuration}
+                      format={(v) => v < 60 ? `${Math.round(v)}s` : `${Math.round(v / 60)}m ${Math.round(v % 60)}s`}
+                      icon={Check}
+                    />
+                  </DashboardGrid>
+
+                  <Card padding="md">
+                    <Box orientation="vertical" spacing={12}>
+                      <Box orientation="vertical" spacing={4}>
+                        <Text variant="caption" color="dim">Duración por run (segundos)</Text>
+                        <SparkAreaChart
+                          data={workflowChartData.durations}
+                          height={48}
+                          aria-label="Duración de los últimos workflow runs"
+                        />
+                      </Box>
+                      <Box orientation="vertical" spacing={4}>
+                        <Text variant="caption" color="dim">Outcomes — success (1) vs otros (0)</Text>
+                        <SparkBarChart
+                          data={workflowChartData.outcomes}
+                          height={32}
+                          color="#26a269"
+                          aria-label="Resultados de los últimos workflow runs"
+                        />
+                      </Box>
                     </Box>
-                  }
-                  title={run.name ?? `Run #${run.run_number}`}
-                  subtitle={`#${run.run_number} · ${run.event} · ${run.head_branch ?? 'unknown branch'}`}
-                  meta={[
-                    run.status === 'in_progress' ? 'running' : (run.conclusion ?? run.status),
-                    relativeTime(run.created_at),
-                  ]}
-                  interactive
-                  onClick={() => window.open(run.html_url, '_blank')}
-                />
-              ))}
+                  </Card>
+
+                  <Box orientation="vertical" spacing={8}>
+                    {runs.map((run) => (
+                      <EntityCard
+                        key={run.id}
+                        avatar={
+                          <Box align="center" justify="center" style={{ width: 36, height: 36 }}>
+                            <div style={{
+                              width: 12,
+                              height: 12,
+                              borderRadius: '50%',
+                              backgroundColor: run.status === 'in_progress'
+                                ? '#3584e4'
+                                : conclusionColor(run.conclusion),
+                            }} />
+                          </Box>
+                        }
+                        title={run.name ?? `Run #${run.run_number}`}
+                        subtitle={`#${run.run_number} · ${run.event} · ${run.head_branch ?? 'unknown branch'}`}
+                        meta={[
+                          run.status === 'in_progress' ? 'running' : (run.conclusion ?? run.status),
+                          relativeTime(run.created_at),
+                        ]}
+                        interactive
+                        onClick={() => window.open(run.html_url, '_blank')}
+                      />
+                    ))}
+                  </Box>
+                </>
+              )}
             </Box>
           )}
 
