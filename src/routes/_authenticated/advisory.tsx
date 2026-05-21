@@ -97,12 +97,21 @@ function Advisory() {
   }), [allAdvisories])
 
   const searchAction = (
-    <IconButton
-      icon={Search}
-      label="Search"
-      variant="flat"
-      onClick={() => setSearchOpen((v) => !v)}
-    />
+    <>
+      <ToggleGroup value={severity} onValueChange={(v) => { setSeverity(v ?? 'all'); }}>
+        <ToggleGroupItem name="all" label="All" aria-label="All severities" />
+        <ToggleGroupItem name="critical" label="Critical" aria-label="Critical" />
+        <ToggleGroupItem name="high" label="High" aria-label="High" />
+        <ToggleGroupItem name="medium" label="Medium" aria-label="Medium" />
+        <ToggleGroupItem name="low" label="Low" aria-label="Low" />
+      </ToggleGroup>
+      <IconButton
+        icon={Search}
+        label="Search"
+        variant="flat"
+        onClick={() => setSearchOpen((v) => !v)}
+      />
+    </>
   )
 
   return (
@@ -113,39 +122,29 @@ function Advisory() {
         actions={searchAction}
       />
 
-      <Box orientation="vertical" spacing={12}>
+      <Box orientation="vertical" spacing={18}>
+        <Box orientation="horizontal" spacing={4} style={{ flexWrap: 'wrap' }}>
+          {['all', ...ECOSYSTEMS].map((eco) => (
+            <Chip
+              key={eco}
+              label={eco === 'all' ? 'All ecosystems' : eco}
+              onClick={() => setEcosystem(eco)}
+              style={{
+                cursor: 'pointer',
+                opacity: ecosystem === eco ? 1 : 0.6,
+                outline: ecosystem === eco ? '2px solid var(--gnome-accent-color)' : undefined,
+                borderRadius: 6,
+              }}
+            />
+          ))}
+        </Box>
+
         <DashboardGrid columns={{ xs: 2, sm: 2, md: 4 }} gap="md">
           <CounterCard label="Critical" value={bySeverity.critical} icon={Lock} loading={isLoading} loadingType="skeleton" color={SEVERITY_COLOR.critical} />
           <CounterCard label="High" value={bySeverity.high} icon={Lock} loading={isLoading} loadingType="skeleton" color={SEVERITY_COLOR.high} />
           <CounterCard label="Medium" value={bySeverity.medium} icon={Lock} loading={isLoading} loadingType="skeleton" color={SEVERITY_COLOR.medium} />
           <CounterCard label="Low" value={bySeverity.low} icon={Lock} loading={isLoading} loadingType="skeleton" color={SEVERITY_COLOR.low} />
         </DashboardGrid>
-
-        <Box orientation="vertical" spacing={8}>
-          <ToggleGroup value={severity} onValueChange={(v) => { setSeverity(v ?? 'all'); }}>
-            <ToggleGroupItem name="all" label="All" aria-label="All severities" />
-            <ToggleGroupItem name="critical" label="Critical" aria-label="Critical" />
-            <ToggleGroupItem name="high" label="High" aria-label="High" />
-            <ToggleGroupItem name="medium" label="Medium" aria-label="Medium" />
-            <ToggleGroupItem name="low" label="Low" aria-label="Low" />
-          </ToggleGroup>
-
-          <Box orientation="horizontal" spacing={4} style={{ flexWrap: 'wrap' }}>
-            {['all', ...ECOSYSTEMS].map((eco) => (
-              <Chip
-                key={eco}
-                label={eco === 'all' ? 'All ecosystems' : eco}
-                onClick={() => setEcosystem(eco)}
-                style={{
-                  cursor: 'pointer',
-                  opacity: ecosystem === eco ? 1 : 0.6,
-                  outline: ecosystem === eco ? '2px solid var(--gnome-accent-color)' : undefined,
-                  borderRadius: 6,
-                }}
-              />
-            ))}
-          </Box>
-        </Box>
 
         <SearchBar
           open={searchOpen}
@@ -196,8 +195,8 @@ function Advisory() {
                   description={
                     packages.length > 0
                       ? packages.map((pkg, i) => (
-                          <Chip key={i} label={pkg!} style={{ marginRight: 4 }} />
-                        )) as unknown as string
+                        <Chip key={i} label={pkg!} style={{ marginRight: 4 }} />
+                      )) as unknown as string
                       : undefined
                   }
                   meta={[
