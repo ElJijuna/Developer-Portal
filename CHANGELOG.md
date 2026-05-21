@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.7.0...v1.8.0) (2026-05-21)
+
+### Features
+
+* add button to force update from pwa ([c9abe21](https://github.com/ElJijuna/Developer-Portal/commit/c9abe21ddd762ef67a060654e928b952ecdabfc6))
+* add releases info in repo page ([e99abab](https://github.com/ElJijuna/Developer-Portal/commit/e99abab4a53b938f3b08a89bfbb035da6d9e0ca9))
+* update [@gnome-ui](https://github.com/gnome-ui) libraria a apply minor refactor to use SparkCharts ([8f95a64](https://github.com/ElJijuna/Developer-Portal/commit/8f95a64058ad064487ef42a3ee2b0c9b1905fe88))
+* update advisory page to move bar ([6c4bb0d](https://github.com/ElJijuna/Developer-Portal/commit/6c4bb0dfa7155cef0e427649aac772a10e04c135))
+* update authenticated page to move profile settings and signout in user popover ([98e4469](https://github.com/ElJijuna/Developer-Portal/commit/98e4469383dd7306fc048a6e445ce3a3401a39f4))
+* update insights and repo workflow tab ([b900763](https://github.com/ElJijuna/Developer-Portal/commit/b90076306cd7641a60baa4f702cfb08e32c6215f))
+
 ## [1.7.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.6.0...v1.7.0) (2026-05-21)
 
 ### Features
