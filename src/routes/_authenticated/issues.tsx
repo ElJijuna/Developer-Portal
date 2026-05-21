@@ -13,7 +13,7 @@ import { Button } from '@gnome-ui/react/components/Button'
 import { Chip } from '@gnome-ui/react/components/Chip'
 import { SearchBar } from '@gnome-ui/react/components/SearchBar'
 import { IconButton } from '@gnome-ui/react/components/IconButton'
-import { Warning, Search, Settings } from '@gnome-ui/icons'
+import { GitIssueOpened, GitRepository, Search, Settings } from '@gnome-ui/icons'
 import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
 import { PageHeader } from '../../components/PageHeader'
 import { useAuth } from '../../auth/AuthProvider'
@@ -111,9 +111,9 @@ function Issues() {
 
       <Box orientation="vertical" spacing={12}>
         <DashboardGrid columns={{ xs: 1, sm: 3 }} gap="md">
-          <CounterCard label="Open issues" value={allIssues.length} icon={Warning} loading={isLoading} loadingType="skeleton" color="#e01b24" />
-          <CounterCard label="Stale (>30d)" value={staleIssues.length} icon={Warning} loading={isLoading} loadingType="skeleton" color="#e5a50a" />
-          <CounterCard label="Repos affected" value={affectedRepos} icon={Warning} loading={isLoading} loadingType="skeleton" />
+          <CounterCard label="Open issues" value={allIssues.length} icon={GitIssueOpened} loading={isLoading} loadingType="skeleton" color="#e01b24" />
+          <CounterCard label="Stale (>30d)" value={staleIssues.length} icon={GitIssueOpened} loading={isLoading} loadingType="skeleton" color="#e5a50a" />
+          <CounterCard label="Repos affected" value={affectedRepos} icon={GitRepository} loading={isLoading} loadingType="skeleton" />
         </DashboardGrid>
 
         <SearchBar
@@ -132,7 +132,7 @@ function Issues() {
           <ErrorState type="network" description={error.message} />
         ) : filtered.length === 0 ? (
           <EmptyState
-            icon={<Icon icon={Warning} size="lg" />}
+            icon={<Icon icon={GitIssueOpened} size="lg" />}
             title={searchQuery.trim() ? 'No results' : 'No open issues'}
             description={searchQuery.trim() ? `No issues matching "${searchQuery}"` : 'All clear across your repositories.'}
           />
@@ -142,7 +142,7 @@ function Issues() {
             {filtered.map((issue) => (
               <EntityCard
                 key={issue.id}
-                avatar={<Icon icon={Warning} size="md" />}
+                avatar={<Icon icon={GitIssueOpened} size="md" />}
                 title={issue.title}
                 subtitle={repoFromUrl(issue.html_url)}
                 description={

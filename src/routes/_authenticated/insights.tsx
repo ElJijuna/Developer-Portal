@@ -14,6 +14,7 @@ import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { Icon } from '@gnome-ui/react/components/Icon'
 import { Button } from '@gnome-ui/react/components/Button'
 import { Information, Star, Settings } from '@gnome-ui/icons'
+import { SparkBarChart } from '@gnome-ui/charts'
 import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
 import { PageHeader } from '../../components/PageHeader'
 import { useAuth } from '../../auth/AuthProvider'
@@ -216,6 +217,17 @@ function Insights() {
                       <Card padding="md">
                         <Box orientation="vertical" spacing={6}>
                           <Text variant="heading">{d.repo.name}</Text>
+                          <SparkBarChart
+                            data={[
+                              { label: 'Stars', value: Math.abs(d.starsDelta) },
+                              { label: 'Forks', value: Math.abs(d.forksDelta) },
+                              { label: 'Issues', value: Math.abs(d.issuesDelta) },
+                            ]}
+                            dataKey="value"
+                            height={40}
+                            color={d.starsDelta >= 0 ? '#26a269' : '#e01b24'}
+                            aria-label={`Deltas de ${d.repo.name}`}
+                          />
                           <Box spacing={16}>
                             <Text variant="caption" color={d.starsDelta >= 0 ? 'success' : 'error'}>
                               ⭐ {d.starsDelta >= 0 ? '+' : ''}{d.starsDelta}

@@ -11,7 +11,10 @@ import { WrapBox } from '@gnome-ui/react/components/WrapBox'
 import { StatusPage } from '@gnome-ui/react/components/StatusPage'
 import { Skeleton } from '@gnome-ui/react/components/Skeleton'
 import { Button } from '@gnome-ui/react/components/Button'
-import { Applications, Person, Heart, Star, GitHub } from '@gnome-ui/icons'
+import { GitRepository, Person, Heart, Star, GitHub } from '@gnome-ui/icons'
+import { SparkAreaChart } from '@gnome-ui/charts'
+import { Separator } from '@gnome-ui/react'
+import { PanelCard } from '@gnome-ui/layout'
 
 export const Route = createFileRoute('/_authenticated/')({
   component: Dashboard,
@@ -65,7 +68,7 @@ function Dashboard() {
         <CounterCard
           label="Repositorios"
           value={ghUser?.public_repos ?? 0}
-          icon={Applications}
+          icon={GitRepository}
           accent
           animated
         />
@@ -99,20 +102,30 @@ function Dashboard() {
       </DashboardGrid.Item>
 
       <DashboardGrid.Item span={4}>
-        <Card padding="md">
-          <Box orientation="vertical" spacing={12}>
-            <Text variant="heading">Contribuciones</Text>
+        <PanelCard title="Contributions">
+          <Box orientation="vertical" spacing={24}>
+            <Box justify="space-between" align="center">
+              {!contribLoading && contributionDays.length > 0 && (
+                <SparkAreaChart
+                  data={contributionDays.slice(-84).map((d) => d.count)}
+                  height={32}
+                  aria-label="Trend de contribuciones"
+                />
+              )}
+            </Box>
+            <Separator />
             {contribLoading ? (
               <Skeleton height={130} />
             ) : (
               <ContributionGraph
+                cellSize={20}
                 data={contributionDays}
                 weekStartDay={1}
                 tooltipContent={(day) => `${day.count} contribuciones el ${day.date}`}
               />
             )}
           </Box>
-        </Card>
+        </PanelCard>
       </DashboardGrid.Item>
 
       {topRepos.map((repo) => (

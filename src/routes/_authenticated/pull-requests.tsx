@@ -12,7 +12,7 @@ import { Text } from '@gnome-ui/react/components/Text'
 import { Icon } from '@gnome-ui/react/components/Icon'
 import { Button } from '@gnome-ui/react/components/Button'
 import { StatusBadge } from '@gnome-ui/react/components/StatusBadge'
-import { Document, Settings, Person } from '@gnome-ui/icons'
+import { GitPullRequest, GitPullRequestDraft, GitCodeReview, Settings } from '@gnome-ui/icons'
 import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
 import { PageHeader } from '../../components/PageHeader'
 import { useAuth } from '../../auth/AuthProvider'
@@ -100,15 +100,16 @@ function PullRequests() {
   return (
     <>
       <PageHeader
+
         title="Pull Requests"
         segments={[{ label: 'Pull Requests', path: '/pull-requests' }]}
       />
 
       <Box orientation="vertical" spacing={12}>
         <DashboardGrid columns={{ xs: 1, sm: 3 }} gap="md">
-          <CounterCard label="Open PRs" value={allPRs.length} icon={Document} loading={isLoading} loadingType="skeleton" color="#3584e4" />
-          <CounterCard label="Draft" value={draftCount} icon={Document} loading={isLoading} loadingType="skeleton" color="#77767b" />
-          <CounterCard label="Awaiting review" value={awaitingCount} icon={Person} loading={isLoading} loadingType="skeleton" color="#e5a50a" />
+          <CounterCard label="Open PRs" value={allPRs.length} icon={GitPullRequest} loading={isLoading} loadingType="skeleton" color="#3584e4" />
+          <CounterCard label="Draft" value={draftCount} icon={GitPullRequestDraft} loading={isLoading} loadingType="skeleton" color="#77767b" />
+          <CounterCard label="Awaiting review" value={awaitingCount} icon={GitCodeReview} loading={isLoading} loadingType="skeleton" color="#e5a50a" />
         </DashboardGrid>
 
         <TabBar aria-label="PR filter tabs" inline>
@@ -133,7 +134,7 @@ function PullRequests() {
           <ErrorState type="network" description={error.message} />
         ) : filtered.length === 0 ? (
           <EmptyState
-            icon={<Icon icon={Document} size="lg" />}
+            icon={<Icon icon={GitPullRequest} size="lg" />}
             title="No pull requests"
             description={`No ${activePreset === 'all' ? 'open' : activePreset} pull requests found.`}
           />
@@ -145,7 +146,7 @@ function PullRequests() {
               return (
                 <EntityCard
                   key={pr.id}
-                  avatar={<Icon icon={Document} size="md" />}
+                  avatar={<Icon icon={isDraft ? GitPullRequestDraft : GitPullRequest} size="md" />}
                   title={pr.title}
                   subtitle={repoFromUrl(pr.html_url)}
                   meta={[`#${pr.number}`, relativeTime(pr.updated_at)]}

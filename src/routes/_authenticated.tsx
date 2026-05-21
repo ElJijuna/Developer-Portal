@@ -5,9 +5,10 @@ import { AdaptiveLayout, type AdaptiveNavItem } from '@gnome-ui/layout/component
 import { UserCard } from '@gnome-ui/layout/components/UserCard';
 import { HeaderBar } from '@gnome-ui/react/components/HeaderBar';
 import { Avatar } from '@gnome-ui/react/components/Avatar';
-import { GoHome, Heart, Applications, Settings, Person, Notifications, Warning, Document, Check, Information, Folder, Lock } from '@gnome-ui/icons';
+import { GoHome, Heart, Applications, Settings, Person, Notifications, GitIssueOpened, GitPullRequest, Check, Information, Folder, Lock } from '@gnome-ui/icons';
+import { GnomeProvider } from '@gnome-ui/react';
 import { DeveloperPortalLogo } from '../components/DeveloperPortalLogo';
-import { FC, useMemo, useEffect } from 'react';
+import { FC, useMemo } from 'react';
 import { Box } from '@gnome-ui/react/components/Box';
 import { Text } from '@gnome-ui/react/components/Text';
 import { WrapBox } from '@gnome-ui/react/components/WrapBox';
@@ -34,8 +35,8 @@ const NAV_ITEMS: AdaptiveNavItem[] = [
   { id: '/repositories', label: 'Repositories', icon: Folder, group: 'Develop' },
   { id: '/advisory', label: 'Advisory', icon: Lock, group: 'Security' },
   { id: '/inbox', label: 'Inbox', icon: Notifications, group: 'Activity' },
-  { id: '/issues', label: 'Issues', icon: Warning, group: 'Activity' },
-  { id: '/pull-requests', label: 'Pull Requests', icon: Document, group: 'Activity' },
+  { id: '/issues', label: 'Issues', icon: GitIssueOpened, group: 'Activity' },
+  { id: '/pull-requests', label: 'Pull Requests', icon: GitPullRequest, group: 'Activity' },
   { id: '/following', label: 'Following', icon: Heart },
   { id: '/insights', label: 'Insights', icon: Information },
   { id: '/settings', label: 'Settings', icon: Settings },
@@ -50,20 +51,6 @@ function AuthenticatedLayout() {
   const ghClient = useMemo(() => new GitHubClient({ token: token || undefined }), [token])
   const appSettings = useAppSettingsState()
   const { settings } = appSettings
-
-  useEffect(() => {
-    const root = document.documentElement
-    if (settings.theme === 'system') {
-      root.removeAttribute('data-theme')
-    } else {
-      root.setAttribute('data-theme', settings.theme)
-    }
-  }, [settings.theme])
-
-  useEffect(() => {
-    document.documentElement.style.setProperty('--gnome-accent-color', settings.accentColor)
-    document.documentElement.style.setProperty('--gnome-accent-bg-color', settings.accentColor)
-  }, [settings.accentColor])
 
   const topBar = (
     <HeaderBar
@@ -101,6 +88,7 @@ function AuthenticatedLayout() {
   const AppLogo: FC<{ size?: number }> = ({ size }) => <Box align="center" padding={6}><DeveloperPortalLogo size={size} /></Box>;
 
   return (
+    <GnomeProvider colorScheme={settings.theme} accentColor={settings.accentColor}>
     <AppSettingsContext.Provider value={appSettings}>
       <GhClientProvider client={ghClient}>
         <div className="main">
@@ -135,5 +123,6 @@ function AuthenticatedLayout() {
         </div>
       </GhClientProvider>
     </AppSettingsContext.Provider>
+    </GnomeProvider>
   )
 }
