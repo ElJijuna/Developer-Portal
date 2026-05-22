@@ -1,5 +1,6 @@
 import { use, useMemo, type ReactElement } from 'react';
 import { api } from 'code-languages';
+import type { LanguageSlug } from 'code-languages'
 import { IconBadge } from '@gnome-ui/layout/components/IconBadge';
 import { GitRepository, GitFork, Lock, Star, ViewReveal } from '@gnome-ui/icons';
 import { Badge, Icon, Text, WrapBox, useLocale } from '@gnome-ui/react';
@@ -32,14 +33,14 @@ export function RepositoryCard({ name, description, language, stars, forks, open
   const rtf = useMemo(() => new Intl.RelativeTimeFormat(locale ?? 'en', { numeric: 'auto' }), [locale]);
 
   const langPromise = useMemo(
-    () => language ? api.language(language.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')).locale('en-US').load() : null,
+    () => language ? api.language(language as LanguageSlug).locale('en-US').load() : null,
     [language],
   );
   const lang = langPromise ? use(langPromise) : null;
 
   return (
     <EntityCard
-      avatar={<IconBadge>{lang ? <img src={lang.logo} alt={lang.name} width={24} height={24} /> : <Icon icon={GitRepository} />}</IconBadge>}
+      avatar={<IconBadge color={lang?.color ?? undefined}>{lang ? <img src={lang.logo} alt={lang.name} width={24} height={24} /> : <Icon icon={GitRepository} />}</IconBadge>}
       title={name}
       description={description}
       badge={

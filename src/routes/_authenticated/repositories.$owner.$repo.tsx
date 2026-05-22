@@ -158,7 +158,7 @@ function RepoDetail() {
 
   useEffect(() => {
     if (!repo?.language) return
-    const rawSlug = GH_LANG_TO_SLUG[repo.language] ?? repo.language.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+    const rawSlug = GH_LANG_TO_SLUG[repo.language] ?? repo.language;
     api.language(rawSlug as LanguageSlug).locale('en-US').load()
       .then((language) => setLangInfo(language ?? null))
       .catch(() => setLangInfo(null))
