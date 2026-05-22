@@ -11,7 +11,7 @@ import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { SearchBar } from '@gnome-ui/react/components/SearchBar'
 import { IconButton } from '@gnome-ui/react/components/IconButton'
 import { ToggleGroup, ToggleGroupItem } from '@gnome-ui/react/components/ToggleGroup'
-import { Folder, Search, Settings, Star } from '@gnome-ui/icons'
+import { Folder, GitFork, GitCommit, Warning, Search, Settings, Star } from '@gnome-ui/icons'
 import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
 import { PageHeader } from '../../components/PageHeader'
 import { RepositoryCard } from '../../components/RepositoryCard'
@@ -44,6 +44,18 @@ function Repositories() {
   } = useGhUserReposInfinite(login, { sort, per_page: 30 }, { enabled: !!login })
 
   const allRepos = useMemo(() => data?.pages.flatMap((p) => p.values) ?? [], [data])
+
+  const stats = useMemo(() => {
+    const now = Date.now()
+    const oneMonth = 30 * 86400000
+    const sixMonths = 180 * 86400000
+    return {
+      noDescription: allRepos.filter((r) => !r.description).length,
+      activeLastMonth: allRepos.filter((r) => now - new Date(r.pushed_at ?? r.updated_at).getTime() < oneMonth).length,
+      stale: allRepos.filter((r) => now - new Date(r.pushed_at ?? r.updated_at).getTime() > sixMonths).length,
+      forked: allRepos.filter((r) => r.fork).length,
+    }
+  }, [allRepos])
 
   const filtered = useMemo(() => {
     const repos = sort === 'full_name'
@@ -97,8 +109,12 @@ function Repositories() {
       />
 
       <Box orientation="vertical" spacing={12}>
-        <DashboardGrid columns={{ xs: 1, sm: 1 }} gap="md">
+        <DashboardGrid columns={{ xs: 2, sm: 3, lg: 5 }} gap="md">
           <CounterCard label="Repositories" value={allRepos.length} icon={Folder} loading={isLoading} loadingType="skeleton" />
+          <CounterCard label="No description" value={stats.noDescription} icon={Warning} color="#e5a50a" loading={isLoading} loadingType="skeleton" />
+          <CounterCard label="Active (30d)" value={stats.activeLastMonth} icon={GitCommit} color="#26a269" loading={isLoading} loadingType="skeleton" />
+          <CounterCard label="Stale (6m+)" value={stats.stale} icon={Warning} color="#e01b24" loading={isLoading} loadingType="skeleton" />
+          <CounterCard label="Forks" value={stats.forked} icon={GitFork} loading={isLoading} loadingType="skeleton" />
         </DashboardGrid>
 
         <Box orientation="horizontal" spacing={8} align="center" style={{ flexWrap: 'wrap' }}>
