@@ -1,22 +1,20 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState, useMemo } from 'react'
+import { Suspense, useState, useMemo } from 'react'
 import { useGhCurrentUser, useGhUserReposInfinite } from '@api-hooks/gh'
-import type { GitHubRepository } from 'gh-api-client'
 import { MasonryGrid, CounterCard, EmptyState, ErrorState } from '@gnome-ui/layout'
 import { DashboardGrid } from '@gnome-ui/layout/components/DashboardGrid'
 import { Box } from '@gnome-ui/react/components/Box'
 import { Text } from '@gnome-ui/react/components/Text'
-import { Card } from '@gnome-ui/react/components/Card'
 import { Icon } from '@gnome-ui/react/components/Icon'
 import { Button } from '@gnome-ui/react/components/Button'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { SearchBar } from '@gnome-ui/react/components/SearchBar'
 import { IconButton } from '@gnome-ui/react/components/IconButton'
 import { ToggleGroup, ToggleGroupItem } from '@gnome-ui/react/components/ToggleGroup'
-import { Chip } from '@gnome-ui/react/components/Chip'
 import { Folder, Search, Settings, Star } from '@gnome-ui/icons'
 import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
 import { PageHeader } from '../../components/PageHeader'
+import { RepositoryCard } from '../../components/RepositoryCard'
 import { useAuth } from '../../auth/AuthProvider'
 
 export const Route = createFileRoute('/_authenticated/repositories/')({
@@ -24,74 +22,6 @@ export const Route = createFileRoute('/_authenticated/repositories/')({
 })
 
 type SortKey = 'updated' | 'pushed' | 'full_name'
-
-const LANGUAGE_COLORS: Record<string, string> = {
-  TypeScript: '#3178c6',
-  JavaScript: '#f7df1e',
-  Python: '#3572a5',
-  Rust: '#dea584',
-  Go: '#00add8',
-  Java: '#b07219',
-  'C++': '#f34b7d',
-  C: '#555555',
-  Ruby: '#701516',
-  Swift: '#fa7343',
-  Kotlin: '#a97bff',
-  Dart: '#00b4ab',
-  PHP: '#4f5d95',
-  Shell: '#89e051',
-  HTML: '#e34c26',
-  CSS: '#563d7c',
-}
-
-function relativeTime(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime()
-  const days = Math.floor(diff / 86_400_000)
-  if (days === 0) return 'today'
-  if (days === 1) return 'yesterday'
-  if (days < 30) return `${days}d ago`
-  const months = Math.floor(days / 30)
-  if (months < 12) return `${months}mo ago`
-  return `${Math.floor(months / 12)}y ago`
-}
-
-function LanguageBadge({ language }: { language: string }) {
-  const color = LANGUAGE_COLORS[language] ?? '#77767b'
-  return (
-    <Box orientation="horizontal" spacing={4} align="center">
-      <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: color, flexShrink: 0 }} />
-      <Text variant="caption" color="dim">{language}</Text>
-    </Box>
-  )
-}
-
-function RepoCard({ repo, onClick }: { repo: GitHubRepository; onClick: () => void }) {
-  const isForked = repo.fork
-  const visibility = isForked ? 'fork' : repo.private ? 'private' : 'public'
-
-  return (
-    <Card padding="md" interactive onClick={onClick} style={{ cursor: 'pointer', height: '100%' }}>
-      <Box orientation="vertical" spacing={8}>
-        <Box orientation="horizontal" justify="space-between" align="center">
-          <Text variant="heading" style={{ fontWeight: 600, wordBreak: 'break-word' }}>{repo.name}</Text>
-          <Chip label={visibility} style={{ flexShrink: 0, marginLeft: 8 }} />
-        </Box>
-
-        {repo.description && (
-          <Text variant="caption" color="dim" style={{ lineHeight: 1.4 }}>{repo.description}</Text>
-        )}
-
-        <Box orientation="horizontal" spacing={12} align="center" style={{ flexWrap: 'wrap', gap: 8 }}>
-          {repo.language && <LanguageBadge language={repo.language} />}
-          <Text variant="caption" color="dim">★ {repo.stargazers_count.toLocaleString()}</Text>
-          <Text variant="caption" color="dim">⑂ {repo.forks_count.toLocaleString()}</Text>
-        </Box>
-
-        <Text variant="caption" color="dim">Updated {relativeTime(repo.pushed_at ?? repo.updated_at)}</Text>
-      </Box>
-    </Card>
-  )
-}
 
 function Repositories() {
   const { user } = useAuth()
@@ -204,11 +134,19 @@ function Repositories() {
             <Text variant="caption" color="dim">{filtered.length} repositor{filtered.length !== 1 ? 'ies' : 'y'}</Text>
             <MasonryGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="md">
               {filtered.map((repo) => (
-                <RepoCard
-                  key={repo.id}
-                  repo={repo}
-                  onClick={() => navigate({ to: '/repositories/$owner/$repo', params: { owner: repo.owner.login, repo: repo.name } })}
-                />
+                <Suspense key={repo.id} fallback={<RepositoryCard name={repo.name} stars={0} forks={0} openIssues={0} pushedAt={repo.updated_at} isPrivate={repo.private} isLoading />}>
+                  <RepositoryCard
+                    name={repo.name}
+                    description={repo.description ?? undefined}
+                    language={repo.language ?? undefined}
+                    stars={repo.stargazers_count}
+                    forks={repo.forks_count}
+                    openIssues={repo.open_issues_count}
+                    pushedAt={repo.pushed_at ?? repo.updated_at}
+                    isPrivate={repo.private}
+                    onClick={() => navigate({ to: '/repositories/$owner/$repo', params: { owner: repo.owner.login, repo: repo.name } })}
+                  />
+                </Suspense>
               ))}
             </MasonryGrid>
 
