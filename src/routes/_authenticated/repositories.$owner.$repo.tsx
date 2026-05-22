@@ -8,8 +8,9 @@ import {
   useGhRepoPullRequests,
   useGhRepoReleases,
   useGhRepoWorkflowRuns,
+  useGhRepoBranches,
 } from '@api-hooks/gh'
-import type { GitHubCommit, GitHubRepositoryAdvisory, GitHubPullRequest, GitHubRelease, GitHubWorkflowRun, WorkflowRunConclusion } from 'gh-api-client'
+import type { GitHubCommit, GitHubRepositoryAdvisory, GitHubPullRequest, GitHubRelease, GitHubWorkflowRun, WorkflowRunConclusion, GitHubBranch } from 'gh-api-client'
 import { api } from 'code-languages'
 import type { LocalizedLanguage, LanguageSlug } from 'code-languages'
 import { CounterCard, EntityCard, EmptyState, ErrorState } from '@gnome-ui/layout'
@@ -25,7 +26,7 @@ import { Chip } from '@gnome-ui/react/components/Chip'
 import { WrapBox } from '@gnome-ui/react/components/WrapBox'
 import { TabBar, TabItem } from '@gnome-ui/react/components/Tabs'
 import { StatusBadge } from '@gnome-ui/react/components/StatusBadge'
-import { Folder, Lock, Warning, Share, Star, Check, GitPullRequest, GitIssueOpened, GitWorkflow, GitTag } from '@gnome-ui/icons'
+import { Folder, Lock, Warning, Share, Star, Check, GitPullRequest, GitIssueOpened, GitWorkflow, GitTag, GitBranch, GitMerge } from '@gnome-ui/icons'
 import { SparkAreaChart, SparkBarChart } from '@gnome-ui/charts'
 import { Drawer } from '@gnome-ui/react/components/Drawer'
 import { Npm } from '@gnome-ui/icons/third-party'
@@ -38,7 +39,8 @@ export const Route = createFileRoute('/_authenticated/repositories/$owner/$repo'
   component: RepoDetail,
 })
 
-type TabId = 'overview' | 'commits' | 'pull-requests' | 'releases' | 'workflows' | 'security'
+type TabId = 'overview' | 'commits' | 'pull-requests' | 'releases' | 'workflows' | 'security' | 'branches'
+type BranchFilter = 'all' | 'merged' | 'unmerged'
 
 const LANGUAGE_COLORS: Record<string, string> = {
   TypeScript: '#3178c6',
@@ -109,6 +111,7 @@ function RepoDetail() {
   const { user } = useAuth()
   const token = user?.githubToken ?? ''
   const [activeTab, setActiveTab] = useState<TabId>('overview')
+  const [branchFilter, setBranchFilter] = useState<BranchFilter>('all')
   const [langInfo, setLangInfo] = useState<LocalizedLanguage | null>(null)
   const [npmDrawerOpen, setNpmDrawerOpen] = useState(false)
 
@@ -131,6 +134,12 @@ function RepoDetail() {
   const { data: advisoriesData, isLoading: advisoriesLoading } = useGhRepoAdvisories(
     owner, repoName, {}, { enabled },
   )
+  const { data: branchesData, isLoading: branchesLoading } = useGhRepoBranches(
+    owner, repoName, { per_page: 100 }, { enabled: enabled && activeTab === 'branches' },
+  )
+  const { data: mergedPrsData } = useGhRepoPullRequests(
+    owner, repoName, { state: 'closed', per_page: 100 }, { enabled: enabled && activeTab === 'branches' },
+  )
   const { data: npmPackage } = useNpmPackage(repoName, { enabled: !!repo })
 
   const commits: GitHubCommit[] = commitsData?.values ?? []
@@ -138,6 +147,13 @@ function RepoDetail() {
   const releases: GitHubRelease[] = releasesData?.values ?? []
   const runs: GitHubWorkflowRun[] = workflowsData?.workflow_runs ?? []
   const advisories: GitHubRepositoryAdvisory[] = advisoriesData?.values ?? []
+  const branches: GitHubBranch[] = branchesData?.values ?? []
+  const mergedPrs: GitHubPullRequest[] = mergedPrsData?.values ?? []
+
+  const mergedBranchNames = useMemo(
+    () => new Set(mergedPrs.filter(pr => pr.merged_at !== null).map(pr => pr.head.ref)),
+    [mergedPrs],
+  )
 
   const workflowChartData = useMemo(() => {
     const chronological = [...runs].reverse()
@@ -277,6 +293,7 @@ function RepoDetail() {
             <TabItem name="releases" label={`Releases${releases.length > 0 ? ` (${releases.length})` : ''}`} active={activeTab === 'releases'} onClick={() => setActiveTab('releases')} />
             <TabItem name="workflows" label="Workflows" active={activeTab === 'workflows'} onClick={() => setActiveTab('workflows')} />
             <TabItem name="security" label={`Security${advisories.length > 0 ? ` (${advisories.length})` : ''}`} active={activeTab === 'security'} onClick={() => setActiveTab('security')} />
+            <TabItem name="branches" label="Branches" active={activeTab === 'branches'} onClick={() => setActiveTab('branches')} />
           </TabBar>
 
           {/* Overview */}
@@ -534,6 +551,71 @@ function RepoDetail() {
                   onClick={() => window.open(adv.html_url, '_blank')}
                 />
               ))}
+            </Box>
+          )}
+          {/* Branches */}
+          {activeTab === 'branches' && (
+            <Box orientation="vertical" spacing={12}>
+              <TabBar aria-label="Branch filter" inline>
+                <TabItem name="all" label="All" active={branchFilter === 'all'} onClick={() => setBranchFilter('all')} />
+                <TabItem name="merged" label="Integrated (merged)" active={branchFilter === 'merged'} onClick={() => setBranchFilter('merged')} />
+                <TabItem name="unmerged" label="Not integrated" active={branchFilter === 'unmerged'} onClick={() => setBranchFilter('unmerged')} />
+              </TabBar>
+              {branchesLoading ? (
+                <Box align="center" justify="center" padding={48}><Spinner /></Box>
+              ) : branches.length === 0 ? (
+                <EmptyState icon={<Icon icon={GitBranch} size="lg" />} title="No branches" description="No branches found for this repository." />
+              ) : (() => {
+                const defaultBranch = repo.default_branch
+                const filtered = branches.filter(branch => {
+                  if (branch.name === defaultBranch) return branchFilter === 'all'
+                  const isMerged = mergedBranchNames.has(branch.name)
+                  if (branchFilter === 'merged') return isMerged
+                  if (branchFilter === 'unmerged') return !isMerged
+                  return true
+                })
+                if (filtered.length === 0) {
+                  return (
+                    <EmptyState
+                      icon={<Icon icon={GitBranch} size="lg" />}
+                      title="No branches in this category"
+                      description={branchFilter === 'merged' ? 'No branches with a merged pull request found.' : 'No unmerged branches found.'}
+                    />
+                  )
+                }
+                return (
+                  <Box orientation="vertical" spacing={8}>
+                    {filtered.map(branch => {
+                      const isDefault = branch.name === defaultBranch
+                      const isMerged = !isDefault && mergedBranchNames.has(branch.name)
+                      return (
+                        <EntityCard
+                          key={branch.name}
+                          avatar={
+                            <Box align="center" justify="center" style={{ width: 36, height: 36 }}>
+                              <Icon icon={isMerged ? GitMerge : GitBranch} size="md" />
+                            </Box>
+                          }
+                          title={branch.name}
+                          subtitle={branch.commit.sha.slice(0, 7)}
+                          description={
+                            isDefault
+                              ? <StatusBadge variant="success">Default</StatusBadge> as unknown as string
+                              : isMerged
+                                ? <StatusBadge variant="neutral">Merged · can be deleted</StatusBadge> as unknown as string
+                                : undefined
+                          }
+                          meta={[
+                            branch.protected ? 'Protected' : 'Not protected',
+                          ]}
+                          interactive
+                          onClick={() => window.open(`${repo.html_url}/tree/${encodeURIComponent(branch.name)}`, '_blank')}
+                        />
+                      )
+                    })}
+                  </Box>
+                )
+              })()}
             </Box>
           )}
         </Box>
