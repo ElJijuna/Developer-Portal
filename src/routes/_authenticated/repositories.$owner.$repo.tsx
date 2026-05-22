@@ -27,7 +27,11 @@ import { TabBar, TabItem } from '@gnome-ui/react/components/Tabs'
 import { StatusBadge } from '@gnome-ui/react/components/StatusBadge'
 import { Folder, Lock, Warning, Share, Star, Check, GitPullRequest, GitIssueOpened, GitWorkflow, GitTag } from '@gnome-ui/icons'
 import { SparkAreaChart, SparkBarChart } from '@gnome-ui/charts'
+import { Drawer } from '@gnome-ui/react/components/Drawer'
+import { Npm } from '@gnome-ui/icons/third-party'
+import { useNpmPackage } from '@api-hooks/npm'
 import { PageHeader } from '../../components/PageHeader'
+import { NpmPackageSummary } from '../../components/NpmPackageSummary'
 import { useAuth } from '../../auth/AuthProvider'
 
 export const Route = createFileRoute('/_authenticated/repositories/$owner/$repo')({
@@ -106,6 +110,7 @@ function RepoDetail() {
   const token = user?.githubToken ?? ''
   const [activeTab, setActiveTab] = useState<TabId>('overview')
   const [langInfo, setLangInfo] = useState<LocalizedLanguage | null>(null)
+  const [npmDrawerOpen, setNpmDrawerOpen] = useState(false)
 
   const enabled = !!owner && !!repoName && !!token
 
@@ -126,6 +131,7 @@ function RepoDetail() {
   const { data: advisoriesData, isLoading: advisoriesLoading } = useGhRepoAdvisories(
     owner, repoName, {}, { enabled },
   )
+  const { data: npmPackage } = useNpmPackage(repoName, { enabled: !!repo })
 
   const commits: GitHubCommit[] = commitsData?.values ?? []
   const prs: GitHubPullRequest[] = prsData?.values ?? []
@@ -212,8 +218,21 @@ function RepoDetail() {
           { label: 'Repositories', path: '/repositories' },
           { label: `${owner}/${repoName}`, path: `/repositories/${owner}/${repoName}` },
         ]}
-        actions={actions}
+        actions={
+          <Box orientation="horizontal" spacing={8}>
+            {npmPackage && (
+              <Button variant="flat" size="sm" leadingIcon={<Icon icon={Npm} />} onClick={() => setNpmDrawerOpen(true)}>
+                View in NPM
+              </Button>
+            )}
+            {actions}
+          </Box>
+        }
       />
+
+      <Drawer open={npmDrawerOpen} title={repoName} size="wide" onClose={() => setNpmDrawerOpen(false)}>
+        <NpmPackageSummary packageName={repoName} />
+      </Drawer>
 
       <Box orientation="vertical" spacing={16}>
         {/* Hero */}
