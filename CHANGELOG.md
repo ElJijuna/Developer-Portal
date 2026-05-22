@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.11.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.10.0...v1.11.0) (2026-05-22)
+
+### Features
+
+* add tab Branches in repo ([6c67840](https://github.com/ElJijuna/Developer-Portal/commit/6c67840d42f67755faf33399ceb439927934dc51))
+
 ## [1.10.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.9.0...v1.10.0) (2026-05-22)
 
 ### Features
