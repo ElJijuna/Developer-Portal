@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.10.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.9.0...v1.10.0) (2026-05-22)
+
+### Features
+
+* update with last version of code-languages ([983094c](https://github.com/ElJijuna/Developer-Portal/commit/983094c3f23751d56210e4b1b57b3f9f575eefeb))
+
 ## [1.9.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.8.0...v1.9.0) (2026-05-22)
 
 ### Features
