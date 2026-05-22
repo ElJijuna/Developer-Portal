@@ -4,17 +4,16 @@ import { useGhCurrentUser, useGhUserRepos, useGhUserContributionMap } from '@api
 import { DashboardGrid } from '@gnome-ui/layout/components/DashboardGrid'
 import { CounterCard } from '@gnome-ui/layout/components/CounterCard'
 import { ContributionGraph } from '@gnome-ui/react/components/ContributionGraph'
-import { Card } from '@gnome-ui/react/components/Card'
 import { Box } from '@gnome-ui/react/components/Box'
-import { Text } from '@gnome-ui/react/components/Text'
-import { WrapBox } from '@gnome-ui/react/components/WrapBox'
 import { StatusPage } from '@gnome-ui/react/components/StatusPage'
 import { Skeleton } from '@gnome-ui/react/components/Skeleton'
 import { Button } from '@gnome-ui/react/components/Button'
 import { GitRepository, Person, Heart, Star, GitHub } from '@gnome-ui/icons'
 import { SparkAreaChart } from '@gnome-ui/charts'
-import { Separator } from '@gnome-ui/react'
-import { PanelCard } from '@gnome-ui/layout'
+import { Icon, Separator } from '@gnome-ui/react'
+import { IconBadge, PanelCard } from '@gnome-ui/layout'
+import { RepositoryCard } from '../../components/RepositoryCard'
+import { GoaPanel } from '@gnome-ui/icons';
 
 export const Route = createFileRoute('/_authenticated/')({
   component: Dashboard,
@@ -102,7 +101,7 @@ function Dashboard() {
       </DashboardGrid.Item>
 
       <DashboardGrid.Item span={4}>
-        <PanelCard title="Contributions">
+        <PanelCard title="Contributions" icon={<IconBadge><Icon icon={GoaPanel} /></IconBadge>}>
           <Box orientation="vertical" spacing={24}>
             <Box justify="space-between" align="center">
               {!contribLoading && contributionDays.length > 0 && (
@@ -130,22 +129,18 @@ function Dashboard() {
 
       {topRepos.map((repo) => (
         <DashboardGrid.Item key={repo.id} span={2}>
-          <a href={repo.html_url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', display: 'block' }}>
-            <Card padding="md" interactive>
-              <Box orientation="vertical" spacing={6}>
-                <Text variant="heading">{repo.name}</Text>
-                {repo.description && (
-                  <Text color="dim" variant="body">{repo.description}</Text>
-                )}
-                <WrapBox childSpacing={8}>
-                  {repo.language && (
-                    <Text variant="caption" color="dim">{repo.language}</Text>
-                  )}
-                  <Text variant="caption" color="dim">⭐ {repo.stargazers_count}</Text>
-                </WrapBox>
-              </Box>
-            </Card>
-          </a>
+          <RepositoryCard
+            name={repo.name}
+            description={repo.description ?? ''}
+            language={repo.language ?? ''}
+            stars={repo.stargazers_count}
+            forks={repo.forks_count}
+            openIssues={repo.open_issues_count}
+            pushedAt={repo.pushed_at ?? repo.updated_at}
+            isPrivate={repo.private}
+            isLoading={false}
+            onClick={() => navigate({ to: '/repositories/$owner/$repo', params: { owner: repo.owner.login, repo: repo.name } })}
+          />
         </DashboardGrid.Item>
       ))}
     </DashboardGrid>
