@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.8.0...v1.9.0) (2026-05-22)
+
+### Features
+
+* add more counters in repositories ([69dfc00](https://github.com/ElJijuna/Developer-Portal/commit/69dfc00214e53f1cba638048ba024aecd94122b9))
+* add validation to npm and show drawer ([eb2e3ec](https://github.com/ElJijuna/Developer-Portal/commit/eb2e3ec291d835621f998bc775f36336372a3480))
+* create RepositoryCard and refacto dashboard page to use ([95759c1](https://github.com/ElJijuna/Developer-Portal/commit/95759c10f02914b1878cdf00036af10cf54982cb))
+* implement NpmPackageSummary first version ([2781d33](https://github.com/ElJijuna/Developer-Portal/commit/2781d33e9c4dcc0565fbaac2bb32a0721664bd9f))
+* update repositories list with RepositoryCard ([0c5b9e2](https://github.com/ElJijuna/Developer-Portal/commit/0c5b9e214140359092e0704e4b6c4f05461b82a9))
+
 ## [1.8.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.7.0...v1.8.0) (2026-05-21)
 
 ### Features
