@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.12.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.11.0...v1.12.0) (2026-05-23)
+
+### Features
+
+* update CiCd page with DORA metric computed values ([f9d9a86](https://github.com/ElJijuna/Developer-Portal/commit/f9d9a86372a859fbcea074c658999cf0f7c2f894))
+
+### Code Refactoring
+
+* change to masonry grid and change DoraMetricCard to use PanelCard ([2216531](https://github.com/ElJijuna/Developer-Portal/commit/2216531250ea3f6b1db161069b10a94747b4e726))
+* separate in childs components and update to use code-language api from hook. ([23d1c7f](https://github.com/ElJijuna/Developer-Portal/commit/23d1c7fe7dbf578c9036fdd62d76b1045b957969))
+
 ## [1.11.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.10.0...v1.11.0) (2026-05-22)
 
 ### Features
