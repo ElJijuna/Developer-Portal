@@ -1,4 +1,7 @@
-import { CounterCard } from '@gnome-ui/layout/components/CounterCard'
+import { Box } from '@gnome-ui/react/components/Box'
+import { Card } from '@gnome-ui/react/components/Card'
+import { Text } from '@gnome-ui/react/components/Text'
+import { Badge } from '@gnome-ui/react'
 import type { DoraMetric } from '../../lib/dora'
 import { DORA_LEVEL_COLOR } from '../../lib/dora'
 
@@ -9,24 +12,22 @@ export type DoraMetricCardProps = {
 }
 
 export function DoraMetricCard({ label, metric, format }: DoraMetricCardProps) {
-  if (metric.value === null || metric.level === null) {
-    return (
-      <CounterCard
-        label={label}
-        value={0}
-        format={() => '—'}
-        color="#77767b"
-      />
-    )
-  }
+  const hasData = metric.value !== null && metric.level !== null
 
   return (
-    <CounterCard
-      label={label}
-      value={metric.value}
-      format={format ?? ((v) => v.toFixed(1))}
-      color={DORA_LEVEL_COLOR[metric.level]}
-      suffix={metric.level}
-    />
+    <Card padding="sm">
+      <Box orientation="vertical" spacing={4}>
+        <Text variant="caption" color="dim">{label}</Text>
+        <Text
+          variant="title-3"
+          style={{ fontWeight: 700, color: hasData ? DORA_LEVEL_COLOR[metric.level!] : '#77767b', lineHeight: 1 }}
+        >
+          {hasData ? (format ? format(metric.value!) : metric.value!.toFixed(1)) : '—'}
+        </Text>
+        {hasData && (
+          <Badge>{metric.level!}</Badge>
+        )}
+      </Box>
+    </Card>
   )
 }

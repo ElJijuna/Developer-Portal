@@ -1,16 +1,22 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useState, useCallback, useMemo } from 'react'
 import { useGhCurrentUser, useGhUserRepos } from '@api-hooks/gh'
+import type { GitHubWorkflowRun } from 'gh-api-client'
 import { DashboardGrid } from '@gnome-ui/layout/components/DashboardGrid'
+import { MasonryGrid } from '@gnome-ui/layout/components/MasonryGrid'
 import { CounterCard } from '@gnome-ui/layout/components/CounterCard'
+import { PanelCard } from '@gnome-ui/layout/components/PanelCard'
 import { EmptyState, ErrorState } from '@gnome-ui/layout'
 import { Box } from '@gnome-ui/react/components/Box'
 import { Icon } from '@gnome-ui/react/components/Icon'
 import { Button } from '@gnome-ui/react/components/Button'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
-import { Check, Settings } from '@gnome-ui/icons'
+import { SparkAreaChart } from '@gnome-ui/charts'
+import { Check, Settings, GitWorkflow } from '@gnome-ui/icons'
 import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
 import { PageHeader } from '../../components/PageHeader'
 import { RepoDoraCard } from '../../components/dora/RepoDoraCard'
+import { computeDeploymentsByDay } from '../../lib/dora'
 import { useAuth } from '../../auth/AuthProvider'
 
 export const Route = createFileRoute('/_authenticated/cicd')({
@@ -33,8 +39,21 @@ function CICD() {
     { enabled: !!login },
   )
 
-  const topRepos = (reposData?.values ?? []).slice(0, MAX_REPOS)
+  const topRepos = useMemo(() => (reposData?.values ?? []).slice(0, MAX_REPOS), [reposData])
   const isLoading = meLoading || reposLoading
+
+  const [repoRuns, setRepoRuns] = useState<Map<number, GitHubWorkflowRun[]>>(new Map())
+
+  const handleRunsLoaded = useCallback((repoId: number, runs: GitHubWorkflowRun[]) => {
+    setRepoRuns((prev) => new Map(prev).set(repoId, runs))
+  }, [])
+
+  const allRuns = useMemo(
+    () => [...repoRuns.values()].flat(),
+    [repoRuns],
+  )
+
+  const deploysByDay = useMemo(() => computeDeploymentsByDay(allRuns), [allRuns])
 
   if (!token) {
     return (
@@ -79,6 +98,20 @@ function CICD() {
           />
         </DashboardGrid>
 
+        <PanelCard
+          icon={<Icon icon={GitWorkflow} />}
+          title="Deployment activity"
+          collapsible={false}
+          footer="Last 30 days · all monitored repos"
+        >
+          <SparkAreaChart
+            data={deploysByDay}
+            height={56}
+            color="#26a269"
+            aria-label="Successful deployments per day across all monitored repos"
+          />
+        </PanelCard>
+
         {isLoading ? (
           <Box align="center" justify="center" padding={48}><Spinner /></Box>
         ) : error ? (
@@ -90,13 +123,15 @@ function CICD() {
             description="No recently pushed repositories found."
           />
         ) : (
-          <DashboardGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="md">
+          <MasonryGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="md" fresh>
             {topRepos.map((repo) => (
-              <DashboardGrid.Item key={repo.id}>
-                <RepoDoraCard repo={repo} />
-              </DashboardGrid.Item>
+              <RepoDoraCard
+                key={repo.id}
+                repo={repo}
+                onRunsLoaded={(runs) => handleRunsLoaded(repo.id, runs)}
+              />
             ))}
-          </DashboardGrid>
+          </MasonryGrid>
         )}
       </Box>
     </>

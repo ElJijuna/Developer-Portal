@@ -107,6 +107,22 @@ export function computeMTTR(
   return { value: avg, level: hoursLevel(avg), label: hoursLevel(avg) }
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000
+
+export function computeDeploymentsByDay(
+  runs: GitHubWorkflowRun[],
+  days = 30,
+): number[] {
+  const now = Date.now()
+  const buckets = new Array<number>(days).fill(0)
+  for (const run of runs) {
+    if (run.conclusion !== 'success') continue
+    const age = Math.floor((now - new Date(run.created_at).getTime()) / DAY_MS)
+    if (age >= 0 && age < days) buckets[days - 1 - age]++
+  }
+  return buckets
+}
+
 export function conclusionToStatus(conclusion: WorkflowRunConclusion): StatusIndicatorStatus {
   if (!conclusion) return 'loading'
   if (conclusion === 'success') return 'online'
