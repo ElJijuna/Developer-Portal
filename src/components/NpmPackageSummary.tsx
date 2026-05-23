@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import { useState, type ReactElement } from 'react';
 import {
   useNpmPackage,
   useNpmPackageLatest,
@@ -15,10 +15,13 @@ import { WrapBox } from '@gnome-ui/react/components/WrapBox';
 import { Separator } from '@gnome-ui/react/components/Separator';
 import { Skeleton } from '@gnome-ui/react/components/Skeleton';
 import { ProgressBar } from '@gnome-ui/react/components/ProgressBar';
+import { Drawer } from '@gnome-ui/react/components/Drawer';
+import { useNumberFormatter } from '@gnome-ui/react/components/GnomeProvider/GnomeContext';
 import { CounterCard } from '@gnome-ui/layout/components/CounterCard';
 import { DashboardGrid } from '@gnome-ui/layout/components/DashboardGrid';
 import { SparkAreaChart } from '@gnome-ui/charts';
 import { FolderDownload, PackageXGeneric, GitTag } from '@gnome-ui/icons';
+import { NpmMaintanerSummary } from './NpmMaintainerSummary';
 
 export type NpmPackageSummaryProps = {
   packageName: string
@@ -30,10 +33,8 @@ function scoreVariant(v: number): 'success' | 'warning' | 'error' {
   return 'error';
 }
 
-function formatDownloads(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
-  return String(n);
+function maintainerId(maintainer: { name?: string; username?: string; email?: string }): string {
+  return maintainer.username ?? maintainer.name ?? maintainer.email ?? '';
 }
 
 function ScoreRow({ label, value }: { label: string; value?: number }): ReactElement {
@@ -49,6 +50,12 @@ function ScoreRow({ label, value }: { label: string; value?: number }): ReactEle
 }
 
 export function NpmPackageSummary({ packageName }: NpmPackageSummaryProps): ReactElement {
+  const [selectedMaintainer, setSelectedMaintainer] = useState<string | null>(null)
+  const downloadsFormatter = useNumberFormatter({
+    notation: 'compact',
+    compactDisplay: 'short',
+    maximumFractionDigits: 1,
+  })
   const { data: pkg, isLoading: pkgLoading } = useNpmPackage(packageName)
   const { data: latest } = useNpmPackageLatest(packageName)
   const { data: weekDl } = useNpmPackageDownloads(packageName, { period: 'last-week' })
@@ -94,7 +101,7 @@ export function NpmPackageSummary({ packageName }: NpmPackageSummaryProps): Reac
           <CounterCard
             label="Last week"
             value={weekDl?.downloads ?? 0}
-            format={formatDownloads}
+            format={downloadsFormatter.format}
             icon={FolderDownload}
             loading={!weekDl}
             loadingType="skeleton"
@@ -102,7 +109,7 @@ export function NpmPackageSummary({ packageName }: NpmPackageSummaryProps): Reac
           <CounterCard
             label="Last month"
             value={monthDl?.downloads ?? 0}
-            format={formatDownloads}
+            format={downloadsFormatter.format}
             icon={FolderDownload}
             loading={!monthDl}
             loadingType="skeleton"
@@ -165,13 +172,33 @@ export function NpmPackageSummary({ packageName }: NpmPackageSummaryProps): Reac
           <Box orientation="vertical" spacing={6} padding={16}>
             <Text variant="heading">Maintainers</Text>
             <WrapBox childSpacing={4}>
-              {pkg.maintainers.map((m) => (
-                <Chip key={m.name ?? m.email} label={m.name ?? m.email ?? '?'} />
-              ))}
+              {pkg.maintainers.map((m) => {
+                const id = maintainerId(m)
+
+                return (
+                  <Chip
+                    key={id || m.name || m.email}
+                    label={m.name ?? m.email ?? '?'}
+                    selectable
+                    selected={selectedMaintainer === id}
+                    disabled={!id}
+                    onClick={() => id && setSelectedMaintainer(id)}
+                  />
+                )
+              })}
             </WrapBox>
           </Box>
         </>
       )}
+
+      <Drawer
+        open={selectedMaintainer !== null}
+        title={selectedMaintainer ?? 'Maintainer'}
+        size="wide"
+        onClose={() => setSelectedMaintainer(null)}
+      >
+        {selectedMaintainer && <NpmMaintanerSummary username={selectedMaintainer} />}
+      </Drawer>
     </Box>
   )
 }
