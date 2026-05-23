@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, use, Suspense } from 'react'
 import {
   DashboardGrid,
   CounterCard,
@@ -6,6 +6,7 @@ import {
   MasonryGrid,
   EmptyState,
   ErrorState,
+  IconBadge,
 } from '@gnome-ui/layout'
 import { TabBar, TabItem } from '@gnome-ui/react/components/Tabs'
 import { Avatar } from '@gnome-ui/react/components/Avatar'
@@ -17,36 +18,49 @@ import { Card } from '@gnome-ui/react/components/Card'
 import { Chip } from '@gnome-ui/react/components/Chip'
 import { Icon } from '@gnome-ui/react/components/Icon'
 import { WrapBox } from '@gnome-ui/react/components/WrapBox'
-import { Heart, Person, Star, Document, Share, Information } from '@gnome-ui/icons'
+import { Heart, Person, Star, Document, Share, Information, GitRepository } from '@gnome-ui/icons'
 import { GitHub } from '@gnome-ui/icons/third-party'
 import {
   useGhUser,
   useGhUserReposInfinite,
   useGhUserPublicEvents,
 } from '@api-hooks/gh'
+import { api } from 'code-languages'
+import type { LanguageSlug } from 'code-languages'
+import { relativeTime } from '../lib/formatting'
 
-const LANGUAGE_COLORS: Record<string, string> = {
-  TypeScript: '#3178c6',
-  JavaScript: '#f7df1e',
-  Python: '#3572a5',
-  Rust: '#dea584',
-  Go: '#00add8',
-  Java: '#b07219',
-  'C++': '#f34b7d',
-  C: '#555555',
-  Ruby: '#701516',
-  Swift: '#fa7343',
+type RepoItem = {
+  id: number
+  name: string
+  full_name: string
+  language?: string | null
+  description?: string | null
+  fork: boolean
+  stargazers_count: number
+  forks_count: number
+  html_url: string
 }
 
-function relativeTime(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime()
-  const days = Math.floor(diff / 86400000)
-  if (days === 0) return 'today'
-  if (days === 1) return 'yesterday'
-  if (days < 30) return `${days}d ago`
-  const months = Math.floor(days / 30)
-  if (months < 12) return `${months}mo ago`
-  return `${Math.floor(months / 12)}y ago`
+function ProfileRepoCard({ repo }: { repo: RepoItem }) {
+  const langPromise = useMemo(
+    () => repo.language ? api.language(repo.language as LanguageSlug).locale('en-US').load() : null,
+    [repo.language],
+  )
+  const lang = langPromise ? use(langPromise) : null
+
+  return (
+    <EntityCard
+      avatar={
+        <IconBadge color={lang?.color ?? undefined}>{lang ? <img src={lang.logo} alt={lang.name} width={24} height={24} /> : <Icon icon={GitRepository} />}</IconBadge>
+      }
+      title={repo.name}
+      subtitle={repo.fork ? `forked from ${repo.full_name}` : undefined}
+      description={repo.description ?? undefined}
+      meta={[lang?.name ?? repo.language ?? undefined, `★ ${repo.stargazers_count} · ⑂ ${repo.forks_count}`]}
+      interactive
+      onClick={() => window.open(repo.html_url, '_blank', 'noopener,noreferrer')}
+    />
+  )
 }
 
 function eventDescription(type: string, repoName: string): string {
@@ -225,40 +239,11 @@ export function ProfileContent({ login }: ProfileContentProps) {
                 {repos.length} repositor{repos.length !== 1 ? 'ies' : 'y'}
               </Text>
               <MasonryGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="md" fresh>
-                {repos.map((repo) => {
-                  const langColor = repo.language ? LANGUAGE_COLORS[repo.language] : undefined
-                  const meta: [string?, string?] = [
-                    repo.language ?? undefined,
-                    `★ ${repo.stargazers_count} · ⑂ ${repo.forks_count}`,
-                  ]
-
-                  return (
-                    <EntityCard
-                      key={repo.id}
-                      avatar={
-                        langColor ? (
-                          <span
-                            style={{
-                              display: 'inline-block',
-                              width: 16,
-                              height: 16,
-                              borderRadius: '50%',
-                              background: langColor,
-                              flexShrink: 0,
-                              marginTop: 4,
-                            }}
-                          />
-                        ) : undefined
-                      }
-                      title={repo.name}
-                      subtitle={repo.fork ? `forked from ${repo.full_name}` : undefined}
-                      description={repo.description ?? undefined}
-                      meta={meta}
-                      interactive
-                      onClick={() => window.open(repo.html_url, '_blank', 'noopener,noreferrer')}
-                    />
-                  )
-                })}
+                {repos.map((repo) => (
+                  <Suspense key={repo.id} fallback={<EntityCard title={repo.name} loading loadingType="skeleton" />}>
+                    <ProfileRepoCard repo={repo} />
+                  </Suspense>
+                ))}
               </MasonryGrid>
 
               {hasMoreRepos && (
