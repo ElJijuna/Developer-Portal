@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.13.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.12.0...v1.13.0) (2026-05-23)
+
+### Features
+
+* add NpmMaintainer componente and event to open Drawer to show maintainer information ([461117d](https://github.com/ElJijuna/Developer-Portal/commit/461117da62c809d4ccde682ad9a2387988d87d27))
+* add support to monorepo npm based in packages directory ([70a7b70](https://github.com/ElJijuna/Developer-Portal/commit/70a7b70b0f647d348ae10cdda94a0a5060f8e9d9))
+
 ## [1.12.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.11.0...v1.12.0) (2026-05-23)
 
 ### Features
