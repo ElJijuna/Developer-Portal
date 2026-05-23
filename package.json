@@ -14,7 +14,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@api-hooks/gh": "^2.0.0",
+    "@api-hooks/gh": "^2.1.0",
     "@api-hooks/npm": "^2.0.0",
     "@gnome-ui/charts": "^1.30.0",
     "@gnome-ui/core": "^1.42.3",

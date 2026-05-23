@@ -11,7 +11,7 @@ import {
   useGhRepoBranches,
 } from '@api-hooks/gh'
 import { useLanguage } from '../../hooks/useLanguage'
-import { CounterCard, ErrorState } from '@gnome-ui/layout'
+import { CounterCard, ErrorState, PanelCard } from '@gnome-ui/layout'
 import { DashboardGrid } from '@gnome-ui/layout/components/DashboardGrid'
 import { Box } from '@gnome-ui/react/components/Box'
 import { Button } from '@gnome-ui/react/components/Button'
@@ -21,9 +21,9 @@ import { TabBar, TabItem } from '@gnome-ui/react/components/Tabs'
 import { Drawer } from '@gnome-ui/react/components/Drawer'
 import { Folder, Warning, Star, Share, GitIssueOpened, GitWorkflow, GitBranch, Lock } from '@gnome-ui/icons'
 import { Npm } from '@gnome-ui/icons/third-party'
-import { useNpmPackage } from '@api-hooks/npm'
 import { PageHeader } from '../../components/PageHeader'
 import { NpmPackageSummary } from '../../components/NpmPackageSummary'
+import { useRepoNpmPackages } from '../../hooks/useRepoNpmPackages'
 import { RepoHero } from '../../components/repo/RepoHero'
 import { RepoOverviewTab } from '../../components/repo/RepoOverviewTab'
 import { RepoCommitsTab } from '../../components/repo/RepoCommitsTab'
@@ -66,8 +66,7 @@ function RepoDetail() {
   const { data: advisoriesData, isLoading: advisoriesLoading } = useGhRepoAdvisories(owner, repoName, {}, { enabled })
   const { data: branchesData, isLoading: branchesLoading } = useGhRepoBranches(owner, repoName, { per_page: 100 }, { enabled: enabled && activeTab === 'branches' })
   const { data: mergedPrsData } = useGhRepoPullRequests(owner, repoName, { state: 'closed', per_page: 100 }, { enabled: enabled && activeTab === 'branches' })
-  const { data: npmPackage } = useNpmPackage(repoName, { enabled: !!repo })
-
+  const npmInfo = useRepoNpmPackages(owner, repoName)
   const commits = commitsData?.values ?? []
   const prs = prsData?.values ?? []
   const releases = releasesData?.values ?? []
@@ -132,7 +131,7 @@ function RepoDetail() {
         segments={breadcrumb}
         actions={
           <Box orientation="horizontal" spacing={8}>
-            {npmPackage && (
+            {(npmInfo.status === 'single' || npmInfo.status === 'monorepo') && (
               <Button variant="flat" size="sm" leadingIcon={<Icon icon={Npm} />} onClick={() => setNpmDrawerOpen(true)}>
                 View in NPM
               </Button>
@@ -150,7 +149,18 @@ function RepoDetail() {
       />
 
       <Drawer open={npmDrawerOpen} title={repoName} size="wide" onClose={() => setNpmDrawerOpen(false)}>
-        <NpmPackageSummary packageName={repoName} />
+        {npmInfo.status === 'single' && (
+          <NpmPackageSummary packageName={npmInfo.packageName} />
+        )}
+        {npmInfo.status === 'monorepo' && (
+          <Box orientation="vertical" spacing={12}>
+            {npmInfo.packages.map((pkg) => (
+              <PanelCard key={pkg} title={pkg}>
+                <NpmPackageSummary key={pkg} packageName={pkg} />
+              </PanelCard>
+            ))}
+          </Box>
+        )}
       </Drawer>
 
       <Box orientation="vertical" spacing={16}>
