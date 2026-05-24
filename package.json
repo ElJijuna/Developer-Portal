@@ -20,7 +20,7 @@
     "@gnome-ui/core": "^1.42.3",
     "@gnome-ui/hooks": "^1.28.0",
     "@gnome-ui/icons": "^1.42.0",
-    "@gnome-ui/layout": "^1.28.0",
+    "@gnome-ui/layout": "^1.28.1",
     "@gnome-ui/react": "^1.45.0",
     "@tanstack/react-router": "^1.114.0",
     "code-languages": "^1.24.0",
