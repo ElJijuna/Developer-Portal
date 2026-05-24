@@ -15,6 +15,7 @@ export type RepositoryCardProps = {
   openIssues: number
   pushedAt: string
   isPrivate: boolean
+  forkedFrom?: string
   isLoading?: boolean
   onClick?: () => void
 }
@@ -28,7 +29,7 @@ function relativeTime(dateStr: string, rtf: Intl.RelativeTimeFormat): string {
   return rtf.format(Math.round(diff / (86400000 * 365)), 'year');
 }
 
-export function RepositoryCard({ name, description, language, stars, forks, openIssues, pushedAt, isPrivate, isLoading, onClick }: RepositoryCardProps): ReactElement {
+export function RepositoryCard({ name, description, language, stars, forks, openIssues, pushedAt, isPrivate, forkedFrom, isLoading, onClick }: RepositoryCardProps): ReactElement {
   const locale = useLocale();
   const rtf = useMemo(() => new Intl.RelativeTimeFormat(locale ?? 'en', { numeric: 'auto' }), [locale]);
 
@@ -42,6 +43,7 @@ export function RepositoryCard({ name, description, language, stars, forks, open
     <EntityCard
       avatar={<IconBadge color={lang?.color ?? undefined}>{lang ? <img src={lang.logo} alt={lang.name} width={24} height={24} /> : <Icon icon={GitRepository} />}</IconBadge>}
       title={name}
+      subtitle={forkedFrom ? `forked from ${forkedFrom}` : undefined}
       description={description}
       badge={
         <span style={{ display: 'flex', gap: 4 }}>

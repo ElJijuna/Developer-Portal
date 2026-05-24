@@ -16,6 +16,7 @@
   "dependencies": {
     "@api-hooks/gh": "^2.2.0",
     "@api-hooks/npm": "^2.0.0",
+    "@baphy/npm": "^1.1.0",
     "@gnome-ui/charts": "^1.30.0",
     "@gnome-ui/core": "^1.42.3",
     "@gnome-ui/hooks": "^1.28.0",

@@ -1,4 +1,5 @@
-import { useState, useMemo, use, Suspense } from 'react'
+import { useState, useMemo, Suspense } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import {
   DashboardGrid,
   CounterCard,
@@ -6,7 +7,6 @@ import {
   MasonryGrid,
   EmptyState,
   ErrorState,
-  IconBadge,
 } from '@gnome-ui/layout'
 import { TabBar, TabItem } from '@gnome-ui/react/components/Tabs'
 import { Button } from '@gnome-ui/react/components/Button'
@@ -17,48 +17,13 @@ import { Card } from '@gnome-ui/react/components/Card'
 import { Icon } from '@gnome-ui/react/components/Icon'
 import { Heart, Person, Star, Document, Share, Information, GitRepository } from '@gnome-ui/icons'
 import { ProfileHero } from './ProfileHero'
+import { RepositoryCard } from './RepositoryCard'
 import {
   useGhUser,
   useGhUserReposInfinite,
   useGhUserPublicEvents,
 } from '@api-hooks/gh'
-import { api } from 'code-languages'
-import type { LanguageSlug } from 'code-languages'
 import { relativeTime } from '../lib/formatting'
-
-type RepoItem = {
-  id: number
-  name: string
-  full_name: string
-  language?: string | null
-  description?: string | null
-  fork: boolean
-  stargazers_count: number
-  forks_count: number
-  html_url: string
-}
-
-function ProfileRepoCard({ repo }: { repo: RepoItem }) {
-  const langPromise = useMemo(
-    () => repo.language ? api.language(repo.language as LanguageSlug).locale('en-US').load() : null,
-    [repo.language],
-  )
-  const lang = langPromise ? use(langPromise) : null
-
-  return (
-    <EntityCard
-      avatar={
-        <IconBadge color={lang?.color ?? undefined}>{lang ? <img src={lang.logo} alt={lang.name} width={24} height={24} /> : <Icon icon={GitRepository} />}</IconBadge>
-      }
-      title={repo.name}
-      subtitle={repo.fork ? `forked from ${repo.full_name}` : undefined}
-      description={repo.description ?? undefined}
-      meta={[lang?.name ?? repo.language ?? undefined, `★ ${repo.stargazers_count} · ⑂ ${repo.forks_count}`]}
-      interactive
-      onClick={() => window.open(repo.html_url, '_blank', 'noopener,noreferrer')}
-    />
-  )
-}
 
 function eventDescription(type: string, repoName: string): string {
   switch (type) {
@@ -83,6 +48,7 @@ interface ProfileContentProps {
 
 export function ProfileContent({ login }: ProfileContentProps) {
   const [activeTab, setActiveTab] = useState<'repos' | 'activity'>('repos')
+  const navigate = useNavigate()
 
   const { data: ghUser, isLoading: userLoading, error: userError } = useGhUser(login, {
     enabled: !!login,
@@ -213,7 +179,18 @@ export function ProfileContent({ login }: ProfileContentProps) {
               <MasonryGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="md" fresh>
                 {repos.map((repo) => (
                   <Suspense key={repo.id} fallback={<EntityCard title={repo.name} loading loadingType="skeleton" />}>
-                    <ProfileRepoCard repo={repo} />
+                    <RepositoryCard
+                      name={repo.name}
+                      description={repo.description ?? undefined}
+                      language={repo.language ?? undefined}
+                      stars={repo.stargazers_count}
+                      forks={repo.forks_count}
+                      openIssues={repo.open_issues_count}
+                      pushedAt={repo.pushed_at ?? repo.updated_at}
+                      isPrivate={repo.private}
+                      forkedFrom={repo.fork ? repo.full_name : undefined}
+                      onClick={() => navigate({ to: '/repositories/$owner/$repo', params: { owner: repo.owner.login, repo: repo.name } })}
+                    />
                   </Suspense>
                 ))}
               </MasonryGrid>
