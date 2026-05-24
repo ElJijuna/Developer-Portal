@@ -3,13 +3,11 @@ import { useState, useMemo } from 'react'
 import {
   DashboardGrid,
   CounterCard,
-  EntityCard,
   MasonryGrid,
   EmptyState,
   ErrorState,
 } from '@gnome-ui/layout'
 import { TabBar, TabItem } from '@gnome-ui/react/components/Tabs'
-import { Avatar } from '@gnome-ui/react/components/Avatar'
 import { SearchBar } from '@gnome-ui/react/components/SearchBar'
 import { Button } from '@gnome-ui/react/components/Button'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
@@ -26,6 +24,7 @@ import {
 } from '@api-hooks/gh'
 import { useAuth } from '../../auth/AuthProvider'
 import { PageHeader } from '../../components/PageHeader'
+import { UserProfileSummaryCard } from '../../components/UserProfileSummaryCard'
 
 export const Route = createFileRoute('/_authenticated/following')({
   component: Following,
@@ -173,13 +172,15 @@ function Following() {
 
         <TabBar aria-label="Network tabs" inline>
           <TabItem
-            label={`Followers${currentUser?.followers != null ? ` · ${currentUser.followers}` : ''}`}
+            label="Followers"
+            count={currentUser?.followers ?? 0}
             icon={Heart}
             active={activeTab === 'followers'}
             onClick={() => setActiveTab('followers')}
           />
           <TabItem
-            label={`Following${currentUser?.following != null ? ` · ${currentUser.following}` : ''}`}
+            label="Following"
+            count={currentUser?.following ?? 0}
             icon={Person}
             active={activeTab === 'following'}
             onClick={() => setActiveTab('following')}
@@ -223,20 +224,11 @@ function Following() {
 
             <MasonryGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="md" fresh>
               {filteredUsers.map((ghUser) => (
-                <EntityCard
+                <UserProfileSummaryCard
                   key={ghUser.id}
-                  avatar={
-                    <Avatar
-                      src={ghUser.avatar_url}
-                      name={ghUser.login}
-                      size="lg"
-                    />
-                  }
-                  title={ghUser.name || ghUser.login}
-                  subtitle={`@${ghUser.login}`}
-                  description={ghUser.bio ?? undefined}
-                  meta={[ghUser.location ?? undefined] as [string?]}
-                  interactive
+                  avatarSrc={ghUser.avatar_url}
+                  username={ghUser.login}
+                  name={ghUser.name || ghUser.login}
                   onClick={() => navigate({ to: '/profile/$login', params: { login: ghUser.login } })}
                 />
               ))}
