@@ -141,7 +141,7 @@ export function ProfileContent({ login }: ProfileContentProps) {
   ].filter(Boolean) as { label: string }[]
 
   return (
-    <Box orientation="vertical" spacing={16}>
+    <Box orientation="vertical" spacing={16} style={{ marginTop: 18 }}>
       {/* Hero */}
       <Card padding="lg">
         <Box orientation="vertical" spacing={16}>
@@ -206,15 +206,17 @@ export function ProfileContent({ login }: ProfileContentProps) {
       <TabBar aria-label="Profile tabs" inline>
         <TabItem
           label="Repositories"
-          icon={Document}
+          icon={GitRepository}
           active={activeTab === 'repos'}
           onClick={() => setActiveTab('repos')}
+          count={repos.length}
         />
         <TabItem
           label="Activity"
           icon={Information}
           active={activeTab === 'activity'}
           onClick={() => setActiveTab('activity')}
+          count={events.length}
         />
       </TabBar>
 
