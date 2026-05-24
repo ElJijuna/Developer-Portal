@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.14.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.13.0...v1.14.0) (2026-05-24)
+
+### Features
+
+* add component UserProfileSummaryCard to centralize how to show and what user info show in card ([235cc63](https://github.com/ElJijuna/Developer-Portal/commit/235cc63f1fc7eca4a80ebaa7b5fbe31f74ad1c56))
+* increase marginTop in all pages ([960eeb6](https://github.com/ElJijuna/Developer-Portal/commit/960eeb6adb4761db0320a1188e3daa3bf3b3f268))
+
+### Code Refactoring
+
+* moved hero section to isolate component and add call to show summary from npm in Drawer ([828f4ab](https://github.com/ElJijuna/Developer-Portal/commit/828f4ab9f72af7c286832c2b4b721059f5030157))
+* unify components and functionalities in RepositoryCard ([a41f4e0](https://github.com/ElJijuna/Developer-Portal/commit/a41f4e04f3a7aedc4a8082b33dcbc237b84bd0fd))
+* update following page to use new componente UserProfileSummaryCard and update tabs to show in property counts values ([0958ee7](https://github.com/ElJijuna/Developer-Portal/commit/0958ee7879fd48d3acacfde32b58e4961da79ae0))
+
 ## [1.13.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.12.0...v1.13.0) (2026-05-23)
 
 ### Features
