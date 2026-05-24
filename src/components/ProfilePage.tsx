@@ -9,17 +9,14 @@ import {
   IconBadge,
 } from '@gnome-ui/layout'
 import { TabBar, TabItem } from '@gnome-ui/react/components/Tabs'
-import { Avatar } from '@gnome-ui/react/components/Avatar'
 import { Button } from '@gnome-ui/react/components/Button'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { Text } from '@gnome-ui/react/components/Text'
 import { Box } from '@gnome-ui/react/components/Box'
 import { Card } from '@gnome-ui/react/components/Card'
-import { Chip } from '@gnome-ui/react/components/Chip'
 import { Icon } from '@gnome-ui/react/components/Icon'
-import { WrapBox } from '@gnome-ui/react/components/WrapBox'
 import { Heart, Person, Star, Document, Share, Information, GitRepository } from '@gnome-ui/icons'
-import { GitHub } from '@gnome-ui/icons/third-party'
+import { ProfileHero } from './ProfileHero'
 import {
   useGhUser,
   useGhUserReposInfinite,
@@ -135,44 +132,17 @@ export function ProfileContent({ login }: ProfileContentProps) {
     )
   }
 
-  const metaChips = [
-    ghUser.location ? { label: ghUser.location } : null,
-    ghUser.company ? { label: ghUser.company.replace(/^@/, '') } : null,
-  ].filter(Boolean) as { label: string }[]
-
   return (
     <Box orientation="vertical" spacing={16} style={{ marginTop: 18 }}>
-      {/* Hero */}
-      <Card padding="lg">
-        <Box orientation="vertical" spacing={16}>
-          <Box spacing={16} align="start">
-            <Avatar src={ghUser.avatar_url} name={ghUser.login} size="xl" />
-            <Box orientation="vertical" spacing={4} style={{ flex: 1 }}>
-              <Text variant="title-2">
-                {ghUser.name || ghUser.login}
-              </Text>
-              <Text color="dim">@{ghUser.login}</Text>
-              {ghUser.bio && (
-                <Text style={{ marginTop: 4 }}>{ghUser.bio}</Text>
-              )}
-              {metaChips.length > 0 && (
-                <WrapBox style={{ marginTop: 8 }}>
-                  {metaChips.map((chip) => (
-                    <Chip key={chip.label} label={chip.label} />
-                  ))}
-                </WrapBox>
-              )}
-            </Box>
-            <Button
-              variant="flat"
-              leadingIcon={<Icon icon={GitHub} />}
-              onClick={() => window.open(ghUser.html_url, '_blank', 'noopener,noreferrer')}
-            >
-              View on GitHub
-            </Button>
-          </Box>
-        </Box>
-      </Card>
+      <ProfileHero
+        login={ghUser.login}
+        name={ghUser.name}
+        avatarUrl={ghUser.avatar_url}
+        bio={ghUser.bio}
+        location={ghUser.location}
+        company={ghUser.company}
+        htmlUrl={ghUser.html_url}
+      />
 
       {/* Stats */}
       <DashboardGrid columns={{ xs: 2, sm: 4 }} gap="md">
