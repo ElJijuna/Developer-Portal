@@ -1,6 +1,7 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useGhRepoWorkflowRuns } from '@api-hooks/gh'
 import type { GitHubRepository, GitHubWorkflowRun } from 'gh-api-client'
+import { useFloaty } from 'floaty-widget';
 import { StatusIndicator } from '@gnome-ui/layout/components/StatusIndicator'
 import { Box } from '@gnome-ui/react/components/Box'
 import { Card } from '@gnome-ui/react/components/Card'
@@ -17,6 +18,8 @@ import {
 import { relativeTime } from '../../lib/formatting'
 import { DoraMetricCard } from './DoraMetricCard'
 import { PanelCard } from '@gnome-ui/layout'
+import { Button, Icon, WrapBox } from '@gnome-ui/react'
+import { FocusWindows } from '@gnome-ui/icons'
 
 function formatFreq(v: number) {
   return v >= 1 ? `${v.toFixed(1)}/wk` : `${(v * 4).toFixed(1)}/mo`
@@ -49,6 +52,7 @@ export function RepoDoraCard({ repo, onRunsLoaded }: RepoDoraCardProps) {
   const runs: GitHubWorkflowRun[] = useMemo(() => data?.workflow_runs ?? [], [data])
   const lastRun = runs[0]
   const defaultBranch = repo.default_branch ?? 'main'
+  const floaty = useFloaty()
 
   const deployFreq = useMemo(() => computeDeploymentFrequency(runs, defaultBranch), [runs, defaultBranch])
   const leadTime = useMemo(() => computeLeadTime(runs), [runs])
@@ -59,9 +63,12 @@ export function RepoDoraCard({ repo, onRunsLoaded }: RepoDoraCardProps) {
     [runs],
   )
 
+  const onRunsLoadedRef = useRef(onRunsLoaded)
+  onRunsLoadedRef.current = onRunsLoaded
+
   useEffect(() => {
-    if (runs.length > 0) onRunsLoaded?.(runs)
-  }, [runs, onRunsLoaded])
+    if (runs.length > 0) onRunsLoadedRef.current?.(runs)
+  }, [runs])
 
   if (isLoading) {
     return (
@@ -77,7 +84,21 @@ export function RepoDoraCard({ repo, onRunsLoaded }: RepoDoraCardProps) {
     <PanelCard icon={<StatusIndicator
       status={conclusionToStatus(lastRun?.conclusion)}
       label=''
-    />} title={repo.name} footer={<Text variant="caption" color="dim">Last run {relativeTime(lastRun.created_at)}</Text>}>
+    />}
+      title={repo.name}
+      footer={
+        <WrapBox justify="space-between" align="center">
+          <Text variant="caption" color="dim">Last run {relativeTime(lastRun.created_at)}</Text>
+          <Button size="sm" onClick={() => {
+            floaty.open({
+              id: `DoraMetricCard-${repo.owner.login}-${repo.name}`,
+              title: `DoraMetricCard: ${repo.name} from: ${repo.owner.login}`,
+              component: DoraMetricCard,
+              props: { label: 'Deploy freq', metric: deployFreq, format: formatFreq },
+            })
+          }}><Icon icon={FocusWindows} /></Button>
+        </WrapBox>
+      }>
       <Box orientation="vertical" spacing={12}>
         <Text variant="caption" color="dim" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           DORA · last 30 days

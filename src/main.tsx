@@ -2,6 +2,8 @@ import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
+import { FloatyProvider, FloatyViewport } from 'floaty-widget';
+import 'floaty-widget/dist/floaty-widget.css'
 import '@gnome-ui/core/styles'
 import '@gnome-ui/react/styles'
 import '@gnome-ui/layout/styles'
@@ -29,7 +31,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       persistOptions={{ persister: idbPersister, maxAge: 24 * 60 * 60 * 1000 }}
     >
       <AuthProvider>
-        <RouterProvider router={router} />
+        <FloatyProvider>
+          <RouterProvider router={router} />
+          <FloatyViewport />
+        </FloatyProvider>
       </AuthProvider>
     </PersistQueryClientProvider>
   </StrictMode>,

@@ -11,14 +11,13 @@ import { GnomeProvider } from '@gnome-ui/react';
 import { DeveloperPortalLogo } from '../components/DeveloperPortalLogo';
 import { FC, useMemo, useState } from 'react';
 import { Box } from '@gnome-ui/react/components/Box';
-import { Text } from '@gnome-ui/react/components/Text';
-import { WrapBox } from '@gnome-ui/react/components/WrapBox';
 import { Button } from '@gnome-ui/react/components/Button';
 import { GhClientProvider } from '@api-hooks/gh';
 import { GitHubClient } from 'gh-api-client';
 import { AppSettingsContext, useAppSettingsState } from '../lib/appSettings';
 import { PwaUpdateControl } from '../components/PwaUpdateControl';
 import { useSignOut } from '../auth/hooks';
+import { ApplicationFooter } from '../components/ApplicationFooter';
 
 export const Route = createFileRoute('/_authenticated')({
   async beforeLoad() {
@@ -130,15 +129,7 @@ function AuthenticatedLayout() {
               showCollapseButtonSeparator={true}
               topBar={topBar}
               glass={settings.glass}
-              footer={
-                <WrapBox justify="space-between">
-                  <Text color="dim" variant="caption">© {new Date().getFullYear()} Developer Portal</Text>
-                  <WrapBox>
-                    <Button variant="flat" size="sm" disabled>Privacy</Button>
-                    <Button variant="flat" size="sm" disabled>Terms</Button>
-                  </WrapBox>
-                </WrapBox>
-              }
+              footer={<ApplicationFooter />}
             >
               <Box padding={16}>
                 <Outlet />
