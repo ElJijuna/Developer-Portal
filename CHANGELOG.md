@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.16.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.15.0...v1.16.0) (2026-05-25)
+
+### Features
+
+* add TanStack DB collections layer and optimistic inbox mutations ([dc5ade1](https://github.com/ElJijuna/Developer-Portal/commit/dc5ade1989d2387bf2ee3d8150eeefb208b4e66c))
+* change strategy to offline fist using indexed db and tanstack storage persister ([e8c84d0](https://github.com/ElJijuna/Developer-Portal/commit/e8c84d0fd2a430fef7b1c419b927cd50e5ac9ee4))
+
 ## [1.15.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.14.0...v1.15.0) (2026-05-25)
 
 ### Features
