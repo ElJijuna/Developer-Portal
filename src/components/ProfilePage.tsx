@@ -3,7 +3,6 @@ import { useNavigate } from '@tanstack/react-router'
 import {
   DashboardGrid,
   CounterCard,
-  EntityCard,
   MasonryGrid,
   EmptyState,
   ErrorState,
@@ -178,7 +177,7 @@ export function ProfileContent({ login }: ProfileContentProps) {
               </Text>
               <MasonryGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="md" fresh>
                 {repos.map((repo) => (
-                  <Suspense key={repo.id} fallback={<EntityCard title={repo.name} loading loadingType="skeleton" />}>
+                  <Suspense key={repo.id} fallback={<RepositoryCard name={repo.name} stars={0} forks={0} openIssues={0} pushedAt={repo.updated_at} isPrivate={repo.private} isLoading />}>
                     <RepositoryCard
                       name={repo.name}
                       description={repo.description ?? undefined}
