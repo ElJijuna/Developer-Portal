@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.17.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.16.0...v1.17.0) (2026-05-25)
+
+### Features
+
+* integrate floaty-widget for detachable DORA metric cards ([187690b](https://github.com/ElJijuna/Developer-Portal/commit/187690be68b699617e6a386100201772be68fcc8))
+
 ## [1.16.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.15.0...v1.16.0) (2026-05-25)
 
 ### Features
