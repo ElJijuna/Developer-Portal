@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.15.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.14.0...v1.15.0) (2026-05-25)
+
+### Features
+
+* refactor useRepoNamePackages to use external libraries and fix proccess to identify real package name published in npm from repository name, update Repo page to show RepoContributionGraph ([d3bccdb](https://github.com/ElJijuna/Developer-Portal/commit/d3bccdb7ab9476b1c7e45d4eeedf5aeb9d37a519))
+
+### Bug Fixes
+
+* change Suspense fallback element ([1abce5f](https://github.com/ElJijuna/Developer-Portal/commit/1abce5f6f41cfd48e2c2b69aea103e25c80a9945))
+
 ## [1.14.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.13.0...v1.14.0) (2026-05-24)
 
 ### Features
