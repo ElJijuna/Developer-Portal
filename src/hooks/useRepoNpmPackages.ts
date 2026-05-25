@@ -1,93 +1,31 @@
-import { useMemo } from 'react'
-import { useGhRepoRaw, useGhRepoContents, useGhRepoMultipleRaw } from '@api-hooks/gh'
-import { useAuth } from '../auth/AuthProvider'
+import { useGhRepoMultipleRaw, useGhRepoGitTree } from '@api-hooks/gh'
+import { detectMonoRepo } from '@baphy/npm';
 
 export type NpmPackagesInfo =
-  | { status: 'loading' }
-  | { status: 'none' }
-  | { status: 'single'; packageName: string }
-  | { status: 'monorepo'; packages: string[] }
-
-type RootPackageJson = {
-  name?: string
-  private?: boolean
-  workspaces?: string[] | { packages?: string[] }
-}
+  | { status: 'single'; packages: PackageJson[], isPending: boolean }
+  | { status: 'monorepo'; packages: PackageJson[], isPending: boolean }
 
 type PackageJson = {
-  name?: string
+  name: string
   private?: boolean
 }
 
-export function useRepoNpmPackages(owner: string, repo: string): NpmPackagesInfo {
-  const { user } = useAuth()
-  const token = user?.githubToken ?? ''
-  const enabled = !!owner && !!repo && !!token
+export function useRepoNpmPackages(owner: string, repoName: string, branch = 'main'): NpmPackagesInfo {
+  const { data: gitTreeData } = useGhRepoGitTree(owner, repoName, branch, { recursive: '1' }, { enabled: true });
+  const files = gitTreeData?.tree.map(t => t.path) ?? []; console.log(files);
+  const { isMonoRepo, packages } = detectMonoRepo(files); console.log(isMonoRepo, packages);
+  const packagesList = packages.map(({ packageJsonPath }) => packageJsonPath); console.log(11, packagesList); // eslint-disable-line no-console
+  const { data: rawPackages = {}, isLoading: multiplePkgLoading } = useGhRepoMultipleRaw(owner, repoName, packagesList, { ref: branch }, { enabled: packages.length > 0 });
+  const packagesEntries = Object.entries(rawPackages).map(([path, content]) => {
+    try {
+      const pkg = JSON.parse(content) as PackageJson;
 
-  const { data: rawPkg, isLoading: pkgLoading } = useGhRepoRaw(owner, repo, 'package.json', undefined, { enabled })
+      return pkg;
+    } catch (e) {
+      console.error(`Failed to parse ${path} as JSON`, e);
+      return null;
+    }
+  }).filter((pkg): pkg is PackageJson => pkg !== null);
 
-  const rootPkg = useMemo<RootPackageJson | null>(() => {
-    if (!rawPkg) return null
-    try { return JSON.parse(rawPkg) } catch { return null }
-  }, [rawPkg])
-
-  const workspacePatterns = useMemo<string[]>(() => {
-    const ws = rootPkg?.workspaces
-    if (!ws) return []
-    return Array.isArray(ws) ? ws : (ws.packages ?? [])
-  }, [rootPkg])
-
-  const isMonorepo = workspacePatterns.length > 0
-
-  const workspaceDirs = useMemo(
-    () => [...new Set(workspacePatterns.map((p) => p.split('/')[0]))],
-    [workspacePatterns],
-  )
-  const workspaceRoot = workspaceDirs[0] ?? ''
-
-  const { data: workspaceEntries, isLoading: workspaceEntriesLoading } = useGhRepoContents(
-    owner, repo, workspaceRoot, undefined,
-    { enabled: enabled && isMonorepo && !!workspaceRoot },
-  )
-
-  const packagePaths = useMemo(
-    () => Array.isArray(workspaceEntries)
-      ? workspaceEntries.filter((c) => c.type === 'dir').map((c) => `${workspaceRoot}/${c.name}/package.json`)
-      : [],
-    [workspaceEntries, workspaceRoot],
-  )
-
-  const { data: packagesJsons, isLoading: packagesLoading } = useGhRepoMultipleRaw(
-    owner,
-    repo,
-    packagePaths,
-    undefined,
-    { enabled: enabled && isMonorepo && packagePaths.length > 0 },
-  )
-
-  const resolvedPackages = useMemo(
-    () => Object.values(packagesJsons ?? {}).flatMap((rawPkg) => {
-      try {
-        const pkg = JSON.parse(rawPkg) as PackageJson
-        return pkg.name && pkg.private !== true ? [pkg.name] : []
-      } catch {
-        return []
-      }
-    }),
-    [packagesJsons],
-  )
-
-  if (pkgLoading || (isMonorepo && (workspaceEntriesLoading || packagesLoading))) return { status: 'loading' }
-  if (!rootPkg) return { status: 'none' }
-
-  if (isMonorepo) {
-    return resolvedPackages.length > 0
-      ? { status: 'monorepo', packages: resolvedPackages }
-      : { status: 'none' }
-  }
-
-  if (rootPkg.private === true) return { status: 'none' }
-  if (rootPkg.name) return { status: 'single', packageName: rootPkg.name }
-
-  return { status: 'none' }
+  return { status: isMonoRepo ? 'monorepo' : 'single', packages: packagesEntries, isPending: multiplePkgLoading };
 }

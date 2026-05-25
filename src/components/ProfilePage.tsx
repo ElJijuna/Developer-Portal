@@ -99,7 +99,7 @@ export function ProfileContent({ login }: ProfileContentProps) {
   }
 
   return (
-    <Box orientation="vertical" spacing={16} style={{ marginTop: 18 }}>
+    <Box orientation="vertical" spacing={16}>
       <ProfileHero
         login={ghUser.login}
         name={ghUser.name}

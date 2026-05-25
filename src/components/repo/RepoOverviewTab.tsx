@@ -8,6 +8,7 @@ import { EmptyState, IconBadge } from '@gnome-ui/layout'
 import { Folder, GitRepository } from '@gnome-ui/icons'
 import type { GitHubRepository } from 'gh-api-client'
 import type { LocalizedLanguage } from 'code-languages'
+import { RepoContributionGraph } from './RepoContributionGraph'
 
 type RepoOverviewExtras = {
   is_template?: boolean
@@ -67,6 +68,9 @@ export function RepoOverviewTab({ repo, langInfo, repoExtras }: RepoOverviewTabP
           description="GitHub has not detected a primary language for this repository."
         />
       )}
+
+      <RepoContributionGraph owner={repo.owner.login} repoName={repo.name} />
+
       <WrapBox childSpacing={4}>
         {repo.fork && <Chip label="Fork" />}
         {repo.archived && <Chip label="Archived" />}
