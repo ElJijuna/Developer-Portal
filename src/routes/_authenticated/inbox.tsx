@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import {
   useGhNotifications,
   useGhMarkNotificationRead,
   useGhMarkAllNotificationsRead,
 } from '@api-hooks/gh'
-import type { GitHubNotification } from 'gh-api-client'
+import { useLiveQuery } from '@tanstack/react-db'
 import { DashboardGrid } from '@gnome-ui/layout/components/DashboardGrid'
 import { CounterCard } from '@gnome-ui/layout/components/CounterCard'
 import { EntityCard } from '@gnome-ui/layout'
@@ -22,6 +22,9 @@ import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
 import { PageHeader } from '../../components/PageHeader'
 import { useAuth } from '../../auth/AuthProvider'
 import { useNavigate } from '@tanstack/react-router'
+import { notificationsCollection } from '../../db/collections'
+import type { NotificationRecord } from '../../db/schema'
+import type { GitHubNotification } from 'gh-api-client'
 
 export const Route = createFileRoute('/_authenticated/inbox')({
   component: Inbox,
@@ -45,38 +48,76 @@ function relativeTime(iso: string) {
   return `${Math.floor(hrs / 24)}d ago`
 }
 
+function mapNotification(n: GitHubNotification): NotificationRecord {
+  return {
+    id: n.id,
+    unread: n.unread,
+    reason: n.reason,
+    subject_title: n.subject.title,
+    subject_type: n.subject.type,
+    subject_url: n.subject.url,
+    repo_name: n.repository.name,
+    repo_full_name: n.repository.full_name,
+    updated_at: n.updated_at,
+  }
+}
+
 function Inbox() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const token = user?.githubToken ?? ''
   const [activeTab, setActiveTab] = useState<InboxTab>('unread')
 
-  const { data, isLoading, error, refetch } = useGhNotifications(
+  const { data: ghData, isLoading, error } = useGhNotifications(
     { all: true, per_page: 50 },
     { enabled: !!token },
   )
 
-  const { mutate: markRead } = useGhMarkNotificationRead()
-  const { mutate: markAllRead, isPending: markingAll } = useGhMarkAllNotificationsRead()
+  const { mutate: markReadMutate } = useGhMarkNotificationRead()
+  const { mutate: markAllReadMutate, isPending: markingAll } = useGhMarkAllNotificationsRead()
 
-  const notifications: GitHubNotification[] = data?.values ?? []
+  // Sync GitHub API data into local collection (insert new, update existing)
+  useEffect(() => {
+    if (!ghData) return
+    const incoming = ghData.values ?? []
+    const existingState = notificationsCollection.state
+
+    const toInsert = incoming.filter((n) => !existingState.has(n.id)).map(mapNotification)
+    const toUpdate = incoming.filter((n) => existingState.has(n.id))
+
+    if (toInsert.length > 0) notificationsCollection.insert(toInsert)
+    toUpdate.forEach((n) => {
+      notificationsCollection.update(n.id, (draft) => { Object.assign(draft, mapNotification(n)) })
+    })
+  }, [ghData])
+
+  // Reactive read from collection — updates instantly on optimistic mutations
+  const { data: notifications = [] } = useLiveQuery(notificationsCollection)
 
   const filtered = useMemo(() => {
     switch (activeTab) {
-      case 'unread':
-        return notifications.filter((n) => n.unread)
-      case 'participating':
-        return notifications.filter((n) => n.reason === 'mention' || n.reason === 'comment' || n.reason === 'author')
-      case 'mentioned':
-        return notifications.filter((n) => n.reason === 'mention' || n.reason === 'team_mention')
-      case 'review_requested':
-        return notifications.filter((n) => n.reason === 'review_requested')
-      default:
-        return notifications
+      case 'unread': return notifications.filter((n) => n.unread)
+      case 'participating': return notifications.filter((n) => ['mention', 'comment', 'author'].includes(n.reason))
+      case 'mentioned': return notifications.filter((n) => ['mention', 'team_mention'].includes(n.reason))
+      case 'review_requested': return notifications.filter((n) => n.reason === 'review_requested')
+      default: return notifications
     }
   }, [notifications, activeTab])
 
   const unreadCount = notifications.filter((n) => n.unread).length
+
+  // Optimistic mark-as-read: updates collection immediately, syncs API in background
+  const handleMarkRead = useCallback((id: string) => {
+    notificationsCollection.update(id, (draft) => { draft.unread = false })
+    markReadMutate(id)
+  }, [markReadMutate])
+
+  const handleMarkAllRead = useCallback(() => {
+    notifications.filter((n) => n.unread).forEach((n) => {
+      notificationsCollection.update(n.id, (draft) => { draft.unread = false })
+    })
+    markAllReadMutate(undefined)
+  }, [notifications, markAllReadMutate])
 
   if (!token) {
     return (
@@ -104,7 +145,7 @@ function Inbox() {
       size="sm"
       disabled={markingAll || unreadCount === 0}
       leadingIcon={markingAll ? <Spinner /> : <Icon icon={Check} />}
-      onClick={() => markAllRead(undefined, { onSuccess: () => refetch() })}
+      onClick={handleMarkAllRead}
     >
       Mark all as read
     </Button>
@@ -124,7 +165,7 @@ function Inbox() {
             label="Unread notifications"
             value={unreadCount}
             icon={Notifications}
-            loading={isLoading}
+            loading={isLoading && notifications.length === 0}
             loadingType="skeleton"
             color="#3584e4"
           />
@@ -141,7 +182,7 @@ function Inbox() {
           ))}
         </TabBar>
 
-        {isLoading ? (
+        {isLoading && notifications.length === 0 ? (
           <Box align="center" justify="center" padding={48}><Spinner /></Box>
         ) : error ? (
           <ErrorState type="network" description={error.message} />
@@ -157,9 +198,9 @@ function Inbox() {
             {filtered.map((n) => (
               <EntityCard
                 key={n.id}
-                avatar={<Icon icon={subjectTypeIcon(n.subject.type)} size="md" />}
-                title={n.subject.title}
-                subtitle={n.repository.full_name}
+                avatar={<Icon icon={subjectTypeIcon(n.subject_type)} size="md" />}
+                title={n.subject_title}
+                subtitle={n.repo_full_name}
                 meta={[n.reason.replace(/_/g, ' '), relativeTime(n.updated_at)]}
                 trailing={
                   n.unread ? (
@@ -168,7 +209,7 @@ function Inbox() {
                       label="Mark as read"
                       variant="flat"
                       size="sm"
-                      onClick={() => markRead(n.id, { onSuccess: () => refetch() })}
+                      onClick={() => handleMarkRead(n.id)}
                     />
                   ) : undefined
                 }

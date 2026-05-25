@@ -12,9 +12,9 @@ type PackageJson = {
 
 export function useRepoNpmPackages(owner: string, repoName: string, branch = 'main'): NpmPackagesInfo {
   const { data: gitTreeData } = useGhRepoGitTree(owner, repoName, branch, { recursive: '1' }, { enabled: true });
-  const files = gitTreeData?.tree.map(t => t.path) ?? []; console.log(files);
-  const { isMonoRepo, packages } = detectMonoRepo(files); console.log(isMonoRepo, packages);
-  const packagesList = packages.map(({ packageJsonPath }) => packageJsonPath); console.log(11, packagesList); // eslint-disable-line no-console
+  const files = gitTreeData?.tree.map(t => t.path) ?? []
+  const { isMonoRepo, packages } = detectMonoRepo(files)
+  const packagesList = packages.map(({ packageJsonPath }) => packageJsonPath)
   const { data: rawPackages = {}, isLoading: multiplePkgLoading } = useGhRepoMultipleRaw(owner, repoName, packagesList, { ref: branch }, { enabled: packages.length > 0 });
   const packagesEntries = Object.entries(rawPackages).map(([path, content]) => {
     try {

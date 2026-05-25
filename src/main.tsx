@@ -1,7 +1,6 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
-import { QueryClient } from '@tanstack/react-query'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import '@gnome-ui/core/styles'
 import '@gnome-ui/react/styles'
@@ -10,15 +9,7 @@ import './styles.css'
 import { AuthProvider } from './auth/AuthProvider'
 import { routeTree } from './routeTree.gen'
 import { idbPersister } from './db/persister'
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000,
-      gcTime: 24 * 60 * 60 * 1000,
-    },
-  },
-})
+import { queryClient } from './db/queryClient'
 
 const router = createRouter({
   routeTree,
