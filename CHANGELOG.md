@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.18.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.17.0...v1.18.0) (2026-05-30)
+
+### Features
+
+* add reusable GitHub blocks ([8a15b55](https://github.com/ElJijuna/Developer-Portal/commit/8a15b55e15f23598075acd18d41963755e15146e))
+* update dependencies and add monitor system component ([65f1cd5](https://github.com/ElJijuna/Developer-Portal/commit/65f1cd50ea43c4d36290fdf6203d1a9679546a11))
+
+### Code Refactoring
+
+* remove RepoDataTabs component a integrate content in repo layout ([c364199](https://github.com/ElJijuna/Developer-Portal/commit/c3641998a9b353b77c6cd47adcddad225348ab2d))
+* rename components to more descriptive component name ([f4dcd6e](https://github.com/ElJijuna/Developer-Portal/commit/f4dcd6e490164c637a5a4a66fcaf61d68d5c537d))
+* use github blocks in repository detail tabs ([a02dd59](https://github.com/ElJijuna/Developer-Portal/commit/a02dd59e453ae562368877f9b8c5d7db38c12b94))
+
 ## [1.17.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.16.0...v1.17.0) (2026-05-25)
 
 ### Features
