@@ -1,7 +1,7 @@
 import { useGhRepoCommits, useGhRepoCommitsInfinite } from '@api-hooks/gh'
 import { ErrorState } from '@gnome-ui/layout'
 import type { CommitsParams, GitHubCommit } from 'gh-api-client'
-import { RepoCommitsTab } from '../../components/repo/RepoCommitsTab'
+import { RepositoryCommitList } from '../../components/repo/RepositoryCommitList'
 import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from './types'
 import { DEFAULT_LIMIT, pagedState, useListStateChange } from './utils'
 
@@ -45,5 +45,5 @@ export function GithubCommits({
   if (children) return children(state)
   if (state.error) return <ErrorState type="network" description={state.error.message} />
 
-  return <RepoCommitsTab commits={state.items} isLoading={state.isPending} />
+  return <RepositoryCommitList commits={state.items} isLoading={state.isPending} />
 }

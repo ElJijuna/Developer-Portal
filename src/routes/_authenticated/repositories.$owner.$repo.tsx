@@ -22,13 +22,13 @@ import { PageHeader } from '../../components/PageHeader'
 import { NpmPackageSummary } from '../../components/NpmPackageSummary'
 import { useRepoNpmPackages } from '../../hooks/useRepoNpmPackages'
 import { RepoHero } from '../../components/repo/RepoHero'
-import { RepoOverviewTab } from '../../components/repo/RepoOverviewTab'
-import { RepoCommitsTab } from '../../components/repo/RepoCommitsTab'
-import { RepoPullRequestsTab } from '../../components/repo/RepoPullRequestsTab'
-import { RepoReleasesTab } from '../../components/repo/RepoReleasesTab'
-import { RepoWorkflowsTab } from '../../components/repo/RepoWorkflowsTab'
-import { RepoSecurityTab } from '../../components/repo/RepoSecurityTab'
-import { RepoBranchesTab } from '../../components/repo/RepoBranchesTab'
+import { RepositoryOverview } from '../../components/repo/RepositoryOverview'
+import { RepositoryCommitList } from '../../components/repo/RepositoryCommitList'
+import { RepositoryPullRequestList } from '../../components/repo/RepositoryPullRequestList'
+import { RepositoryReleaseList } from '../../components/repo/RepositoryReleaseList'
+import { RepositoryWorkflowRunPanel } from '../../components/repo/RepositoryWorkflowRunPanel'
+import { RepositoryAdvisoryList } from '../../components/repo/RepositoryAdvisoryList'
+import { RepositoryBranchList } from '../../components/repo/RepositoryBranchList'
 import { useAuth } from '../../auth/AuthProvider'
 import { Badge, Skeleton } from '@gnome-ui/react'
 import {
@@ -175,34 +175,34 @@ function RepoDetail() {
           </TabBar>
 
           {activeTab === 'overview' && (
-            <RepoOverviewTab repo={repo} langInfo={langInfo} repoExtras={repoExtras} />
+            <RepositoryOverview repo={repo} langInfo={langInfo} repoExtras={repoExtras} />
           )}
 
           <GithubCommits owner={owner} repo={repoName} limit={10} enabled={enabled} onStateChange={({ count }) => setTabCount('commits', count)}>
-            {(state) => activeTab === 'commits' ? <RepoCommitsTab commits={state.items} isLoading={state.isPending} /> : null}
+            {(state) => activeTab === 'commits' ? <RepositoryCommitList commits={state.items} isLoading={state.isPending} /> : null}
           </GithubCommits>
 
           <GithubPullRequests owner={owner} repo={repoName} limit={20} state="open" enabled={enabled} onStateChange={({ count }) => setTabCount('pullRequests', count)}>
-            {(state) => activeTab === 'pull-requests' ? <RepoPullRequestsTab prs={state.items} isLoading={state.isPending} /> : null}
+            {(state) => activeTab === 'pull-requests' ? <RepositoryPullRequestList prs={state.items} isLoading={state.isPending} /> : null}
           </GithubPullRequests>
 
           <GithubReleases owner={owner} repo={repoName} limit={20} enabled={enabled} onStateChange={({ count }) => setTabCount('releases', count)}>
-            {(state) => activeTab === 'releases' ? <RepoReleasesTab releases={state.items} isLoading={state.isPending} /> : null}
+            {(state) => activeTab === 'releases' ? <RepositoryReleaseList releases={state.items} isLoading={state.isPending} /> : null}
           </GithubReleases>
 
           <GithubWorkflowRuns owner={owner} repo={repoName} limit={15} enabled={enabled} onStateChange={({ count }) => setTabCount('workflows', count)}>
             {(state) => activeTab === 'workflows'
-              ? <RepoWorkflowsTab runs={state.items} isLoading={state.isPending} chartData={getWorkflowChartData(state.items)} />
+              ? <RepositoryWorkflowRunPanel runs={state.items} isLoading={state.isPending} chartData={getWorkflowChartData(state.items)} />
               : null}
           </GithubWorkflowRuns>
 
           {activeTab === 'security' && (
-            <RepoSecurityTab advisories={advisories} isLoading={advisoriesLoading} />
+            <RepositoryAdvisoryList advisories={advisories} isLoading={advisoriesLoading} />
           )}
 
           <GithubBranches owner={owner} repo={repoName} limit={100} enabled={enabled && activeTab === 'branches'} onStateChange={({ count }) => setTabCount('branches', count)}>
             {(state) => activeTab === 'branches' ? (
-              <RepoBranchesTab
+              <RepositoryBranchList
                 branches={state.items}
                 isLoading={state.isPending}
                 branchFilter={branchFilter}

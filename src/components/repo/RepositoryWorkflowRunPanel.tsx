@@ -16,13 +16,13 @@ export type WorkflowChartData = {
   avgDuration: number
 }
 
-export type RepoWorkflowsTabProps = {
+export type RepositoryWorkflowRunPanelProps = {
   runs: GitHubWorkflowRun[]
   isLoading: boolean
   chartData: WorkflowChartData
 }
 
-export function RepoWorkflowsTab({ runs, isLoading, chartData }: RepoWorkflowsTabProps) {
+export function RepositoryWorkflowRunPanel({ runs, isLoading, chartData }: RepositoryWorkflowRunPanelProps) {
   if (isLoading) {
     return <Box align="center" justify="center" padding={48}><Spinner /></Box>
   }

@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useGhRepoWorkflowRuns, useGhRepoWorkflowRunsInfinite } from '@api-hooks/gh'
 import { ErrorState } from '@gnome-ui/layout'
 import type { GitHubWorkflowRun, GitHubWorkflowRunsResponse, WorkflowRunsParams } from 'gh-api-client'
-import { RepoWorkflowsTab } from '../../components/repo/RepoWorkflowsTab'
+import { RepositoryWorkflowRunPanel } from '../../components/repo/RepositoryWorkflowRunPanel'
 import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from './types'
 import { DEFAULT_LIMIT, useListStateChange, workflowRunsState } from './utils'
 
@@ -45,7 +45,7 @@ export function GithubWorkflowRuns({
   if (children) return children(state)
   if (state.error) return <ErrorState type="network" description={state.error.message} />
 
-  return <RepoWorkflowsTab runs={state.items} isLoading={state.isPending} chartData={chartData} />
+  return <RepositoryWorkflowRunPanel runs={state.items} isLoading={state.isPending} chartData={chartData} />
 }
 
 function getWorkflowChartData(runs: GitHubWorkflowRun[]) {

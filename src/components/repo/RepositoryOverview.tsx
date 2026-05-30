@@ -15,13 +15,13 @@ type RepoOverviewExtras = {
   license?: { name: string } | null
 }
 
-export type RepoOverviewTabProps = {
+export type RepositoryOverviewProps = {
   repo: GitHubRepository
   langInfo: LocalizedLanguage | null
   repoExtras: RepoOverviewExtras
 }
 
-export function RepoOverviewTab({ repo, langInfo, repoExtras }: RepoOverviewTabProps) {
+export function RepositoryOverview({ repo, langInfo, repoExtras }: RepositoryOverviewProps) {
   return (
     <Box orientation="vertical" spacing={12}>
       {repo.language ? (

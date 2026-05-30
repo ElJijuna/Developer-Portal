@@ -1,7 +1,7 @@
 import { useGhRepoPullRequests, useGhRepoPullRequestsInfinite } from '@api-hooks/gh'
 import { ErrorState } from '@gnome-ui/layout'
 import type { GitHubPullRequest, PullRequestsParams } from 'gh-api-client'
-import { RepoPullRequestsTab } from '../../components/repo/RepoPullRequestsTab'
+import { RepositoryPullRequestList } from '../../components/repo/RepositoryPullRequestList'
 import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from './types'
 import { DEFAULT_LIMIT, pagedState, useListStateChange } from './utils'
 
@@ -43,5 +43,5 @@ export function GithubPullRequests({
   if (children) return children(state)
   if (state.error) return <ErrorState type="network" description={state.error.message} />
 
-  return <RepoPullRequestsTab prs={state.items} isLoading={state.isPending} />
+  return <RepositoryPullRequestList prs={state.items} isLoading={state.isPending} />
 }

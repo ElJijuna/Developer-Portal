@@ -6,12 +6,12 @@ import { Lock } from '@gnome-ui/icons'
 import type { GitHubRepositoryAdvisory } from 'gh-api-client'
 import { SEVERITY_COLOR, relativeTime } from '../../lib/formatting'
 
-export type RepoSecurityTabProps = {
+export type RepositoryAdvisoryListProps = {
   advisories: GitHubRepositoryAdvisory[]
   isLoading: boolean
 }
 
-export function RepoSecurityTab({ advisories, isLoading }: RepoSecurityTabProps) {
+export function RepositoryAdvisoryList({ advisories, isLoading }: RepositoryAdvisoryListProps) {
   if (isLoading) {
     return <Box align="center" justify="center" padding={48}><Spinner /></Box>
   }

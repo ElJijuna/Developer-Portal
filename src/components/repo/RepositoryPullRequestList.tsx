@@ -8,12 +8,12 @@ import { GitPullRequest } from '@gnome-ui/icons'
 import type { GitHubPullRequest } from 'gh-api-client'
 import { relativeTime } from '../../lib/formatting'
 
-export type RepoPullRequestsTabProps = {
+export type RepositoryPullRequestListProps = {
   prs: GitHubPullRequest[]
   isLoading: boolean
 }
 
-export function RepoPullRequestsTab({ prs, isLoading }: RepoPullRequestsTabProps) {
+export function RepositoryPullRequestList({ prs, isLoading }: RepositoryPullRequestListProps) {
   if (isLoading) {
     return <Box align="center" justify="center" padding={48}><Spinner /></Box>
   }

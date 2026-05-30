@@ -7,12 +7,12 @@ import { Folder } from '@gnome-ui/icons'
 import type { GitHubCommit } from 'gh-api-client'
 import { relativeTime } from '../../lib/formatting'
 
-export type RepoCommitsTabProps = {
+export type RepositoryCommitListProps = {
   commits: GitHubCommit[]
   isLoading: boolean
 }
 
-export function RepoCommitsTab({ commits, isLoading }: RepoCommitsTabProps) {
+export function RepositoryCommitList({ commits, isLoading }: RepositoryCommitListProps) {
   if (isLoading) {
     return <Box align="center" justify="center" padding={48}><Spinner /></Box>
   }

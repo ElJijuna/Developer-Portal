@@ -1,7 +1,7 @@
 import { useGhRepoReleases, useGhRepoReleasesInfinite } from '@api-hooks/gh'
 import { ErrorState } from '@gnome-ui/layout'
 import type { GitHubRelease, ReleasesParams } from 'gh-api-client'
-import { RepoReleasesTab } from '../../components/repo/RepoReleasesTab'
+import { RepositoryReleaseList } from '../../components/repo/RepositoryReleaseList'
 import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from './types'
 import { DEFAULT_LIMIT, pagedState, useListStateChange } from './utils'
 
@@ -33,5 +33,5 @@ export function GithubReleases({
   if (children) return children(state)
   if (state.error) return <ErrorState type="network" description={state.error.message} />
 
-  return <RepoReleasesTab releases={state.items} isLoading={state.isPending} />
+  return <RepositoryReleaseList releases={state.items} isLoading={state.isPending} />
 }

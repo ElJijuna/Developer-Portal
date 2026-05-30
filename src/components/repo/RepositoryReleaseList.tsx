@@ -8,12 +8,12 @@ import { GitTag } from '@gnome-ui/icons'
 import type { GitHubRelease } from 'gh-api-client'
 import { relativeTime } from '../../lib/formatting'
 
-export type RepoReleasesTabProps = {
+export type RepositoryReleaseListProps = {
   releases: GitHubRelease[]
   isLoading: boolean
 }
 
-export function RepoReleasesTab({ releases, isLoading }: RepoReleasesTabProps) {
+export function RepositoryReleaseList({ releases, isLoading }: RepositoryReleaseListProps) {
   if (isLoading) {
     return <Box align="center" justify="center" padding={48}><Spinner /></Box>
   }

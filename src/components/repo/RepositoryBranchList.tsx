@@ -9,7 +9,7 @@ import type { GitHubBranch } from 'gh-api-client'
 
 type BranchFilter = 'all' | 'merged' | 'unmerged'
 
-export type RepoBranchesTabProps = {
+export type RepositoryBranchListProps = {
   branches: GitHubBranch[]
   isLoading: boolean
   branchFilter: BranchFilter
@@ -19,7 +19,7 @@ export type RepoBranchesTabProps = {
   repoHtmlUrl: string
 }
 
-export function RepoBranchesTab({
+export function RepositoryBranchList({
   branches,
   isLoading,
   branchFilter,
@@ -27,7 +27,7 @@ export function RepoBranchesTab({
   defaultBranch,
   mergedBranchNames,
   repoHtmlUrl,
-}: RepoBranchesTabProps) {
+}: RepositoryBranchListProps) {
   const filtered = branches.filter((branch) => {
     if (branch.name === defaultBranch) return branchFilter === 'all'
     const isMerged = mergedBranchNames.has(branch.name)
