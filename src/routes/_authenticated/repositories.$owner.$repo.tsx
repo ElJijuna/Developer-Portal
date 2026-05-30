@@ -60,6 +60,13 @@ function RepoDetail() {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [branchFilter, setBranchFilter] = useState<BranchFilter>('all');
   const [npmDrawerOpen, setNpmDrawerOpen] = useState(false);
+  const [tabCounts, setTabCounts] = useState({
+    commits: 0,
+    pullRequests: 0,
+    releases: 0,
+    workflows: 0,
+    branches: 0,
+  })
 
   const enabled = !!owner && !!repoName && !!token;
 
@@ -80,6 +87,10 @@ function RepoDetail() {
   )
 
   const langInfo = useLanguage(repo?.language)
+
+  function setTabCount(key: keyof typeof tabCounts, count: number) {
+    setTabCounts((current) => current[key] === count ? current : { ...current, [key]: count })
+  }
 
   const breadcrumb = [
     { label: 'Repositories', path: '/repositories' },
@@ -153,117 +164,57 @@ function RepoDetail() {
         </DashboardGrid>
 
         <Box orientation="vertical" spacing={12}>
-          <RepoDataTabs
-            owner={owner}
-            repo={repoName}
-            enabled={enabled}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            repoNode={<RepoOverviewTab repo={repo} langInfo={langInfo} repoExtras={repoExtras} />}
-            advisoriesNode={<RepoSecurityTab advisories={advisories} isLoading={advisoriesLoading} />}
-            advisoriesCount={advisories.length}
-            branchFilter={branchFilter}
-            onBranchFilterChange={setBranchFilter}
-            defaultBranch={repo.default_branch}
-            mergedBranchNames={mergedBranchNames}
-            repoHtmlUrl={repo.html_url}
-          />
+          <TabBar aria-label="Repository tabs" inline>
+            <TabItem name="overview" label="Overview" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} />
+            <TabItem name="commits" count={tabCounts.commits} label="Commits" active={activeTab === 'commits'} onClick={() => setActiveTab('commits')} />
+            <TabItem name="pull-requests" count={tabCounts.pullRequests} label="Pull Requests" active={activeTab === 'pull-requests'} onClick={() => setActiveTab('pull-requests')} />
+            <TabItem name="releases" count={tabCounts.releases} label="Releases" active={activeTab === 'releases'} onClick={() => setActiveTab('releases')} />
+            <TabItem name="workflows" count={tabCounts.workflows} label="Workflows" active={activeTab === 'workflows'} onClick={() => setActiveTab('workflows')} icon={GitWorkflow} />
+            <TabItem name="security" count={advisories.length} label="Security" active={activeTab === 'security'} onClick={() => setActiveTab('security')} icon={Lock} />
+            <TabItem name="branches" count={tabCounts.branches} label="Branches" active={activeTab === 'branches'} onClick={() => setActiveTab('branches')} icon={GitBranch} />
+          </TabBar>
+
+          {activeTab === 'overview' && (
+            <RepoOverviewTab repo={repo} langInfo={langInfo} repoExtras={repoExtras} />
+          )}
+
+          <GithubCommits owner={owner} repo={repoName} limit={10} enabled={enabled} onStateChange={({ count }) => setTabCount('commits', count)}>
+            {(state) => activeTab === 'commits' ? <RepoCommitsTab commits={state.items} isLoading={state.isPending} /> : null}
+          </GithubCommits>
+
+          <GithubPullRequests owner={owner} repo={repoName} limit={20} state="open" enabled={enabled} onStateChange={({ count }) => setTabCount('pullRequests', count)}>
+            {(state) => activeTab === 'pull-requests' ? <RepoPullRequestsTab prs={state.items} isLoading={state.isPending} /> : null}
+          </GithubPullRequests>
+
+          <GithubReleases owner={owner} repo={repoName} limit={20} enabled={enabled} onStateChange={({ count }) => setTabCount('releases', count)}>
+            {(state) => activeTab === 'releases' ? <RepoReleasesTab releases={state.items} isLoading={state.isPending} /> : null}
+          </GithubReleases>
+
+          <GithubWorkflowRuns owner={owner} repo={repoName} limit={15} enabled={enabled} onStateChange={({ count }) => setTabCount('workflows', count)}>
+            {(state) => activeTab === 'workflows'
+              ? <RepoWorkflowsTab runs={state.items} isLoading={state.isPending} chartData={getWorkflowChartData(state.items)} />
+              : null}
+          </GithubWorkflowRuns>
+
+          {activeTab === 'security' && (
+            <RepoSecurityTab advisories={advisories} isLoading={advisoriesLoading} />
+          )}
+
+          <GithubBranches owner={owner} repo={repoName} limit={100} enabled={enabled && activeTab === 'branches'} onStateChange={({ count }) => setTabCount('branches', count)}>
+            {(state) => activeTab === 'branches' ? (
+              <RepoBranchesTab
+                branches={state.items}
+                isLoading={state.isPending}
+                branchFilter={branchFilter}
+                onBranchFilterChange={setBranchFilter}
+                defaultBranch={repo.default_branch}
+                mergedBranchNames={mergedBranchNames}
+                repoHtmlUrl={repo.html_url}
+              />
+            ) : null}
+          </GithubBranches>
         </Box>
       </Box>
-    </>
-  )
-}
-
-type RepoDataTabsProps = {
-  owner: string
-  repo: string
-  enabled: boolean
-  activeTab: TabId
-  onTabChange: (tab: TabId) => void
-  repoNode: React.ReactNode
-  advisoriesNode: React.ReactNode
-  advisoriesCount: number
-  branchFilter: BranchFilter
-  onBranchFilterChange: (filter: BranchFilter) => void
-  defaultBranch: string
-  mergedBranchNames: Set<string>
-  repoHtmlUrl: string
-}
-
-function RepoDataTabs({
-  owner,
-  repo,
-  enabled,
-  activeTab,
-  onTabChange,
-  repoNode,
-  advisoriesNode,
-  advisoriesCount,
-  branchFilter,
-  onBranchFilterChange,
-  defaultBranch,
-  mergedBranchNames,
-  repoHtmlUrl,
-}: RepoDataTabsProps) {
-  const [counts, setCounts] = useState({
-    commits: 0,
-    pullRequests: 0,
-    releases: 0,
-    workflows: 0,
-    branches: 0,
-  })
-
-  function setTabCount(key: keyof typeof counts, count: number) {
-    setCounts((current) => current[key] === count ? current : { ...current, [key]: count })
-  }
-
-  return (
-    <>
-      <TabBar aria-label="Repository tabs" inline>
-        <TabItem name="overview" label="Overview" active={activeTab === 'overview'} onClick={() => onTabChange('overview')} />
-        <TabItem name="commits" count={counts.commits} label="Commits" active={activeTab === 'commits'} onClick={() => onTabChange('commits')} />
-        <TabItem name="pull-requests" count={counts.pullRequests} label="Pull Requests" active={activeTab === 'pull-requests'} onClick={() => onTabChange('pull-requests')} />
-        <TabItem name="releases" count={counts.releases} label="Releases" active={activeTab === 'releases'} onClick={() => onTabChange('releases')} />
-        <TabItem name="workflows" count={counts.workflows} label="Workflows" active={activeTab === 'workflows'} onClick={() => onTabChange('workflows')} icon={GitWorkflow} />
-        <TabItem name="security" count={advisoriesCount} label="Security" active={activeTab === 'security'} onClick={() => onTabChange('security')} icon={Lock} />
-        <TabItem name="branches" count={counts.branches} label="Branches" active={activeTab === 'branches'} onClick={() => onTabChange('branches')} icon={GitBranch} />
-      </TabBar>
-
-      {activeTab === 'overview' && repoNode}
-
-      <GithubCommits owner={owner} repo={repo} limit={10} enabled={enabled} onStateChange={({ count }) => setTabCount('commits', count)}>
-        {(state) => activeTab === 'commits' ? <RepoCommitsTab commits={state.items} isLoading={state.isPending} /> : null}
-      </GithubCommits>
-
-      <GithubPullRequests owner={owner} repo={repo} limit={20} state="open" enabled={enabled} onStateChange={({ count }) => setTabCount('pullRequests', count)}>
-        {(state) => activeTab === 'pull-requests' ? <RepoPullRequestsTab prs={state.items} isLoading={state.isPending} /> : null}
-      </GithubPullRequests>
-
-      <GithubReleases owner={owner} repo={repo} limit={20} enabled={enabled} onStateChange={({ count }) => setTabCount('releases', count)}>
-        {(state) => activeTab === 'releases' ? <RepoReleasesTab releases={state.items} isLoading={state.isPending} /> : null}
-      </GithubReleases>
-
-      <GithubWorkflowRuns owner={owner} repo={repo} limit={15} enabled={enabled} onStateChange={({ count }) => setTabCount('workflows', count)}>
-        {(state) => activeTab === 'workflows'
-          ? <RepoWorkflowsTab runs={state.items} isLoading={state.isPending} chartData={getWorkflowChartData(state.items)} />
-          : null}
-      </GithubWorkflowRuns>
-
-      {activeTab === 'security' && advisoriesNode}
-
-      <GithubBranches owner={owner} repo={repo} limit={100} enabled={enabled && activeTab === 'branches'} onStateChange={({ count }) => setTabCount('branches', count)}>
-        {(state) => activeTab === 'branches' ? (
-          <RepoBranchesTab
-            branches={state.items}
-            isLoading={state.isPending}
-            branchFilter={branchFilter}
-            onBranchFilterChange={onBranchFilterChange}
-            defaultBranch={defaultBranch}
-            mergedBranchNames={mergedBranchNames}
-            repoHtmlUrl={repoHtmlUrl}
-          />
-        ) : null}
-      </GithubBranches>
     </>
   )
 }
