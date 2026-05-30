@@ -9,6 +9,7 @@ export type GithubBlockBaseProps = {
 
 export type GithubListState<T> = {
   items: T[]
+  totalCount?: number
   isPending: boolean
   isFetching: boolean
   isFetchingNextPage: boolean
@@ -18,8 +19,23 @@ export type GithubListState<T> = {
   refetch: () => void
 }
 
+export type GithubListSnapshot<T> = {
+  items: T[]
+  count: number
+  totalCount?: number
+  isPending: boolean
+  isFetching: boolean
+  isFetchingNextPage: boolean
+  error: Error | null
+  hasNextPage: boolean
+}
+
 export type GithubListChildren<T> = {
   children?: (state: GithubListState<T>) => ReactNode
+}
+
+export type GithubListCallbacks<T> = {
+  onStateChange?: (state: GithubListSnapshot<T>) => void
 }
 
 export type GithubValueState<T> = {

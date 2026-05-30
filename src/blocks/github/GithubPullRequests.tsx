@@ -2,10 +2,11 @@ import { useGhRepoPullRequests, useGhRepoPullRequestsInfinite } from '@api-hooks
 import { ErrorState } from '@gnome-ui/layout'
 import type { GitHubPullRequest, PullRequestsParams } from 'gh-api-client'
 import { RepoPullRequestsTab } from '../../components/repo/RepoPullRequestsTab'
-import type { GithubBlockBaseProps, GithubListChildren } from './types'
-import { DEFAULT_LIMIT, pagedState } from './utils'
+import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from './types'
+import { DEFAULT_LIMIT, pagedState, useListStateChange } from './utils'
 
 export type GithubPullRequestsProps = GithubBlockBaseProps &
+  GithubListCallbacks<GitHubPullRequest> &
   GithubListChildren<GitHubPullRequest> & {
     owner: string
     repo: string
@@ -30,12 +31,14 @@ export function GithubPullRequests({
   base,
   sort,
   direction,
+  onStateChange,
   children,
 }: GithubPullRequestsProps) {
   const baseParams = { per_page: limit, state: pullRequestState, head, base, sort, direction }
   const pageResult = useGhRepoPullRequests(owner, repo, { ...baseParams, page }, { enabled: enabled && variant === 'page' })
   const infinityResult = useGhRepoPullRequestsInfinite(owner, repo, baseParams, { enabled: enabled && variant === 'infinity' })
   const state = pagedState(variant, pageResult, infinityResult)
+  useListStateChange(state, onStateChange)
 
   if (children) return children(state)
   if (state.error) return <ErrorState type="network" description={state.error.message} />

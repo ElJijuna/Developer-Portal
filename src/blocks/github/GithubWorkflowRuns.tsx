@@ -3,10 +3,11 @@ import { useGhRepoWorkflowRuns, useGhRepoWorkflowRunsInfinite } from '@api-hooks
 import { ErrorState } from '@gnome-ui/layout'
 import type { GitHubWorkflowRun, GitHubWorkflowRunsResponse, WorkflowRunsParams } from 'gh-api-client'
 import { RepoWorkflowsTab } from '../../components/repo/RepoWorkflowsTab'
-import type { GithubBlockBaseProps, GithubListChildren } from './types'
-import { DEFAULT_LIMIT, workflowRunsState } from './utils'
+import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from './types'
+import { DEFAULT_LIMIT, useListStateChange, workflowRunsState } from './utils'
 
 export type GithubWorkflowRunsProps = GithubBlockBaseProps &
+  GithubListCallbacks<GitHubWorkflowRun> &
   GithubListChildren<GitHubWorkflowRun> & {
     owner: string
     repo: string
@@ -31,12 +32,14 @@ export function GithubWorkflowRuns({
   status,
   created,
   actor,
+  onStateChange,
   children,
 }: GithubWorkflowRunsProps) {
   const baseParams = { per_page: limit, branch, event, status, created, actor }
   const pageResult = useGhRepoWorkflowRuns(owner, repo, { ...baseParams, page }, { enabled: enabled && variant === 'page' })
   const infinityResult = useGhRepoWorkflowRunsInfinite(owner, repo, baseParams, { enabled: enabled && variant === 'infinity' })
   const state = workflowRunsState<GitHubWorkflowRunsResponse, GitHubWorkflowRun>(variant, pageResult, infinityResult)
+  useListStateChange(state, onStateChange)
   const chartData = useMemo(() => getWorkflowChartData(state.items), [state.items])
 
   if (children) return children(state)

@@ -3,12 +3,8 @@ import { useState, useMemo } from 'react'
 import {
   useGhRepo,
   useGhRepoTopics,
-  useGhRepoCommits,
   useGhRepoAdvisories,
   useGhRepoPullRequests,
-  useGhRepoReleases,
-  useGhRepoWorkflowRuns,
-  useGhRepoBranches,
   useGhRepoGitTree,
 } from '@api-hooks/gh'
 import { useLanguage } from '../../hooks/useLanguage'
@@ -35,6 +31,14 @@ import { RepoSecurityTab } from '../../components/repo/RepoSecurityTab'
 import { RepoBranchesTab } from '../../components/repo/RepoBranchesTab'
 import { useAuth } from '../../auth/AuthProvider'
 import { Badge, Skeleton } from '@gnome-ui/react'
+import {
+  GithubBranches,
+  GithubCommits,
+  GithubPullRequests,
+  GithubReleases,
+  GithubWorkflowRuns,
+} from '../../blocks/github'
+import type { GitHubWorkflowRun } from 'gh-api-client'
 
 export const Route = createFileRoute('/_authenticated/repositories/$owner/$repo')({
   component: RepoDetail,
@@ -61,20 +65,10 @@ function RepoDetail() {
 
   const { data: repo, isLoading: repoLoading, error: repoError } = useGhRepo(owner, repoName, { enabled });
   const { data: topics } = useGhRepoTopics(owner, repoName, { enabled });
-  const { data: commitsData, isLoading: commitsLoading } = useGhRepoCommits(owner, repoName, { per_page: 10 }, { enabled });
-  const { data: prsData, isLoading: prsLoading } = useGhRepoPullRequests(owner, repoName, { state: 'open', per_page: 20 }, { enabled });
-  const { data: releasesData, isLoading: releasesLoading } = useGhRepoReleases(owner, repoName, { per_page: 20 }, { enabled });
-  const { data: workflowsData, isLoading: workflowsLoading } = useGhRepoWorkflowRuns(owner, repoName, { per_page: 15 }, { enabled });
   const { data: advisoriesData, isLoading: advisoriesLoading } = useGhRepoAdvisories(owner, repoName, {}, { enabled });
-  const { data: branchesData, isLoading: branchesLoading } = useGhRepoBranches(owner, repoName, { per_page: 100 }, { enabled: enabled && activeTab === 'branches' });
   const { data: mergedPrsData } = useGhRepoPullRequests(owner, repoName, { state: 'closed', per_page: 100 }, { enabled: enabled && activeTab === 'branches' });
   const { data: gitTreeData } = useGhRepoGitTree(owner, repoName, repo?.default_branch ?? 'main', { recursive: '1' }, { enabled: !repoLoading });
-  const commits = commitsData?.values ?? [];
-  const prs = prsData?.values ?? [];
-  const releases = releasesData?.values ?? [];
-  const runs = workflowsData?.workflow_runs ?? [];
   const advisories = advisoriesData?.values ?? [];
-  const branches = branchesData?.values ?? [];
   const mergedPrs = mergedPrsData?.values ?? [];
   const totalFiles = gitTreeData?.tree.length ?? 0;
 
@@ -84,23 +78,6 @@ function RepoDetail() {
     () => new Set(mergedPrs.filter((pr) => pr.merged_at !== null).map((pr) => pr.head.ref)),
     [mergedPrs],
   )
-
-  const workflowChartData = useMemo(() => {
-    const chronological = [...runs].reverse()
-    const completed = chronological.filter((r) => r.run_started_at && r.conclusion !== null)
-    const durations = completed.map((r) =>
-      Math.max(1, Math.round((new Date(r.updated_at).getTime() - new Date(r.run_started_at!).getTime()) / 1000))
-    )
-    const outcomes = chronological.map((r) => r.conclusion === 'success' ? 1 : 0)
-    const finishedRuns = runs.filter((r) => r.conclusion !== null)
-    const successRate = finishedRuns.length > 0
-      ? finishedRuns.filter((r) => r.conclusion === 'success').length / finishedRuns.length
-      : 0
-    const avgDuration = durations.length > 0
-      ? durations.reduce((a, b) => a + b, 0) / durations.length
-      : 0
-    return { durations, outcomes, successRate, avgDuration }
-  }, [runs])
 
   const langInfo = useLanguage(repo?.language)
 
@@ -176,47 +153,135 @@ function RepoDetail() {
         </DashboardGrid>
 
         <Box orientation="vertical" spacing={12}>
-          <TabBar aria-label="Repository tabs" inline>
-            <TabItem name="overview" label="Overview" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} />
-            <TabItem name="commits" count={commits.length} label="Commits" active={activeTab === 'commits'} onClick={() => setActiveTab('commits')} />
-            <TabItem name="pull-requests" count={prs.length} label="Pull Requests" active={activeTab === 'pull-requests'} onClick={() => setActiveTab('pull-requests')} />
-            <TabItem name="releases" count={releases.length} label="Releases" active={activeTab === 'releases'} onClick={() => setActiveTab('releases')} />
-            <TabItem name="workflows" count={runs.length} label="Workflows" active={activeTab === 'workflows'} onClick={() => setActiveTab('workflows')} icon={GitWorkflow} />
-            <TabItem name="security" count={advisories.length} label="Security" active={activeTab === 'security'} onClick={() => setActiveTab('security')} icon={Lock} />
-            <TabItem name="branches" count={branches.length} label="Branches" active={activeTab === 'branches'} onClick={() => setActiveTab('branches')} icon={GitBranch} />
-          </TabBar>
-
-          {activeTab === 'overview' && (
-            <RepoOverviewTab repo={repo} langInfo={langInfo} repoExtras={repoExtras} />
-          )}
-          {activeTab === 'commits' && (
-            <RepoCommitsTab commits={commits} isLoading={commitsLoading} />
-          )}
-          {activeTab === 'pull-requests' && (
-            <RepoPullRequestsTab prs={prs} isLoading={prsLoading} />
-          )}
-          {activeTab === 'releases' && (
-            <RepoReleasesTab releases={releases} isLoading={releasesLoading} />
-          )}
-          {activeTab === 'workflows' && (
-            <RepoWorkflowsTab runs={runs} isLoading={workflowsLoading} chartData={workflowChartData} />
-          )}
-          {activeTab === 'security' && (
-            <RepoSecurityTab advisories={advisories} isLoading={advisoriesLoading} />
-          )}
-          {activeTab === 'branches' && (
-            <RepoBranchesTab
-              branches={branches}
-              isLoading={branchesLoading}
-              branchFilter={branchFilter}
-              onBranchFilterChange={setBranchFilter}
-              defaultBranch={repo.default_branch}
-              mergedBranchNames={mergedBranchNames}
-              repoHtmlUrl={repo.html_url}
-            />
-          )}
+          <RepoDataTabs
+            owner={owner}
+            repo={repoName}
+            enabled={enabled}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            repoNode={<RepoOverviewTab repo={repo} langInfo={langInfo} repoExtras={repoExtras} />}
+            advisoriesNode={<RepoSecurityTab advisories={advisories} isLoading={advisoriesLoading} />}
+            advisoriesCount={advisories.length}
+            branchFilter={branchFilter}
+            onBranchFilterChange={setBranchFilter}
+            defaultBranch={repo.default_branch}
+            mergedBranchNames={mergedBranchNames}
+            repoHtmlUrl={repo.html_url}
+          />
         </Box>
       </Box>
     </>
   )
+}
+
+type RepoDataTabsProps = {
+  owner: string
+  repo: string
+  enabled: boolean
+  activeTab: TabId
+  onTabChange: (tab: TabId) => void
+  repoNode: React.ReactNode
+  advisoriesNode: React.ReactNode
+  advisoriesCount: number
+  branchFilter: BranchFilter
+  onBranchFilterChange: (filter: BranchFilter) => void
+  defaultBranch: string
+  mergedBranchNames: Set<string>
+  repoHtmlUrl: string
+}
+
+function RepoDataTabs({
+  owner,
+  repo,
+  enabled,
+  activeTab,
+  onTabChange,
+  repoNode,
+  advisoriesNode,
+  advisoriesCount,
+  branchFilter,
+  onBranchFilterChange,
+  defaultBranch,
+  mergedBranchNames,
+  repoHtmlUrl,
+}: RepoDataTabsProps) {
+  const [counts, setCounts] = useState({
+    commits: 0,
+    pullRequests: 0,
+    releases: 0,
+    workflows: 0,
+    branches: 0,
+  })
+
+  function setTabCount(key: keyof typeof counts, count: number) {
+    setCounts((current) => current[key] === count ? current : { ...current, [key]: count })
+  }
+
+  return (
+    <>
+      <TabBar aria-label="Repository tabs" inline>
+        <TabItem name="overview" label="Overview" active={activeTab === 'overview'} onClick={() => onTabChange('overview')} />
+        <TabItem name="commits" count={counts.commits} label="Commits" active={activeTab === 'commits'} onClick={() => onTabChange('commits')} />
+        <TabItem name="pull-requests" count={counts.pullRequests} label="Pull Requests" active={activeTab === 'pull-requests'} onClick={() => onTabChange('pull-requests')} />
+        <TabItem name="releases" count={counts.releases} label="Releases" active={activeTab === 'releases'} onClick={() => onTabChange('releases')} />
+        <TabItem name="workflows" count={counts.workflows} label="Workflows" active={activeTab === 'workflows'} onClick={() => onTabChange('workflows')} icon={GitWorkflow} />
+        <TabItem name="security" count={advisoriesCount} label="Security" active={activeTab === 'security'} onClick={() => onTabChange('security')} icon={Lock} />
+        <TabItem name="branches" count={counts.branches} label="Branches" active={activeTab === 'branches'} onClick={() => onTabChange('branches')} icon={GitBranch} />
+      </TabBar>
+
+      {activeTab === 'overview' && repoNode}
+
+      <GithubCommits owner={owner} repo={repo} limit={10} enabled={enabled} onStateChange={({ count }) => setTabCount('commits', count)}>
+        {(state) => activeTab === 'commits' ? <RepoCommitsTab commits={state.items} isLoading={state.isPending} /> : null}
+      </GithubCommits>
+
+      <GithubPullRequests owner={owner} repo={repo} limit={20} state="open" enabled={enabled} onStateChange={({ count }) => setTabCount('pullRequests', count)}>
+        {(state) => activeTab === 'pull-requests' ? <RepoPullRequestsTab prs={state.items} isLoading={state.isPending} /> : null}
+      </GithubPullRequests>
+
+      <GithubReleases owner={owner} repo={repo} limit={20} enabled={enabled} onStateChange={({ count }) => setTabCount('releases', count)}>
+        {(state) => activeTab === 'releases' ? <RepoReleasesTab releases={state.items} isLoading={state.isPending} /> : null}
+      </GithubReleases>
+
+      <GithubWorkflowRuns owner={owner} repo={repo} limit={15} enabled={enabled} onStateChange={({ count }) => setTabCount('workflows', count)}>
+        {(state) => activeTab === 'workflows'
+          ? <RepoWorkflowsTab runs={state.items} isLoading={state.isPending} chartData={getWorkflowChartData(state.items)} />
+          : null}
+      </GithubWorkflowRuns>
+
+      {activeTab === 'security' && advisoriesNode}
+
+      <GithubBranches owner={owner} repo={repo} limit={100} enabled={enabled && activeTab === 'branches'} onStateChange={({ count }) => setTabCount('branches', count)}>
+        {(state) => activeTab === 'branches' ? (
+          <RepoBranchesTab
+            branches={state.items}
+            isLoading={state.isPending}
+            branchFilter={branchFilter}
+            onBranchFilterChange={onBranchFilterChange}
+            defaultBranch={defaultBranch}
+            mergedBranchNames={mergedBranchNames}
+            repoHtmlUrl={repoHtmlUrl}
+          />
+        ) : null}
+      </GithubBranches>
+    </>
+  )
+}
+
+function getWorkflowChartData(runs: GitHubWorkflowRun[]) {
+  const chronological = [...runs].reverse()
+  const completed = chronological.filter((run) => run.run_started_at && run.conclusion !== null)
+  const durations = completed.map((run) =>
+    Math.max(1, Math.round((new Date(run.updated_at).getTime() - new Date(run.run_started_at!).getTime()) / 1000)),
+  )
+  const outcomes = chronological.map((run) => (run.conclusion === 'success' ? 1 : 0))
+  const finishedRuns = runs.filter((run) => run.conclusion !== null)
+  const successRate = finishedRuns.length > 0
+    ? finishedRuns.filter((run) => run.conclusion === 'success').length / finishedRuns.length
+    : 0
+  const avgDuration = durations.length > 0
+    ? durations.reduce((total, duration) => total + duration, 0) / durations.length
+    : 0
+
+  return { durations, outcomes, successRate, avgDuration }
 }

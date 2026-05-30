@@ -1,9 +1,10 @@
-import type { GithubBlockVariant, GithubListState, GithubValueState } from './types'
+import { useEffect, useEffectEvent, useMemo } from 'react'
+import type { GithubBlockVariant, GithubListSnapshot, GithubListState, GithubValueState } from './types'
 
 export const DEFAULT_LIMIT = 100
 
 type PageResult<T> = {
-  data?: { values: T[] }
+  data?: { values: T[]; totalCount?: number }
   isPending: boolean
   isFetching: boolean
   error: Error | null
@@ -11,7 +12,7 @@ type PageResult<T> = {
 }
 
 type InfiniteResult<T> = {
-  data?: { pages: Array<{ values: T[] }> }
+  data?: { pages: Array<{ values: T[]; totalCount?: number }> }
   isPending: boolean
   isFetching: boolean
   isFetchingNextPage: boolean
@@ -29,6 +30,7 @@ export function pagedState<T>(
   if (variant === 'infinity') {
     return {
       items: infinityResult.data?.pages.flatMap((page) => page.values) ?? [],
+      totalCount: infinityResult.data?.pages[0]?.totalCount,
       isPending: infinityResult.isPending,
       isFetching: infinityResult.isFetching,
       isFetchingNextPage: infinityResult.isFetchingNextPage,
@@ -45,6 +47,7 @@ export function pagedState<T>(
 
   return {
     items: pageResult.data?.values ?? [],
+    totalCount: pageResult.data?.totalCount,
     isPending: pageResult.isPending,
     isFetching: pageResult.isFetching,
     isFetchingNextPage: false,
@@ -77,7 +80,41 @@ export function valueState<T>(result: ValueResult<T>): GithubValueState<T> {
   }
 }
 
-export function workflowRunsState<T extends { workflow_runs: R[] }, R>(
+export function useListStateChange<T>(
+  state: GithubListState<T>,
+  onStateChange?: (state: GithubListSnapshot<T>) => void,
+) {
+  const emitStateChange = useEffectEvent((snapshot: GithubListSnapshot<T>) => {
+    onStateChange?.(snapshot)
+  })
+  const snapshot = useMemo(
+    () => ({
+      items: state.items,
+      count: state.items.length,
+      totalCount: state.totalCount,
+      isPending: state.isPending,
+      isFetching: state.isFetching,
+      isFetchingNextPage: state.isFetchingNextPage,
+      error: state.error,
+      hasNextPage: state.hasNextPage,
+    }),
+    [
+      state.error,
+      state.hasNextPage,
+      state.isFetching,
+      state.isFetchingNextPage,
+      state.isPending,
+      state.items,
+      state.totalCount,
+    ],
+  )
+
+  useEffect(() => {
+    emitStateChange(snapshot)
+  }, [emitStateChange, snapshot])
+}
+
+export function workflowRunsState<T extends { workflow_runs: R[]; total_count?: number }, R>(
   variant: GithubBlockVariant,
   pageResult: {
     data?: T
@@ -100,6 +137,7 @@ export function workflowRunsState<T extends { workflow_runs: R[] }, R>(
   if (variant === 'infinity') {
     return {
       items: infinityResult.data?.pages.flatMap((page) => page.workflow_runs) ?? [],
+      totalCount: infinityResult.data?.pages[0]?.total_count,
       isPending: infinityResult.isPending,
       isFetching: infinityResult.isFetching,
       isFetchingNextPage: infinityResult.isFetchingNextPage,
@@ -116,6 +154,7 @@ export function workflowRunsState<T extends { workflow_runs: R[] }, R>(
 
   return {
     items: pageResult.data?.workflow_runs ?? [],
+    totalCount: pageResult.data?.total_count,
     isPending: pageResult.isPending,
     isFetching: pageResult.isFetching,
     isFetchingNextPage: false,

@@ -6,10 +6,11 @@ import { Icon } from '@gnome-ui/react/components/Icon'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { StatusBadge } from '@gnome-ui/react/components/StatusBadge'
 import type { BranchesParams, GitHubBranch } from 'gh-api-client'
-import type { GithubBlockBaseProps, GithubListChildren } from './types'
-import { DEFAULT_LIMIT, pagedState } from './utils'
+import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from './types'
+import { DEFAULT_LIMIT, pagedState, useListStateChange } from './utils'
 
 export type GithubBranchesProps = GithubBlockBaseProps &
+  GithubListCallbacks<GitHubBranch> &
   GithubListChildren<GitHubBranch> & {
     owner: string
     repo: string
@@ -26,12 +27,14 @@ export function GithubBranches({
   limit = DEFAULT_LIMIT,
   page,
   protected: protectedBranch,
+  onStateChange,
   children,
 }: GithubBranchesProps) {
   const baseParams = { per_page: limit, protected: protectedBranch }
   const pageResult = useGhRepoBranches(owner, repo, { ...baseParams, page }, { enabled: enabled && variant === 'page' })
   const infinityResult = useGhRepoBranchesInfinite(owner, repo, baseParams, { enabled: enabled && variant === 'infinity' })
   const state = pagedState(variant, pageResult, infinityResult)
+  useListStateChange(state, onStateChange)
 
   if (children) return children(state)
   if (state.error) return <ErrorState type="network" description={state.error.message} />
