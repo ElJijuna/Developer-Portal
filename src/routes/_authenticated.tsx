@@ -9,15 +9,17 @@ import { Popover } from '@gnome-ui/react/components/Popover';
 import { GoHome, Heart, Applications, Notifications, GitIssueOpened, GitPullRequest, Check, Information, Folder, Lock } from '@gnome-ui/icons';
 import { GnomeProvider } from '@gnome-ui/react';
 import { DeveloperPortalLogo } from '../components/DeveloperPortalLogo';
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { Box } from '@gnome-ui/react/components/Box';
 import { Button } from '@gnome-ui/react/components/Button';
 import { GhClientProvider } from '@api-hooks/gh';
 import { GitHubClient } from 'gh-api-client';
+import { createMonitor } from 'monitor-api';
 import { AppSettingsContext, useAppSettingsState } from '../lib/appSettings';
 import { PwaUpdateControl } from '../components/PwaUpdateControl';
 import { useSignOut } from '../auth/hooks';
 import { ApplicationFooter } from '../components/ApplicationFooter';
+import { AppMonitorControl } from '../components/AppMonitorControl';
 
 export const Route = createFileRoute('/_authenticated')({
   async beforeLoad() {
@@ -50,9 +52,29 @@ function AuthenticatedLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const token = user?.githubToken ?? ''
   const ghClient = useMemo(() => new GitHubClient({ token: token || undefined }), [token])
+  const monitor = useMemo(() => createMonitor({
+    maxHistory: 120,
+    env: import.meta.env.PROD ? 'production' : 'development',
+    collectors: {
+      performance: true,
+      network: true,
+      react: false,
+      events: true,
+      webVitals: true,
+    },
+    networkFilter: (url) =>
+      !url.includes('/manifest.webmanifest') &&
+      !url.includes('/sw.js') &&
+      !url.includes('/workbox-'),
+  }), [])
   const appSettings = useAppSettingsState()
   const { settings } = appSettings
   const { mutate: signOut, isPending: signOutPending } = useSignOut()
+
+  useEffect(() => {
+    monitor.start()
+    return () => monitor.destroy()
+  }, [monitor])
 
   function go(to: '/profile' | '/settings') {
     setUserMenuOpen(false)
@@ -109,6 +131,18 @@ function AuthenticatedLayout() {
   )
 
   const AppLogo: FC<{ size?: number }> = ({ size }) => <Box align="center" padding={6}><DeveloperPortalLogo size={size} /></Box>;
+  const sidebarFooter = (
+    <Box orientation="vertical" spacing={2}>
+      <AppMonitorControl monitor={monitor} />
+      <PwaUpdateControl />
+    </Box>
+  )
+  const sidebarFooterCollapsed = (
+    <Box orientation="vertical" spacing={2}>
+      <AppMonitorControl monitor={monitor} collapsed />
+      <PwaUpdateControl collapsed />
+    </Box>
+  )
 
   return (
     <GnomeProvider colorScheme={settings.theme} accentColor={settings.accentColor}>
@@ -121,8 +155,8 @@ function AuthenticatedLayout() {
               onValueChange={(id) => navigate({ to: id })}
               sidebarHeader={<AppLogo />}
               sidebarHeaderCollapsed={<AppLogo size={32} />}
-              sidebarFooter={<PwaUpdateControl />}
-              sidebarFooterCollapsed={<PwaUpdateControl collapsed />}
+              sidebarFooter={sidebarFooter}
+              sidebarFooterCollapsed={sidebarFooterCollapsed}
               sidebarPlacement="full"
               showHeaderSeparator={false}
               showFooterSeparator={false}
