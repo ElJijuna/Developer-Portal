@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.19.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.18.0...v1.19.0) (2026-05-31)
+
+### Features
+
+* add hover preview popover to footer widgets and floaty open button to profile card ([072bac2](https://github.com/ElJijuna/Developer-Portal/commit/072bac2f78967880c2aca4e6e02241f8586c0a8a))
+
 ## [1.18.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.17.0...v1.18.0) (2026-05-30)
 
 ### Features
