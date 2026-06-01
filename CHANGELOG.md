@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.20.1](https://github.com/ElJijuna/Developer-Portal/compare/v1.20.0...v1.20.1) (2026-06-01)
+
+### Code Refactoring
+
+* centralize GitHub token guard in authenticated route beforeLoad ([dc48123](https://github.com/ElJijuna/Developer-Portal/commit/dc4812370accecb1e5f58640c637a85f82d04da1))
+
 ## [1.20.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.19.0...v1.20.0) (2026-06-01)
 
 ### Features
