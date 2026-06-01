@@ -1,4 +1,5 @@
 export * from './GithubBranches'
+export * from './GithubRepositoryLanguages'
 export * from './GithubCommits'
 export * from './GithubPullRequests'
 export * from './GithubReleases'

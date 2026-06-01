@@ -9,6 +9,7 @@ import { Folder, GitRepository } from '@gnome-ui/icons'
 import type { GitHubRepository } from 'gh-api-client'
 import type { LocalizedLanguage } from 'code-languages'
 import { RepoContributionGraph } from './RepoContributionGraph'
+import { GithubRepositoryLanguages } from '../../blocks/github'
 
 type RepoOverviewExtras = {
   is_template?: boolean
@@ -24,6 +25,8 @@ export type RepositoryOverviewProps = {
 export function RepositoryOverview({ repo, langInfo, repoExtras }: RepositoryOverviewProps) {
   return (
     <Box orientation="vertical" spacing={12}>
+      <GithubRepositoryLanguages owner={repo.owner.login} repo={repo.name} />
+
       {repo.language ? (
         <Card padding="md">
           <Box orientation="vertical" spacing={12}>
