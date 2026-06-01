@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.20.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.19.0...v1.20.0) (2026-06-01)
+
+### Features
+
+* add GithubRepositoryLanguages block with language distribution bar ([2e3d24d](https://github.com/ElJijuna/Developer-Portal/commit/2e3d24d9b0bca54923ad7680af6338dbbea58fbf))
+* add GithubRepositoryLanguages block with language distribution bar ([a85424d](https://github.com/ElJijuna/Developer-Portal/commit/a85424dd1a4c6282407d2334d867a5a63529bdce))
+
 ## [1.19.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.18.0...v1.19.0) (2026-05-31)
 
 ### Features

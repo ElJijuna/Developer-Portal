@@ -1,7 +1,7 @@
 {
   "name": "developer-portal",
   "private": false,
-  "version": "1.19.0",
+  "version": "1.20.0",
   "type": "module",
   "author": "pilmee <pilmee@gmail.com> (https://github.com/ElJijuna)",
   "scripts": {
