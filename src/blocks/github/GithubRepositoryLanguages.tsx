@@ -3,6 +3,7 @@ import { EmptyState, ErrorState } from '@gnome-ui/layout'
 import { GitCodeReview } from '@gnome-ui/icons'
 import { Box } from '@gnome-ui/react/components/Box'
 import { Icon } from '@gnome-ui/react/components/Icon'
+import { Popover } from '@gnome-ui/react/components/Popover'
 import { SegmentedBar } from '@gnome-ui/react/components/SegmentedBar'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { Text } from '@gnome-ui/react/components/Text'
@@ -28,7 +29,7 @@ export function GithubRepositoryLanguages({ owner, repo, enabled = true }: Githu
       .sort(([, a], [, b]) => b - a)
       .map(([lang, bytes]) => {
         const info = api.language(lang).locale('en-US').get()
-        return { lang, bytes, percent: (bytes / total) * 100, color: info?.color }
+        return { lang, bytes, percent: (bytes / total) * 100, color: info?.color, info: info ?? null }
       })
   }, [state.data])
 
@@ -61,7 +62,7 @@ export function GithubRepositoryLanguages({ owner, repo, enabled = true }: Githu
       <Box orientation="vertical" spacing={12}>
         <SegmentedBar values={segments} />
         <Box orientation="vertical" spacing={4}>
-          {entries.map(({ lang, percent, color }) => (
+          {entries.map(({ lang, percent, color, info }) => (
             <Box key={lang} orientation="horizontal" spacing={12} align="center">
               <Box
                 style={{
@@ -72,7 +73,32 @@ export function GithubRepositoryLanguages({ owner, repo, enabled = true }: Githu
                   flexShrink: 0,
                 }}
               />
-              <Text variant="caption" style={{ flex: 1 }}>{lang}</Text>
+              {info ? (
+                <div style={{ flex: 1, cursor: 'pointer' }}>
+                  <Popover
+                    placement="top"
+                    content={
+                      <Box orientation="vertical" spacing={8} style={{ maxWidth: 260, padding: 4 }}>
+                        <Box orientation="horizontal" spacing={8} align="center">
+                          <img src={info.logo} alt={info.name} width={20} height={20} />
+                          <Text variant="heading" style={{ fontWeight: 600 }}>{info.name}</Text>
+                        </Box>
+                        <Text variant="caption" color="dim">{info.description}</Text>
+                        {info.paradigms.length > 0 && (
+                          <Text variant="caption" color="dim">{info.paradigms.join(', ')}</Text>
+                        )}
+                        {info.author && (
+                          <Text variant="caption" color="dim">by {info.author}</Text>
+                        )}
+                      </Box>
+                    }
+                  >
+                    <Text variant="caption">{lang}</Text>
+                  </Popover>
+                </div>
+              ) : (
+                <Text variant="caption" style={{ flex: 1 }}>{lang}</Text>
+              )}
               <Text variant="caption" color="dim">{percent.toFixed(1)}%</Text>
             </Box>
           ))}
