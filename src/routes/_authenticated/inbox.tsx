@@ -17,7 +17,7 @@ import { IconButton } from '@gnome-ui/react/components/IconButton'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { Icon } from '@gnome-ui/react/components/Icon'
 import { Text } from '@gnome-ui/react/components/Text'
-import { Notifications, Check, Warning, Document, Settings } from '@gnome-ui/icons'
+import { Notifications, Check, Warning, Document } from '@gnome-ui/icons'
 import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
 import { PageHeader } from '../../components/PageHeader'
 import { useAuth } from '../../auth/AuthProvider'
@@ -119,25 +119,6 @@ function Inbox() {
     markAllReadMutate(undefined)
   }, [notifications, markAllReadMutate])
 
-  if (!token) {
-    return (
-      <>
-        <PageHeader title="Inbox" segments={[{ label: 'Inbox', path: '/inbox' }]} />
-        <Box padding={24}>
-          <EmptyState
-            icon={<Icon icon={GitHubIcon} size="lg" />}
-            title="GitHub not connected"
-            description="Add your GitHub token in Settings to see your notifications."
-            action={
-              <Button variant="suggested" leadingIcon={<Icon icon={Settings} />} onClick={() => navigate({ to: '/settings' })}>
-                Go to Settings
-              </Button>
-            }
-          />
-        </Box>
-      </>
-    )
-  }
 
   const markAllAction = (
     <Button

@@ -12,8 +12,7 @@ import { Text } from '@gnome-ui/react/components/Text'
 import { Icon } from '@gnome-ui/react/components/Icon'
 import { Button } from '@gnome-ui/react/components/Button'
 import { StatusBadge } from '@gnome-ui/react/components/StatusBadge'
-import { GitPullRequest, GitPullRequestDraft, GitCodeReview, Settings } from '@gnome-ui/icons'
-import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
+import { GitPullRequest, GitPullRequestDraft, GitCodeReview } from '@gnome-ui/icons'
 import { PageHeader } from '../../components/PageHeader'
 import { useAuth } from '../../auth/AuthProvider'
 
@@ -77,25 +76,6 @@ function PullRequests() {
 
   const isLoading = meLoading || prsLoading
 
-  if (!token) {
-    return (
-      <>
-        <PageHeader title="Pull Requests" segments={[{ label: 'Pull Requests', path: '/pull-requests' }]} />
-        <Box padding={24}>
-          <EmptyState
-            icon={<Icon icon={GitHubIcon} size="lg" />}
-            title="GitHub not connected"
-            description="Add your GitHub token in Settings to see your pull requests."
-            action={
-              <Button variant="suggested" leadingIcon={<Icon icon={Settings} />} onClick={() => navigate({ to: '/settings' })}>
-                Go to Settings
-              </Button>
-            }
-          />
-        </Box>
-      </>
-    )
-  }
 
   return (
     <>

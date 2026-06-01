@@ -2,8 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { onAuthStateChanged, type User } from 'firebase/auth'
 import { auth } from './proxy/firebase'
 import type { AuthUser } from './domain'
-
-const GITHUB_TOKEN_KEY = 'dp:github_token'
+import { GITHUB_TOKEN_KEY } from './constants'
 
 export function persistGithubToken(token: string): void {
   localStorage.setItem(GITHUB_TOKEN_KEY, token)
@@ -29,9 +28,21 @@ const AuthContext = createContext<AuthContextValue>({
   setGithubToken: () => {},
 })
 
+function userFromFirebase(firebaseUser: User): AuthUser {
+  return {
+    uid: firebaseUser.uid,
+    displayName: firebaseUser.displayName,
+    email: firebaseUser.email,
+    photoURL: firebaseUser.photoURL,
+    githubToken: readGithubToken(),
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null)
-  const [authLoading, setAuthLoading] = useState(true)
+  const [user, setUser] = useState<AuthUser | null>(() =>
+    auth?.currentUser ? userFromFirebase(auth.currentUser) : null
+  )
+  const [authLoading, setAuthLoading] = useState(() => !auth?.currentUser)
 
   useEffect(() => {
     if (!auth) {
@@ -41,13 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser: User | null) => {
       if (firebaseUser) {
-        setUser({
-          uid: firebaseUser.uid,
-          displayName: firebaseUser.displayName,
-          email: firebaseUser.email,
-          photoURL: firebaseUser.photoURL,
-          githubToken: readGithubToken(),
-        })
+        setUser(userFromFirebase(firebaseUser))
       } else {
         clearGithubToken()
         setUser(null)

@@ -5,10 +5,8 @@ import { DashboardGrid } from '@gnome-ui/layout/components/DashboardGrid'
 import { CounterCard } from '@gnome-ui/layout/components/CounterCard'
 import { ContributionGraph } from '@gnome-ui/react/components/ContributionGraph'
 import { Box } from '@gnome-ui/react/components/Box'
-import { StatusPage } from '@gnome-ui/react/components/StatusPage'
 import { Skeleton } from '@gnome-ui/react/components/Skeleton'
-import { Button } from '@gnome-ui/react/components/Button'
-import { GitRepository, Person, Heart, Star, GitHub } from '@gnome-ui/icons'
+import { GitRepository, Person, Heart, Star } from '@gnome-ui/icons'
 import { SparkAreaChart } from '@gnome-ui/charts'
 import { Icon, Separator } from '@gnome-ui/react'
 import { IconBadge, PanelCard } from '@gnome-ui/layout'
@@ -38,20 +36,6 @@ function Dashboard() {
     {},
     { enabled: !!login && !!token },
   )
-
-  if (!token) {
-    return (
-      <StatusPage
-        icon={GitHub}
-        title="Configura tu token"
-        description="Añade un token de GitHub en Settings para ver tus estadísticas."
-      >
-        <Button variant="suggested" onClick={() => navigate({ to: '/settings' })}>
-          Ir a Settings
-        </Button>
-      </StatusPage>
-    )
-  }
 
   const totalStars = repos?.values.reduce((s, r) => s + r.stargazers_count, 0) ?? 0
   const topRepos = [...(repos?.values ?? [])]

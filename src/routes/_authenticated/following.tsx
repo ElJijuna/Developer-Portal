@@ -15,8 +15,7 @@ import { Text } from '@gnome-ui/react/components/Text'
 import { Box } from '@gnome-ui/react/components/Box'
 import { Icon } from '@gnome-ui/react/components/Icon'
 import { IconButton } from '@gnome-ui/react/components/IconButton'
-import { Heart, Person, Search, Settings } from '@gnome-ui/icons'
-import { GitHub } from '@gnome-ui/icons/third-party'
+import { Heart, Person, Search } from '@gnome-ui/icons'
 import {
   useGhCurrentUser,
   useGhUserFollowersInfinite,
@@ -105,29 +104,6 @@ function Following() {
       onClick={() => setSearchOpen((v) => !v)}
     />
   )
-
-  if (!token) {
-    return (
-      <>
-        <PageHeader
-          title="Following"
-          segments={[{ label: 'Following', path: '/following' }]}
-        />
-        <Box padding={24}>
-          <EmptyState
-            icon={<Icon icon={GitHub} size="lg" />}
-            title="GitHub not connected"
-            description="Sign in with GitHub or add your GitHub token in Settings to view your followers and following."
-            action={
-              <Button variant="suggested" leadingIcon={<Icon icon={Settings} />}>
-                Go to Settings
-              </Button>
-            }
-          />
-        </Box>
-      </>
-    )
-  }
 
   return (
     <>

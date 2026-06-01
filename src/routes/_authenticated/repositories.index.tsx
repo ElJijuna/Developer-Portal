@@ -11,7 +11,7 @@ import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { SearchBar } from '@gnome-ui/react/components/SearchBar'
 import { IconButton } from '@gnome-ui/react/components/IconButton'
 import { ToggleGroup, ToggleGroupItem } from '@gnome-ui/react/components/ToggleGroup'
-import { Folder, GitFork, GitCommit, Warning, Search, Settings, Star } from '@gnome-ui/icons'
+import { Folder, GitFork, GitCommit, Warning, Search, Star } from '@gnome-ui/icons'
 import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
 import { PageHeader } from '../../components/PageHeader'
 import { RepositoryCard } from '../../components/RepositoryCard'
@@ -71,25 +71,6 @@ function Repositories() {
 
   const isLoading = meLoading || reposLoading
 
-  if (!token) {
-    return (
-      <>
-        <PageHeader title="Repositories" segments={[{ label: 'Repositories', path: '/repositories' }]} />
-        <Box padding={24}>
-          <EmptyState
-            icon={<Icon icon={GitHubIcon} size="lg" />}
-            title="GitHub not connected"
-            description="Add your GitHub token in Settings to see your repositories."
-            action={
-              <Button variant="suggested" leadingIcon={<Icon icon={Settings} />} onClick={() => navigate({ to: '/settings' })}>
-                Go to Settings
-              </Button>
-            }
-          />
-        </Box>
-      </>
-    )
-  }
 
   const actions = (
     <IconButton

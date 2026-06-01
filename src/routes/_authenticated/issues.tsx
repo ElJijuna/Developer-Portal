@@ -13,7 +13,7 @@ import { Button } from '@gnome-ui/react/components/Button'
 import { Chip } from '@gnome-ui/react/components/Chip'
 import { SearchBar } from '@gnome-ui/react/components/SearchBar'
 import { IconButton } from '@gnome-ui/react/components/IconButton'
-import { GitIssueOpened, GitRepository, Search, Settings } from '@gnome-ui/icons'
+import { GitIssueOpened, GitRepository, Search } from '@gnome-ui/icons'
 import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
 import { PageHeader } from '../../components/PageHeader'
 import { useAuth } from '../../auth/AuthProvider'
@@ -72,25 +72,6 @@ function Issues() {
     )
   }, [allIssues, searchQuery])
 
-  if (!token) {
-    return (
-      <>
-        <PageHeader title="Issues" segments={[{ label: 'Issues', path: '/issues' }]} />
-        <Box padding={24}>
-          <EmptyState
-            icon={<Icon icon={GitHubIcon} size="lg" />}
-            title="GitHub not connected"
-            description="Add your GitHub token in Settings to see your issues."
-            action={
-              <Button variant="suggested" leadingIcon={<Icon icon={Settings} />} onClick={() => navigate({ to: '/settings' })}>
-                Go to Settings
-              </Button>
-            }
-          />
-        </Box>
-      </>
-    )
-  }
 
   const searchAction = (
     <IconButton

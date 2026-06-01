@@ -12,7 +12,7 @@ import { Icon } from '@gnome-ui/react/components/Icon'
 import { Button } from '@gnome-ui/react/components/Button'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { SparkAreaChart } from '@gnome-ui/charts'
-import { Check, Settings, GitWorkflow } from '@gnome-ui/icons'
+import { Check, GitWorkflow } from '@gnome-ui/icons'
 import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
 import { PageHeader } from '../../components/PageHeader'
 import { RepoDoraCard } from '../../components/dora/RepoDoraCard'
@@ -55,25 +55,6 @@ function CICD() {
 
   const deploysByDay = useMemo(() => computeDeploymentsByDay(allRuns), [allRuns])
 
-  if (!token) {
-    return (
-      <>
-        <PageHeader title="CI/CD" segments={[{ label: 'CI/CD', path: '/cicd' }]} />
-        <Box padding={24}>
-          <EmptyState
-            icon={<Icon icon={GitHubIcon} size="lg" />}
-            title="GitHub not connected"
-            description="Add your GitHub token in Settings to see your CI/CD status."
-            action={
-              <Button variant="suggested" leadingIcon={<Icon icon={Settings} />} onClick={() => navigate({ to: '/settings' })}>
-                Go to Settings
-              </Button>
-            }
-          />
-        </Box>
-      </>
-    )
-  }
 
   return (
     <>

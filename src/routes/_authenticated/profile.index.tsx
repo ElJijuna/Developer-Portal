@@ -1,11 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { EmptyState } from '@gnome-ui/layout'
 import { Box } from '@gnome-ui/react/components/Box'
-import { Button } from '@gnome-ui/react/components/Button'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
-import { Icon } from '@gnome-ui/react/components/Icon'
-import { Settings } from '@gnome-ui/icons'
-import { GitHub } from '@gnome-ui/icons/third-party'
 import { useGhCurrentUser } from '@api-hooks/gh'
 import { useAuth } from '../../auth/AuthProvider'
 import { PageHeader } from '../../components/PageHeader'
@@ -23,28 +18,6 @@ function OwnProfile() {
     enabled: !!token,
   })
 
-  if (!token) {
-    return (
-      <>
-        <PageHeader
-          title="Profile"
-          segments={[{ label: 'Profile', path: '/profile' }]}
-        />
-        <Box padding={24}>
-          <EmptyState
-            icon={<Icon icon={GitHub} size="lg" />}
-            title="GitHub not connected"
-            description="Sign in with GitHub or add your GitHub token in Settings to view your profile."
-            action={
-              <Button variant="suggested" leadingIcon={<Icon icon={Settings} />}>
-                Go to Settings
-              </Button>
-            }
-          />
-        </Box>
-      </>
-    )
-  }
 
   if (isLoading || !currentUser?.login) {
     return (

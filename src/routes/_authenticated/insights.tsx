@@ -13,7 +13,7 @@ import { Text } from '@gnome-ui/react/components/Text'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { Icon } from '@gnome-ui/react/components/Icon'
 import { Button } from '@gnome-ui/react/components/Button'
-import { Information, Star, Settings } from '@gnome-ui/icons'
+import { Information, Star } from '@gnome-ui/icons'
 import { SparkBarChart } from '@gnome-ui/charts'
 import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
 import { PageHeader } from '../../components/PageHeader'
@@ -127,25 +127,6 @@ function Insights() {
   )
 
 
-  if (!token) {
-    return (
-      <>
-        <PageHeader title="Insights" segments={[{ label: 'Insights', path: '/insights' }]} />
-        <Box padding={24}>
-          <EmptyState
-            icon={<Icon icon={GitHubIcon} size="lg" />}
-            title="GitHub not connected"
-            description="Add your GitHub token in Settings to see insights."
-            action={
-              <Button variant="suggested" leadingIcon={<Icon icon={Settings} />} onClick={() => navigate({ to: '/settings' })}>
-                Go to Settings
-              </Button>
-            }
-          />
-        </Box>
-      </>
-    )
-  }
 
   return (
     <>

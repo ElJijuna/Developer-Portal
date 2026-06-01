@@ -1,5 +1,6 @@
 import { createFileRoute, redirect, Outlet, useNavigate, useRouterState } from '@tanstack/react-router';
 import { auth } from '../auth/proxy/firebase';
+import { GITHUB_TOKEN_KEY } from '../auth/constants';
 import { useAuth } from '../auth/AuthProvider';
 import { AdaptiveLayout, type AdaptiveNavItem } from '@gnome-ui/layout/components/AdaptiveLayout';
 import { UserCard } from '@gnome-ui/layout/components/UserCard';
@@ -25,9 +26,9 @@ export const Route = createFileRoute('/_authenticated')({
   async beforeLoad() {
     if (auth) await auth.authStateReady()
     const currentUser = auth?.currentUser ?? null
-    if (!currentUser) {
-      throw redirect({ to: '/login' })
-    }
+    if (!currentUser) throw redirect({ to: '/login' })
+    const token = localStorage.getItem(GITHUB_TOKEN_KEY) ?? ''
+    if (!token) throw redirect({ to: '/login' })
   },
   component: AuthenticatedLayout,
 })
