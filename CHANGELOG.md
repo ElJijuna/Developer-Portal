@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.21.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.20.1...v1.21.0) (2026-06-01)
+
+### Features
+
+* add organizations section with list and detail views ([2d6367e](https://github.com/ElJijuna/Developer-Portal/commit/2d6367e1c5e8081b09611a809837a78dfc82d74a))
+
+### Bug Fixes
+
+* change isLoading for isPending and update value setted in search state ([9cbd0f3](https://github.com/ElJijuna/Developer-Portal/commit/9cbd0f361481223bd2aa616d5ecc0de6cdacfc87))
+
 ## [1.20.1](https://github.com/ElJijuna/Developer-Portal/compare/v1.20.0...v1.20.1) (2026-06-01)
 
 ### Code Refactoring
