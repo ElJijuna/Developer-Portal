@@ -24,10 +24,10 @@ function Organizations() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
 
-  const { data: me, isLoading: meLoading } = useGhCurrentUser({ enabled: !!token })
+  const { data: me, isPending: meLoading } = useGhCurrentUser({ enabled: !!token })
   const login = me?.login ?? ''
 
-  const { data: orgsData, isLoading: orgsLoading, error } = useGhUserOrganizations(
+  const { data: orgsData, isPending: orgsLoading, error } = useGhUserOrganizations(
     login,
     { per_page: 100 },
     { enabled: !!login },
@@ -62,14 +62,13 @@ function Organizations() {
       />
 
       <Box orientation="vertical" spacing={12}>
-        {searchOpen && (
-          <SearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Search organizations…"
-            autoFocus
-          />
-        )}
+        <SearchBar
+          open={searchOpen}
+          onClose={() => setSearchOpen(false)}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search organizations…"
+        />
 
         <DashboardGrid columns={{ xs: 1, sm: 2 }} gap="md">
           <CounterCard
