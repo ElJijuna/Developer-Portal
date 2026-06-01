@@ -2,11 +2,15 @@ import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { resolve } from 'node:path'
 
 export default defineConfig(({ command }) => {
   const base = command === 'build' ? (process.env.VITE_BASE_URL ?? '/') : '/'
   return {
     base,
+    resolve: {
+      alias: { '@': resolve(__dirname, 'src') },
+    },
     plugins: [
       tanstackRouter({ routesDirectory: './src/routes', generatedRouteTree: './src/routeTree.gen.ts' }),
       react(),
