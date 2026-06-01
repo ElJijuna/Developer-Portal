@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState, useCallback, useMemo } from 'react'
 import { useGhCurrentUser, useGhUserRepos } from '@api-hooks/gh'
 import type { GitHubWorkflowRun } from 'gh-api-client'
@@ -9,15 +9,13 @@ import { PanelCard } from '@gnome-ui/layout/components/PanelCard'
 import { EmptyState, ErrorState } from '@gnome-ui/layout'
 import { Box } from '@gnome-ui/react/components/Box'
 import { Icon } from '@gnome-ui/react/components/Icon'
-import { Button } from '@gnome-ui/react/components/Button'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { SparkAreaChart } from '@gnome-ui/charts'
 import { Check, GitWorkflow } from '@gnome-ui/icons'
-import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
-import { PageHeader } from '../../components/PageHeader'
-import { RepoDoraCard } from '../../components/dora/RepoDoraCard'
-import { computeDeploymentsByDay } from '../../lib/dora'
-import { useAuth } from '../../auth/AuthProvider'
+import { PageHeader } from '@/components/PageHeader'
+import { RepoDoraCard } from '@/components/dora/RepoDoraCard'
+import { computeDeploymentsByDay } from '@/lib/dora'
+import { useAuth } from '@/auth/AuthProvider'
 
 export const Route = createFileRoute('/_authenticated/cicd')({
   component: CICD,
@@ -27,7 +25,6 @@ const MAX_REPOS = 15
 
 function CICD() {
   const { user } = useAuth()
-  const navigate = useNavigate()
   const token = user?.githubToken ?? ''
 
   const { data: me, isLoading: meLoading } = useGhCurrentUser({ enabled: !!token })
@@ -90,6 +87,7 @@ function CICD() {
             height={56}
             color="#26a269"
             aria-label="Successful deployments per day across all monitored repos"
+            gradient
           />
         </PanelCard>
 

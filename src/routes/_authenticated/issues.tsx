@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState, useMemo } from 'react'
 import { useGhIssues } from '@api-hooks/gh'
 import type { GitHubIssue } from 'gh-api-client'
@@ -9,14 +9,12 @@ import { Box } from '@gnome-ui/react/components/Box'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { Text } from '@gnome-ui/react/components/Text'
 import { Icon } from '@gnome-ui/react/components/Icon'
-import { Button } from '@gnome-ui/react/components/Button'
 import { Chip } from '@gnome-ui/react/components/Chip'
 import { SearchBar } from '@gnome-ui/react/components/SearchBar'
 import { IconButton } from '@gnome-ui/react/components/IconButton'
 import { GitIssueOpened, GitRepository, Search } from '@gnome-ui/icons'
-import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
-import { PageHeader } from '../../components/PageHeader'
-import { useAuth } from '../../auth/AuthProvider'
+import { PageHeader } from '@/components/PageHeader'
+import { useAuth } from '@/auth/AuthProvider'
 
 export const Route = createFileRoute('/_authenticated/issues')({
   component: Issues,
@@ -39,7 +37,6 @@ function relativeTime(iso: string) {
 
 function Issues() {
   const { user } = useAuth()
-  const navigate = useNavigate()
   const token = user?.githubToken ?? ''
   const [searchQuery, setSearchQuery] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
@@ -129,8 +126,8 @@ function Issues() {
                 description={
                   issue.labels.length > 0
                     ? issue.labels.map((l) => (
-                        <Chip key={l.id} label={l.name} style={{ marginRight: 4 }} />
-                      )) as unknown as string
+                      <Chip key={l.id} label={l.name} style={{ marginRight: 4 }} />
+                    )) as unknown as string
                     : undefined
                 }
                 meta={[`#${issue.number}`, relativeTime(issue.updated_at)]}

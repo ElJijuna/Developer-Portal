@@ -8,8 +8,8 @@ import { EmptyState, IconBadge } from '@gnome-ui/layout'
 import { Folder, GitRepository } from '@gnome-ui/icons'
 import type { GitHubRepository } from 'gh-api-client'
 import type { LocalizedLanguage } from 'code-languages'
-import { RepoContributionGraph } from './RepoContributionGraph'
-import { GithubRepositoryLanguages } from '../../blocks/github'
+import { RepoContributionGraph } from '@/components/repo/RepoContributionGraph'
+import { GithubRepositoryLanguages } from '@/blocks/github'
 
 type RepoOverviewExtras = {
   is_template?: boolean

@@ -7,7 +7,7 @@ import {
   useGhRepoPullRequests,
   useGhRepoGitTree,
 } from '@api-hooks/gh'
-import { useLanguage } from '../../hooks/useLanguage'
+import { useLanguage } from '@/hooks/useLanguage'
 import { CounterCard, ErrorState, PanelCard } from '@gnome-ui/layout'
 import { DashboardGrid } from '@gnome-ui/layout/components/DashboardGrid'
 import { Box } from '@gnome-ui/react/components/Box'
@@ -18,18 +18,18 @@ import { TabBar, TabItem } from '@gnome-ui/react/components/Tabs'
 import { Drawer } from '@gnome-ui/react/components/Drawer'
 import { Folder, Warning, Star, Share, GitIssueOpened, GitWorkflow, GitBranch, Lock, GitDiff } from '@gnome-ui/icons'
 import { Npm } from '@gnome-ui/icons/third-party'
-import { PageHeader } from '../../components/PageHeader'
-import { NpmPackageSummary } from '../../components/NpmPackageSummary'
-import { useRepoNpmPackages } from '../../hooks/useRepoNpmPackages'
-import { RepoHero } from '../../components/repo/RepoHero'
-import { RepositoryOverview } from '../../components/repo/RepositoryOverview'
-import { RepositoryCommitList } from '../../components/repo/RepositoryCommitList'
-import { RepositoryPullRequestList } from '../../components/repo/RepositoryPullRequestList'
-import { RepositoryReleaseList } from '../../components/repo/RepositoryReleaseList'
-import { RepositoryWorkflowRunPanel } from '../../components/repo/RepositoryWorkflowRunPanel'
-import { RepositoryAdvisoryList } from '../../components/repo/RepositoryAdvisoryList'
-import { RepositoryBranchList } from '../../components/repo/RepositoryBranchList'
-import { useAuth } from '../../auth/AuthProvider'
+import { PageHeader } from '@/components/PageHeader'
+import { NpmPackageSummary } from '@/components/NpmPackageSummary'
+import { useRepoNpmPackages } from '@/hooks/useRepoNpmPackages'
+import { RepoHero } from '@/components/repo/RepoHero'
+import { RepositoryOverview } from '@/components/repo/RepositoryOverview'
+import { RepositoryCommitList } from '@/components/repo/RepositoryCommitList'
+import { RepositoryPullRequestList } from '@/components/repo/RepositoryPullRequestList'
+import { RepositoryReleaseList } from '@/components/repo/RepositoryReleaseList'
+import { RepositoryWorkflowRunPanel } from '@/components/repo/RepositoryWorkflowRunPanel'
+import { RepositoryAdvisoryList } from '@/components/repo/RepositoryAdvisoryList'
+import { RepositoryBranchList } from '@/components/repo/RepositoryBranchList'
+import { useAuth } from '@/auth/AuthProvider'
 import { Badge, Skeleton } from '@gnome-ui/react'
 import {
   GithubBranches,
@@ -37,7 +37,7 @@ import {
   GithubPullRequests,
   GithubReleases,
   GithubWorkflowRuns,
-} from '../../blocks/github'
+} from '@/blocks/github'
 import type { GitHubWorkflowRun } from 'gh-api-client'
 
 export const Route = createFileRoute('/_authenticated/repositories/$owner/$repo')({

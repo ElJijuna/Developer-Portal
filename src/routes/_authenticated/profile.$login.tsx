@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useAuth } from '../../auth/AuthProvider'
-import { PageHeader } from '../../components/PageHeader'
-import { ProfileContent } from '../../components/ProfilePage'
+import { useAuth } from '@/auth/AuthProvider'
+import { PageHeader } from '@/components/PageHeader'
+import { ProfileContent } from '@/components/ProfilePage'
 
 export const Route = createFileRoute('/_authenticated/profile/$login')({
   component: UserProfile,

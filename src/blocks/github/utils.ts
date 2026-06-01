@@ -1,5 +1,5 @@
 import { useEffect, useEffectEvent, useMemo } from 'react'
-import type { GithubBlockVariant, GithubListSnapshot, GithubListState, GithubValueState } from './types'
+import type { GithubBlockVariant, GithubListSnapshot, GithubListState, GithubValueState } from '@/blocks/github/types'
 
 export const DEFAULT_LIMIT = 100
 

@@ -166,7 +166,7 @@ export function NpmMaintanerSummary({ username }: NpmMaintanerSummaryProps): Rea
         {chartData.length > 0 && (
           <Box orientation="vertical" spacing={4}>
             <Text variant="caption" color="dim">Downloads by published package — last month</Text>
-            <SparkAreaChart data={chartData} height={56} aria-label="Maintainer package downloads over the last month" />
+            <SparkAreaChart data={chartData} height={56} gradient strokeWidth={2.5} aria-label="Maintainer package downloads over the last month" />
           </Box>
         )}
       </Box>

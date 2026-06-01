@@ -18,12 +18,10 @@ import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { Icon } from '@gnome-ui/react/components/Icon'
 import { Text } from '@gnome-ui/react/components/Text'
 import { Notifications, Check, Warning, Document } from '@gnome-ui/icons'
-import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
-import { PageHeader } from '../../components/PageHeader'
-import { useAuth } from '../../auth/AuthProvider'
-import { useNavigate } from '@tanstack/react-router'
-import { notificationsCollection } from '../../db/collections'
-import type { NotificationRecord } from '../../db/schema'
+import { PageHeader } from '@/components/PageHeader'
+import { useAuth } from '@/auth/AuthProvider'
+import { notificationsCollection } from '@/db/collections'
+import type { NotificationRecord } from '@/db/schema'
 import type { GitHubNotification } from 'gh-api-client'
 
 export const Route = createFileRoute('/_authenticated/inbox')({
@@ -64,7 +62,6 @@ function mapNotification(n: GitHubNotification): NotificationRecord {
 
 function Inbox() {
   const { user } = useAuth()
-  const navigate = useNavigate()
   const token = user?.githubToken ?? ''
   const [activeTab, setActiveTab] = useState<InboxTab>('unread')
 

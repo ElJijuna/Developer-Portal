@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback } from 'react'
-import { getItem, setItem } from './localStorage'
+import { getItem, setItem } from '@/lib/localStorage'
 
 export interface AppSettings {
   theme: 'system' | 'light' | 'dark'

@@ -1,7 +1,7 @@
 import { GithubAuthProvider, signInWithPopup } from 'firebase/auth'
-import { auth } from './firebase'
-import { persistGithubToken } from '../AuthProvider'
-import type { AuthUser } from '../domain'
+import { auth } from '@/auth/proxy/firebase'
+import { persistGithubToken } from '@/auth/AuthProvider'
+import type { AuthUser } from '@/auth/domain'
 
 const provider = new GithubAuthProvider()
 provider.addScope('gist')

@@ -2,9 +2,9 @@ import { useMemo } from 'react'
 import { useGhRepoWorkflowRuns, useGhRepoWorkflowRunsInfinite } from '@api-hooks/gh'
 import { ErrorState } from '@gnome-ui/layout'
 import type { GitHubWorkflowRun, GitHubWorkflowRunsResponse, WorkflowRunsParams } from 'gh-api-client'
-import { RepositoryWorkflowRunPanel } from '../../components/repo/RepositoryWorkflowRunPanel'
-import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from './types'
-import { DEFAULT_LIMIT, useListStateChange, workflowRunsState } from './utils'
+import { RepositoryWorkflowRunPanel } from '@/components/repo/RepositoryWorkflowRunPanel'
+import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from '@/blocks/github/types'
+import { DEFAULT_LIMIT, useListStateChange, workflowRunsState } from '@/blocks/github/utils'
 
 export type GithubWorkflowRunsProps = GithubBlockBaseProps &
   GithubListCallbacks<GitHubWorkflowRun> &

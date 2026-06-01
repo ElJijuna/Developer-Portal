@@ -5,7 +5,7 @@ import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { EntityCard, EmptyState } from '@gnome-ui/layout'
 import { Folder } from '@gnome-ui/icons'
 import type { GitHubCommit } from 'gh-api-client'
-import { relativeTime } from '../../lib/formatting'
+import { relativeTime } from '@/lib/formatting'
 
 export type RepositoryCommitListProps = {
   commits: GitHubCommit[]

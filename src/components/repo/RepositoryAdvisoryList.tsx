@@ -4,7 +4,7 @@ import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { EntityCard, EmptyState } from '@gnome-ui/layout'
 import { Lock } from '@gnome-ui/icons'
 import type { GitHubRepositoryAdvisory } from 'gh-api-client'
-import { SEVERITY_COLOR, relativeTime } from '../../lib/formatting'
+import { SEVERITY_COLOR, relativeTime } from '@/lib/formatting'
 
 export type RepositoryAdvisoryListProps = {
   advisories: GitHubRepositoryAdvisory[]

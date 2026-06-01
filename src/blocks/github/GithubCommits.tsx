@@ -1,9 +1,9 @@
 import { useGhRepoCommits, useGhRepoCommitsInfinite } from '@api-hooks/gh'
 import { ErrorState } from '@gnome-ui/layout'
 import type { CommitsParams, GitHubCommit } from 'gh-api-client'
-import { RepositoryCommitList } from '../../components/repo/RepositoryCommitList'
-import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from './types'
-import { DEFAULT_LIMIT, pagedState, useListStateChange } from './utils'
+import { RepositoryCommitList } from '@/components/repo/RepositoryCommitList'
+import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from '@/blocks/github/types'
+import { DEFAULT_LIMIT, pagedState, useListStateChange } from '@/blocks/github/utils'
 
 export type GithubCommitsProps = GithubBlockBaseProps &
   GithubListCallbacks<GitHubCommit> &

@@ -1,9 +1,9 @@
 import { useGhRepoPullRequests, useGhRepoPullRequestsInfinite } from '@api-hooks/gh'
 import { ErrorState } from '@gnome-ui/layout'
 import type { GitHubPullRequest, PullRequestsParams } from 'gh-api-client'
-import { RepositoryPullRequestList } from '../../components/repo/RepositoryPullRequestList'
-import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from './types'
-import { DEFAULT_LIMIT, pagedState, useListStateChange } from './utils'
+import { RepositoryPullRequestList } from '@/components/repo/RepositoryPullRequestList'
+import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from '@/blocks/github/types'
+import { DEFAULT_LIMIT, pagedState, useListStateChange } from '@/blocks/github/utils'
 
 export type GithubPullRequestsProps = GithubBlockBaseProps &
   GithubListCallbacks<GitHubPullRequest> &

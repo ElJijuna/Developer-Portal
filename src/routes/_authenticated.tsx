@@ -1,7 +1,7 @@
 import { createFileRoute, redirect, Outlet, useNavigate, useRouterState } from '@tanstack/react-router';
-import { auth } from '../auth/proxy/firebase';
-import { GITHUB_TOKEN_KEY } from '../auth/constants';
-import { useAuth } from '../auth/AuthProvider';
+import { auth } from '@/auth/proxy/firebase';
+import { GITHUB_TOKEN_KEY } from '@/auth/constants';
+import { useAuth } from '@/auth/AuthProvider';
 import { AdaptiveLayout, type AdaptiveNavItem } from '@gnome-ui/layout/components/AdaptiveLayout';
 import { UserCard } from '@gnome-ui/layout/components/UserCard';
 import { HeaderBar } from '@gnome-ui/react/components/HeaderBar';
@@ -9,18 +9,18 @@ import { Avatar } from '@gnome-ui/react/components/Avatar';
 import { Popover } from '@gnome-ui/react/components/Popover';
 import { GoHome, Heart, Applications, Notifications, GitIssueOpened, GitPullRequest, Check, Information, Folder, Lock } from '@gnome-ui/icons';
 import { GnomeProvider } from '@gnome-ui/react';
-import { DeveloperPortalLogo } from '../components/DeveloperPortalLogo';
+import { DeveloperPortalLogo } from '@/components/DeveloperPortalLogo';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { Box } from '@gnome-ui/react/components/Box';
 import { Button } from '@gnome-ui/react/components/Button';
 import { GhClientProvider } from '@api-hooks/gh';
 import { GitHubClient } from 'gh-api-client';
 import { createMonitor } from 'monitor-api';
-import { AppSettingsContext, useAppSettingsState } from '../lib/appSettings';
-import { PwaUpdateControl } from '../components/PwaUpdateControl';
-import { useSignOut } from '../auth/hooks';
-import { ApplicationFooter } from '../components/ApplicationFooter';
-import { AppMonitorControl } from '../components/AppMonitorControl';
+import { AppSettingsContext, useAppSettingsState } from '@/lib/appSettings';
+import { PwaUpdateControl } from '@/components/PwaUpdateControl';
+import { useSignOut } from '@/auth/hooks';
+import { ApplicationFooter } from '@/components/ApplicationFooter';
+import { AppMonitorControl } from '@/components/AppMonitorControl';
 
 export const Route = createFileRoute('/_authenticated')({
   async beforeLoad() {

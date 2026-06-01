@@ -7,7 +7,7 @@ import { CounterCard, EntityCard, EmptyState } from '@gnome-ui/layout'
 import { SparkAreaChart, SparkBarChart } from '@gnome-ui/charts'
 import { Check, GitWorkflow } from '@gnome-ui/icons'
 import type { GitHubWorkflowRun } from 'gh-api-client'
-import { conclusionColor, relativeTime } from '../../lib/formatting'
+import { conclusionColor, relativeTime } from '@/lib/formatting'
 
 export type WorkflowChartData = {
   durations: number[]
@@ -63,6 +63,7 @@ export function RepositoryWorkflowRunPanel({ runs, isLoading, chartData }: Repos
               data={chartData.durations}
               height={48}
               aria-label="Duración de los últimos workflow runs"
+              gradient
             />
           </Box>
           <Box orientation="vertical" spacing={4}>

@@ -1,9 +1,9 @@
 import { useGhRepoReleases, useGhRepoReleasesInfinite } from '@api-hooks/gh'
 import { ErrorState } from '@gnome-ui/layout'
 import type { GitHubRelease, ReleasesParams } from 'gh-api-client'
-import { RepositoryReleaseList } from '../../components/repo/RepositoryReleaseList'
-import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from './types'
-import { DEFAULT_LIMIT, pagedState, useListStateChange } from './utils'
+import { RepositoryReleaseList } from '@/components/repo/RepositoryReleaseList'
+import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from '@/blocks/github/types'
+import { DEFAULT_LIMIT, pagedState, useListStateChange } from '@/blocks/github/utils'
 
 export type GithubReleasesProps = GithubBlockBaseProps &
   GithubListCallbacks<GitHubRelease> &

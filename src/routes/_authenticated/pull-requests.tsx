@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState, useMemo } from 'react'
 import { useGhCurrentUser, useGhSearchIssues } from '@api-hooks/gh'
 import type { GitHubIssue } from 'gh-api-client'
@@ -10,11 +10,10 @@ import { Box } from '@gnome-ui/react/components/Box'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { Text } from '@gnome-ui/react/components/Text'
 import { Icon } from '@gnome-ui/react/components/Icon'
-import { Button } from '@gnome-ui/react/components/Button'
 import { StatusBadge } from '@gnome-ui/react/components/StatusBadge'
 import { GitPullRequest, GitPullRequestDraft, GitCodeReview } from '@gnome-ui/icons'
-import { PageHeader } from '../../components/PageHeader'
-import { useAuth } from '../../auth/AuthProvider'
+import { PageHeader } from '@/components/PageHeader'
+import { useAuth } from '@/auth/AuthProvider'
 
 export const Route = createFileRoute('/_authenticated/pull-requests')({
   component: PullRequests,
@@ -53,7 +52,6 @@ function filterByPreset(prs: GitHubIssue[], preset: PRPreset): GitHubIssue[] {
 
 function PullRequests() {
   const { user } = useAuth()
-  const navigate = useNavigate()
   const token = user?.githubToken ?? ''
   const [activePreset, setActivePreset] = useState<PRPreset>('all')
 

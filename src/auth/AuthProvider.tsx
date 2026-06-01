@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { onAuthStateChanged, type User } from 'firebase/auth'
-import { auth } from './proxy/firebase'
-import type { AuthUser } from './domain'
-import { GITHUB_TOKEN_KEY } from './constants'
+import { auth } from '@/auth/proxy/firebase'
+import type { AuthUser } from '@/auth/domain'
+import { GITHUB_TOKEN_KEY } from '@/auth/constants'
 
 export function persistGithubToken(token: string): void {
   localStorage.setItem(GITHUB_TOKEN_KEY, token)

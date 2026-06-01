@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useAuth } from '../../auth/AuthProvider'
+import { useAuth } from '@/auth/AuthProvider'
 import { useGhCurrentUser, useGhUserRepos, useGhUserContributionMap } from '@api-hooks/gh'
 import { DashboardGrid } from '@gnome-ui/layout/components/DashboardGrid'
 import { CounterCard } from '@gnome-ui/layout/components/CounterCard'
@@ -10,7 +10,7 @@ import { GitRepository, Person, Heart, Star } from '@gnome-ui/icons'
 import { SparkAreaChart } from '@gnome-ui/charts'
 import { Icon, Separator } from '@gnome-ui/react'
 import { IconBadge, PanelCard } from '@gnome-ui/layout'
-import { RepositoryCard } from '../../components/RepositoryCard'
+import { RepositoryCard } from '@/components/RepositoryCard'
 import { GoaPanel } from '@gnome-ui/icons';
 
 export const Route = createFileRoute('/_authenticated/')({
@@ -93,6 +93,7 @@ function Dashboard() {
                   data={contributionDays.slice(-84).map((d) => d.count)}
                   height={32}
                   aria-label="Trend de contribuciones"
+                  gradient
                 />
               )}
             </Box>

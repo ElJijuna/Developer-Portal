@@ -21,7 +21,7 @@ import { CounterCard } from '@gnome-ui/layout/components/CounterCard';
 import { DashboardGrid } from '@gnome-ui/layout/components/DashboardGrid';
 import { SparkAreaChart } from '@gnome-ui/charts';
 import { FolderDownload, PackageXGeneric, GitTag } from '@gnome-ui/icons';
-import { NpmMaintanerSummary } from './NpmMaintainerSummary';
+import { NpmMaintanerSummary } from '@/components/NpmMaintainerSummary';
 
 export type NpmPackageSummaryProps = {
   packageName: string
@@ -133,7 +133,7 @@ export function NpmPackageSummary({ packageName }: NpmPackageSummaryProps): Reac
         {chartData.length > 0 && (
           <Box orientation="vertical" spacing={4}>
             <Text variant="caption" color="dim">Downloads — last 30 days</Text>
-            <SparkAreaChart data={chartData} height={52} aria-label="Downloads over the last 30 days" />
+            <SparkAreaChart data={chartData} height={52} gradient aria-label="Downloads over the last 30 days" />
           </Box>
         )}
       </Box>

@@ -7,9 +7,9 @@ import { ActionRow } from '@gnome-ui/react/components/ActionRow'
 import { ColorPicker, GNOME_PALETTE } from '@gnome-ui/react/components/ColorPicker'
 import { Button } from '@gnome-ui/react/components/Button'
 import { Box } from '@gnome-ui/react/components/Box'
-import { useSignOut } from '../../auth/hooks'
-import { PageHeader } from '../../components/PageHeader'
-import { useAppSettings } from '../../lib/appSettings'
+import { useSignOut } from '@/auth/hooks'
+import { PageHeader } from '@/components/PageHeader'
+import { useAppSettings } from '@/lib/appSettings'
 
 export const Route = createFileRoute('/_authenticated/settings')({
   component: Settings,

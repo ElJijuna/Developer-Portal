@@ -14,9 +14,9 @@ import {
   computeLeadTime,
   computeChangeFailureRate,
   computeMTTR,
-} from '../../lib/dora'
-import { relativeTime } from '../../lib/formatting'
-import { DoraMetricCard } from './DoraMetricCard'
+} from '@/lib/dora'
+import { relativeTime } from '@/lib/formatting'
+import { DoraMetricCard } from '@/components/dora/DoraMetricCard'
 import { PanelCard } from '@gnome-ui/layout'
 import { Button, Icon, WrapBox } from '@gnome-ui/react'
 import { FocusWindows } from '@gnome-ui/icons'

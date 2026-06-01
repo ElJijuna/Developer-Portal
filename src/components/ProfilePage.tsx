@@ -15,14 +15,14 @@ import { Box } from '@gnome-ui/react/components/Box'
 import { Card } from '@gnome-ui/react/components/Card'
 import { Icon } from '@gnome-ui/react/components/Icon'
 import { Heart, Person, Star, Document, Share, Information, GitRepository } from '@gnome-ui/icons'
-import { ProfileHero } from './ProfileHero'
-import { RepositoryCard } from './RepositoryCard'
+import { ProfileHero } from '@/components/ProfileHero'
+import { RepositoryCard } from '@/components/RepositoryCard'
 import {
   useGhUser,
   useGhUserReposInfinite,
   useGhUserPublicEvents,
 } from '@api-hooks/gh'
-import { relativeTime } from '../lib/formatting'
+import { relativeTime } from '@/lib/formatting'
 
 function eventDescription(type: string, repoName: string): string {
   switch (type) {

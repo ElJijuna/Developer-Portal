@@ -6,8 +6,8 @@ import { Icon } from '@gnome-ui/react/components/Icon'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { StatusBadge } from '@gnome-ui/react/components/StatusBadge'
 import type { BranchesParams, GitHubBranch } from 'gh-api-client'
-import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from './types'
-import { DEFAULT_LIMIT, pagedState, useListStateChange } from './utils'
+import type { GithubBlockBaseProps, GithubListCallbacks, GithubListChildren } from '@/blocks/github/types'
+import { DEFAULT_LIMIT, pagedState, useListStateChange } from '@/blocks/github/utils'
 
 export type GithubBranchesProps = GithubBlockBaseProps &
   GithubListCallbacks<GitHubBranch> &

@@ -8,10 +8,10 @@ import '@gnome-ui/core/styles'
 import '@gnome-ui/react/styles'
 import '@gnome-ui/layout/styles'
 import './styles.css'
-import { AuthProvider } from './auth/AuthProvider'
-import { routeTree } from './routeTree.gen'
-import { idbPersister } from './db/persister'
-import { queryClient } from './db/queryClient'
+import { AuthProvider } from '@/auth/AuthProvider'
+import { routeTree } from '@/routeTree.gen'
+import { idbPersister } from '@/db/persister'
+import { queryClient } from '@/db/queryClient'
 
 const router = createRouter({
   routeTree,

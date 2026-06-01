@@ -39,6 +39,7 @@ export function RepoContributionGraph({ owner, repoName, enabled, limit = 100 }:
               data={contributionDays.slice(-84).map((d) => d.count)}
               height={32}
               aria-label="Trend de contribuciones"
+              gradient
             />
           )}
         </Box>

@@ -2,9 +2,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Box } from '@gnome-ui/react/components/Box'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { useGhCurrentUser } from '@api-hooks/gh'
-import { useAuth } from '../../auth/AuthProvider'
-import { PageHeader } from '../../components/PageHeader'
-import { ProfileContent } from '../../components/ProfilePage'
+import { useAuth } from '@/auth/AuthProvider'
+import { PageHeader } from '@/components/PageHeader'
+import { ProfileContent } from '@/components/ProfilePage'
 
 export const Route = createFileRoute('/_authenticated/profile/')({
   component: OwnProfile,

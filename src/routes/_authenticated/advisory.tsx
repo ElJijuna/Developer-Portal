@@ -13,7 +13,7 @@ import { IconButton } from '@gnome-ui/react/components/IconButton'
 import { ToggleGroup, ToggleGroupItem } from '@gnome-ui/react/components/ToggleGroup'
 import { Chip } from '@gnome-ui/react/components/Chip'
 import { Lock, Search } from '@gnome-ui/icons'
-import { PageHeader } from '../../components/PageHeader'
+import { PageHeader } from '@/components/PageHeader'
 
 export const Route = createFileRoute('/_authenticated/advisory')({
   component: Advisory,

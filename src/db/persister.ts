@@ -1,5 +1,5 @@
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister'
-import { db } from './idb'
+import { db } from '@/db/idb'
 
 export const idbPersister = createAsyncStoragePersister({
   storage: {

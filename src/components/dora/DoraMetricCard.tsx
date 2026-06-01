@@ -2,8 +2,8 @@ import { Box } from '@gnome-ui/react/components/Box'
 import { Card } from '@gnome-ui/react/components/Card'
 import { Text } from '@gnome-ui/react/components/Text'
 import { Badge } from '@gnome-ui/react'
-import type { DoraMetric } from '../../lib/dora'
-import { DORA_LEVEL_COLOR } from '../../lib/dora'
+import type { DoraMetric } from '@/lib/dora'
+import { DORA_LEVEL_COLOR } from '@/lib/dora'
 
 export type DoraMetricCardProps = {
   label: string

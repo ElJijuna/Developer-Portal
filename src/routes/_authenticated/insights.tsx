@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState, useMemo, useEffect } from 'react'
 import { useGhCurrentUser, useGhUserRepos } from '@api-hooks/gh'
 import type { GitHubRepository } from 'gh-api-client'
@@ -12,13 +12,11 @@ import { Card } from '@gnome-ui/react/components/Card'
 import { Text } from '@gnome-ui/react/components/Text'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { Icon } from '@gnome-ui/react/components/Icon'
-import { Button } from '@gnome-ui/react/components/Button'
 import { Information, Star } from '@gnome-ui/icons'
 import { SparkBarChart } from '@gnome-ui/charts'
-import { GitHub as GitHubIcon } from '@gnome-ui/icons/third-party'
-import { PageHeader } from '../../components/PageHeader'
-import { useAuth } from '../../auth/AuthProvider'
-import { getItem, setItem } from '../../lib/localStorage'
+import { PageHeader } from '@/components/PageHeader'
+import { useAuth } from '@/auth/AuthProvider'
+import { getItem, setItem } from '@/lib/localStorage'
 
 export const Route = createFileRoute('/_authenticated/insights')({
   component: Insights,
@@ -71,7 +69,6 @@ function healthColor(score: number): string {
 
 function Insights() {
   const { user } = useAuth()
-  const navigate = useNavigate()
   const token = user?.githubToken ?? ''
   const [activeTab, setActiveTab] = useState<InsightsTab>('insights')
   const [period, setPeriod] = useState<DigestPeriod>('week')
@@ -186,10 +183,10 @@ function Insights() {
                       trend={
                         repo.pushed_at
                           ? {
-                              direction: score >= 70 ? 'up' : score >= 40 ? 'neutral' : 'down',
-                              value: score,
-                              period: repo.pushed_at.slice(0, 10),
-                            }
+                            direction: score >= 70 ? 'up' : score >= 40 ? 'neutral' : 'down',
+                            value: score,
+                            period: repo.pushed_at.slice(0, 10),
+                          }
                           : undefined
                       }
                     />

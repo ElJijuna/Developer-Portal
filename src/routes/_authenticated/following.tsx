@@ -21,9 +21,9 @@ import {
   useGhUserFollowersInfinite,
   useGhUserFollowingInfinite,
 } from '@api-hooks/gh'
-import { useAuth } from '../../auth/AuthProvider'
-import { PageHeader } from '../../components/PageHeader'
-import { UserProfileSummaryCard } from '../../components/UserProfileSummaryCard'
+import { useAuth } from '@/auth/AuthProvider'
+import { PageHeader } from '@/components/PageHeader'
+import { UserProfileSummaryCard } from '@/components/UserProfileSummaryCard'
 
 export const Route = createFileRoute('/_authenticated/following')({
   component: Following,

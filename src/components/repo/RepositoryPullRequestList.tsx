@@ -6,7 +6,7 @@ import { StatusBadge } from '@gnome-ui/react/components/StatusBadge'
 import { EntityCard, EmptyState } from '@gnome-ui/layout'
 import { GitPullRequest } from '@gnome-ui/icons'
 import type { GitHubPullRequest } from 'gh-api-client'
-import { relativeTime } from '../../lib/formatting'
+import { relativeTime } from '@/lib/formatting'
 
 export type RepositoryPullRequestListProps = {
   prs: GitHubPullRequest[]

@@ -37,7 +37,7 @@ export function UserProfileSummaryCard({ name, username, avatarSrc, avatarColor,
           { label: 'Stars', value: totalStars },
         ]}
         onClick={() => onClick?.(username)}
-        backgroundChart={<SparkAreaChart data={activityData} height={80} />}
+        backgroundChart={<SparkAreaChart data={activityData} height={80} gradient strokeWidth={2.5} />}
         interactive
         children={123}
       />

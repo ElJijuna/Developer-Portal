@@ -9,8 +9,8 @@ import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { Text } from '@gnome-ui/react/components/Text'
 import { api } from 'code-languages'
 import { useMemo } from 'react'
-import type { GithubBlockBaseProps } from './types'
-import { valueState } from './utils'
+import type { GithubBlockBaseProps } from '@/blocks/github/types'
+import { valueState } from '@/blocks/github/utils'
 import { Card } from '@gnome-ui/react'
 
 export type GithubRepositoryLanguagesProps = GithubBlockBaseProps & {

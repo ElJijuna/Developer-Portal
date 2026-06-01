@@ -10,7 +10,7 @@ import { WrapBox } from '@gnome-ui/react/components/WrapBox'
 import { Drawer } from '@gnome-ui/react/components/Drawer'
 import { GitHub } from '@gnome-ui/icons/third-party'
 import { useGhUserSocialAccounts } from '@api-hooks/gh'
-import { NpmMaintanerSummary } from './NpmMaintainerSummary'
+import { NpmMaintanerSummary } from '@/components/NpmMaintainerSummary'
 
 function extractNpmUsername(url: string): string | null {
   const match = url.match(/npmjs\.com\/~(.+)/)

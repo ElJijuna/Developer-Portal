@@ -2,8 +2,8 @@ import { useRouter } from '@tanstack/react-router';
 import { Spinner } from '@gnome-ui/react/components/Spinner';
 import { Icon } from '@gnome-ui/react/components/Icon';
 import { GitHub } from '@gnome-ui/icons/third-party';
-import { useAuth } from '../AuthProvider';
-import { useSignIn } from '../hooks';
+import { useAuth } from '@/auth/AuthProvider';
+import { useSignIn } from '@/auth/hooks';
 import { Button } from '@gnome-ui/react/components/Button';
 import { ActionRow } from '@gnome-ui/react/components/ActionRow';
 import { Card } from '@gnome-ui/react/components/Card';
@@ -12,7 +12,7 @@ import { Text } from '@gnome-ui/react/components/Text';
 import { WrapBox } from '@gnome-ui/react/components/WrapBox';
 import { BoxedList } from '@gnome-ui/react/components/BoxedList';
 import { IconBadge } from '@gnome-ui/layout';
-import { DeveloperPortalLogo } from '../../components/DeveloperPortalLogo';
+import { DeveloperPortalLogo } from '@/components/DeveloperPortalLogo';
 
 export function Login() {
   const router = useRouter()

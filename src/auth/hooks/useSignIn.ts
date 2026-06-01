@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
-import { signInWithGitHub } from '../proxy'
-import { useAuth } from '../AuthProvider'
+import { signInWithGitHub } from '@/auth/proxy'
+import { useAuth } from '@/auth/AuthProvider'
 
 export function useSignIn() {
   const { setGithubToken } = useAuth()

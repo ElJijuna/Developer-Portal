@@ -1,5 +1,5 @@
 import { createCollection, localOnlyCollectionOptions } from '@tanstack/db'
-import type { NotificationRecord, UserRecord, RepoRecord } from './schema'
+import type { NotificationRecord, UserRecord, RepoRecord } from '@/db/schema'
 
 // Colección de notificaciones — fuente de verdad local para optimistic updates en /inbox
 export const notificationsCollection = createCollection(

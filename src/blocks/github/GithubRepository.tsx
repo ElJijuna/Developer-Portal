@@ -3,9 +3,9 @@ import { ErrorState } from '@gnome-ui/layout'
 import { Box } from '@gnome-ui/react/components/Box'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
 import type { GitHubRepository } from 'gh-api-client'
-import { RepoHero } from '../../components/repo/RepoHero'
-import type { GithubBlockBaseProps, GithubValueChildren } from './types'
-import { valueState } from './utils'
+import { RepoHero } from '@/components/repo/RepoHero'
+import type { GithubBlockBaseProps, GithubValueChildren } from '@/blocks/github/types'
+import { valueState } from '@/blocks/github/utils'
 
 type RepoExtras = GitHubRepository & {
   homepage?: string | null
