@@ -7,7 +7,7 @@ import { UserCard } from '@gnome-ui/layout/components/UserCard';
 import { HeaderBar } from '@gnome-ui/react/components/HeaderBar';
 import { Avatar } from '@gnome-ui/react/components/Avatar';
 import { Popover } from '@gnome-ui/react/components/Popover';
-import { GoHome, Heart, Applications, Notifications, GitIssueOpened, GitPullRequest, Check, Information, Folder, Lock } from '@gnome-ui/icons';
+import { GoHome, Heart, Applications, Notifications, GitIssueOpened, GitPullRequest, Check, Information, Folder, Lock, SystemUsers } from '@gnome-ui/icons';
 import { GnomeProvider } from '@gnome-ui/react';
 import { DeveloperPortalLogo } from '@/components/DeveloperPortalLogo';
 import { FC, useEffect, useMemo, useState } from 'react';
@@ -42,6 +42,7 @@ const NAV_ITEMS: AdaptiveNavItem[] = [
   { id: '/inbox', label: 'Inbox', icon: Notifications, group: 'Activity' },
   { id: '/issues', label: 'Issues', icon: GitIssueOpened, group: 'Activity' },
   { id: '/pull-requests', label: 'Pull Requests', icon: GitPullRequest, group: 'Activity' },
+  { id: '/organizations', label: 'Organizations', icon: SystemUsers },
   { id: '/following', label: 'Following', icon: Heart },
   { id: '/insights', label: 'Insights', icon: Information },
 ]

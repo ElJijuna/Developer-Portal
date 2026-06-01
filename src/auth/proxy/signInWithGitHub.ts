@@ -6,6 +6,7 @@ import type { AuthUser } from '@/auth/domain'
 const provider = new GithubAuthProvider()
 provider.addScope('gist')
 provider.addScope('read:user')
+provider.addScope('read:org')
 provider.addScope('notifications')
 provider.addScope('repo')
 
