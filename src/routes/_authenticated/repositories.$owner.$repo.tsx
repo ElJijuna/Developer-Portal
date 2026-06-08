@@ -18,9 +18,12 @@ import { TabBar, TabItem } from '@gnome-ui/react/components/Tabs'
 import { Drawer } from '@gnome-ui/react/components/Drawer'
 import { Folder, Warning, Star, Share, GitIssueOpened, GitWorkflow, GitBranch, Lock, GitDiff } from '@gnome-ui/icons'
 import { Npm } from '@gnome-ui/icons/third-party'
+import { PackageXGeneric } from '@gnome-ui/icons'
 import { PageHeader } from '../../components/PageHeader'
 import { NpmPackageSummary } from '../../components/NpmPackageSummary'
+import { DockerImageSummary } from '../../components/DockerImageSummary'
 import { useRepoNpmPackages } from '../../hooks/useRepoNpmPackages'
+import { useRepoDockerImage } from '../../hooks/useRepoDockerImage'
 import { RepoHero } from '../../components/repo/RepoHero'
 import { RepositoryOverview } from '../../components/repo/RepositoryOverview'
 import { RepositoryCommitList } from '../../components/repo/RepositoryCommitList'
@@ -60,6 +63,7 @@ function RepoDetail() {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [branchFilter, setBranchFilter] = useState<BranchFilter>('all');
   const [npmDrawerOpen, setNpmDrawerOpen] = useState(false);
+  const [dockerDrawerOpen, setDockerDrawerOpen] = useState(false);
   const [tabCounts, setTabCounts] = useState({
     commits: 0,
     pullRequests: 0,
@@ -80,6 +84,7 @@ function RepoDetail() {
   const totalFiles = gitTreeData?.tree.length ?? 0;
 
   const npmInfo = useRepoNpmPackages(owner, repoName, repo?.default_branch ?? 'main');
+  const dockerInfo = useRepoDockerImage(owner, repoName, repo?.default_branch ?? 'main');
 
   const mergedBranchNames = useMemo(
     () => new Set(mergedPrs.filter((pr) => pr.merged_at !== null).map((pr) => pr.head.ref)),
@@ -130,6 +135,12 @@ function RepoDetail() {
                 View in NPM {npmInfo.packages.length > 1 && <Badge variant="neutral">{npmInfo.packages.length}</Badge>}
               </Button>
             )}
+            {dockerInfo.isPending && <Skeleton width={120} height={32} />}
+            {!dockerInfo.isPending && dockerInfo.hasDockerfile && (
+              <Button variant="flat" size="sm" leadingIcon={<Icon icon={PackageXGeneric} />} onClick={() => setDockerDrawerOpen(true)}>
+                View in Docker Hub {dockerInfo.dockerfilePaths.length > 1 && <Badge variant="neutral">{dockerInfo.dockerfilePaths.length}</Badge>}
+              </Button>
+            )}
             <Button
               variant="flat"
               size="sm"
@@ -150,6 +161,10 @@ function RepoDetail() {
             </PanelCard>
           ))}
         </Box>
+      </Drawer>
+
+      <Drawer open={dockerDrawerOpen} title={repoName} size="wide" onClose={() => setDockerDrawerOpen(false)}>
+        <DockerImageSummary namespace="pilmee" name={repoName.toLowerCase()} />
       </Drawer>
 
       <Box orientation="vertical" spacing={16}>
