@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.22.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.21.0...v1.22.0) (2026-09-06)
+
+### Features
+
+* enhance NPM package drawer functionality with active package selection ([51a3239](https://github.com/ElJijuna/Developer-Portal/commit/51a3239eea58d211359d88916998236427ed2a62))
+
+### Bug Fixes
+
+* filter out private packages and ensure active package selection in NPM drawer ([5458ad8](https://github.com/ElJijuna/Developer-Portal/commit/5458ad84932db76df4e4789ae10ca97901363deb))
+* update [@gnome-ui](https://github.com/gnome-ui) dependencies and add @gnome-ui/cli ([4ab145f](https://github.com/ElJijuna/Developer-Portal/commit/4ab145fb8484dbf207d8c387285fc92277bc3497))
+* update @api-hooks/gh and @api-hooks/npm dependencies to latest versions ([00e6b95](https://github.com/ElJijuna/Developer-Portal/commit/00e6b95adf880a7790cf3a9e94935938a176b4a8))
+
 ## [1.21.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.20.1...v1.21.0) (2026-06-01)
 
 ### Features
