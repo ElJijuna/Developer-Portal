@@ -25,7 +25,7 @@ export function useRepoNpmPackages(owner: string, repoName: string, branch = 'ma
       console.error(`Failed to parse ${path} as JSON`, e);
       return null;
     }
-  }).filter((pkg): pkg is PackageJson => pkg !== null);
+  }).filter((pkg): pkg is PackageJson => pkg !== null && !pkg.private && !!pkg.name);
 
   return { status: isMonoRepo ? 'monorepo' : 'single', packages: packagesEntries, isPending: multiplePkgLoading };
 }

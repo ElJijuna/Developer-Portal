@@ -126,7 +126,7 @@ function RepoDetail() {
         actions={
           <Box orientation="horizontal" spacing={8}>
             {npmInfo.isPending && (<Skeleton width={100} height={32} />)}
-            {(!npmInfo.isPending) && (
+            {(!npmInfo.isPending && npmInfo.packages.length > 0) && (
               <Button
                 variant="flat"
                 size="sm"
