@@ -60,6 +60,7 @@ function RepoDetail() {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [branchFilter, setBranchFilter] = useState<BranchFilter>('all');
   const [npmDrawerOpen, setNpmDrawerOpen] = useState(false);
+  const [activeNpmPackage, setActiveNpmPackage] = useState<string | null>(null);
   const [tabCounts, setTabCounts] = useState({
     commits: 0,
     pullRequests: 0,
@@ -126,7 +127,15 @@ function RepoDetail() {
           <Box orientation="horizontal" spacing={8}>
             {npmInfo.isPending && (<Skeleton width={100} height={32} />)}
             {(!npmInfo.isPending) && (
-              <Button variant="flat" size="sm" leadingIcon={<Icon icon={Npm} />} onClick={() => setNpmDrawerOpen(true)}>
+              <Button
+                variant="flat"
+                size="sm"
+                leadingIcon={<Icon icon={Npm} />}
+                onClick={() => {
+                  setActiveNpmPackage(npmInfo.packages[0]?.name ?? null);
+                  setNpmDrawerOpen(true);
+                }}
+              >
                 View in NPM {npmInfo.packages.length > 1 && <Badge variant="neutral">{npmInfo.packages.length}</Badge>}
               </Button>
             )}
@@ -142,14 +151,28 @@ function RepoDetail() {
         }
       />
 
-      <Drawer open={npmDrawerOpen} title={repoName} size="wide" onClose={() => setNpmDrawerOpen(false)}>
-        <Box orientation="vertical" spacing={12}>
-          {npmInfo.packages.map((pkg) => (
-            <PanelCard key={pkg.name} title={pkg.name}>
-              <NpmPackageSummary key={pkg.name} packageName={pkg.name} />
+      <Drawer
+        open={npmDrawerOpen}
+        title={npmInfo.packages.length > 1 ? activeNpmPackage ?? repoName : repoName}
+        size="wide"
+        onClose={() => setNpmDrawerOpen(false)}
+        rail={npmInfo.packages.length > 1 ? npmInfo.packages.map((pkg) => ({
+          id: pkg.name,
+          icon: Npm,
+          label: pkg.name,
+          active: activeNpmPackage === pkg.name,
+          onClick: () => setActiveNpmPackage(pkg.name),
+        })) : undefined}
+      >
+        {npmInfo.packages.length > 1 ? (
+          activeNpmPackage && <NpmPackageSummary key={activeNpmPackage} packageName={activeNpmPackage} />
+        ) : (
+          npmInfo.packages[0] && (
+            <PanelCard title={npmInfo.packages[0].name}>
+              <NpmPackageSummary packageName={npmInfo.packages[0].name} />
             </PanelCard>
-          ))}
-        </Box>
+          )
+        )}
       </Drawer>
 
       <Box orientation="vertical" spacing={16}>
