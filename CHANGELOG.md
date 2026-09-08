@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.23.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.22.0...v1.23.0) (2026-09-08)
+
+### Features
+
+* add end-to-end authentication tests with Playwright and enhance Firebase auth handling ([7b975c4](https://github.com/ElJijuna/Developer-Portal/commit/7b975c4613d6e9c651f1fc0b0b51a628257322da))
+
+### Bug Fixes
+
+* change star icon color from gold to yellow in RepositoryCard component ([7f8dcce](https://github.com/ElJijuna/Developer-Portal/commit/7f8dcce78c38f5f9dea9be5824c93c2bd323b311))
+
 ## [1.22.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.21.0...v1.22.0) (2026-09-06)
 
 ### Features
