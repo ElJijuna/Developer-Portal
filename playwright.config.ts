@@ -26,6 +26,21 @@ export default defineConfig({
       name: 'chromium',
       testMatch: '*.spec.ts',
     },
+    {
+      name: 'mobile-safari',
+      testMatch: '*.spec.ts',
+      use: { ...devices['iPhone 14'] },
+    },
+    {
+      name: 'mobile-chrome',
+      testMatch: '*.spec.ts',
+      use: { ...devices['Pixel 7'] },
+    },
+    {
+      name: 'tablet',
+      testMatch: '*.spec.ts',
+      use: { ...devices['iPad Mini landscape'] },
+    },
   ],
   webServer: {
     command: process.env.E2E_PREVIEW === '1'
