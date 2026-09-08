@@ -3,6 +3,7 @@ import { Suspense, useState, useMemo } from 'react'
 import { useGhCurrentUser, useGhUserReposInfinite } from '@api-hooks/gh'
 import { MasonryGrid, CounterCard, EmptyState, ErrorState } from '@gnome-ui/layout'
 import { DashboardGrid } from '@gnome-ui/layout/components/DashboardGrid'
+import { type CounterCardProps } from '@gnome-ui/layout/components/CounterCard'
 import { Box } from '@gnome-ui/react/components/Box'
 import { Text } from '@gnome-ui/react/components/Text'
 import { Icon } from '@gnome-ui/react/components/Icon'
@@ -11,6 +12,8 @@ import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { SearchBar } from '@gnome-ui/react/components/SearchBar'
 import { IconButton } from '@gnome-ui/react/components/IconButton'
 import { ToggleGroup, ToggleGroupItem } from '@gnome-ui/react/components/ToggleGroup'
+import { Carousel } from '@gnome-ui/react'
+import { useBreakpoint } from '@gnome-ui/hooks/useBreakpoint'
 import { Folder, GitFork, GitCommit, Warning, Search, Star } from '@gnome-ui/icons'
 import { PageHeader } from '@/components/PageHeader'
 import { RepositoryCard } from '@/components/RepositoryCard'
@@ -25,6 +28,7 @@ type SortKey = 'updated' | 'pushed' | 'full_name'
 function Repositories() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { isMobile } = useBreakpoint()
   const token = user?.githubToken ?? ''
   const [sort, setSort] = useState<SortKey>('updated')
   const [searchOpen, setSearchOpen] = useState(false)
@@ -70,6 +74,13 @@ function Repositories() {
 
   const isLoading = meLoading || reposLoading
 
+  const repoStatCards: (CounterCardProps & { key: string })[] = [
+    { key: 'total', label: 'Repositories', value: allRepos.length, icon: Folder, loading: isLoading, loadingType: 'skeleton' },
+    { key: 'no-description', label: 'No description', value: stats.noDescription, icon: Warning, color: '#e5a50a', loading: isLoading, loadingType: 'skeleton' },
+    { key: 'active', label: 'Active (30d)', value: stats.activeLastMonth, icon: GitCommit, color: '#26a269', loading: isLoading, loadingType: 'skeleton' },
+    { key: 'stale', label: 'Stale (6m+)', value: stats.stale, icon: Warning, color: '#e01b24', loading: isLoading, loadingType: 'skeleton' },
+    { key: 'forks', label: 'Forks', value: stats.forked, icon: GitFork, loading: isLoading, loadingType: 'skeleton' },
+  ]
 
   const actions = (
     <IconButton
@@ -89,13 +100,19 @@ function Repositories() {
       />
 
       <Box orientation="vertical" spacing={12}>
-        <DashboardGrid columns={{ xs: 2, sm: 3, lg: 5 }} gap="md">
-          <CounterCard label="Repositories" value={allRepos.length} icon={Folder} loading={isLoading} loadingType="skeleton" />
-          <CounterCard label="No description" value={stats.noDescription} icon={Warning} color="#e5a50a" loading={isLoading} loadingType="skeleton" />
-          <CounterCard label="Active (30d)" value={stats.activeLastMonth} icon={GitCommit} color="#26a269" loading={isLoading} loadingType="skeleton" />
-          <CounterCard label="Stale (6m+)" value={stats.stale} icon={Warning} color="#e01b24" loading={isLoading} loadingType="skeleton" />
-          <CounterCard label="Forks" value={stats.forked} icon={GitFork} loading={isLoading} loadingType="skeleton" />
-        </DashboardGrid>
+        {isMobile ? (
+          <Carousel label="Estadísticas" indicator="dots" peek={24} spacing={18} infinite>
+            {repoStatCards.map(({ key, ...card }) => (
+              <CounterCard key={key} {...card} />
+            ))}
+          </Carousel>
+        ) : (
+          <DashboardGrid columns={{ xs: 2, sm: 3, lg: 5 }} gap="md">
+            {repoStatCards.map(({ key, ...card }) => (
+              <CounterCard key={key} {...card} />
+            ))}
+          </DashboardGrid>
+        )}
 
         <Box orientation="horizontal" spacing={8} align="center" style={{ flexWrap: 'wrap' }}>
           <ToggleGroup value={sort} onValueChange={(v) => { if (v) setSort(v as SortKey) }}>
