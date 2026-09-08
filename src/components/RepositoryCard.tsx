@@ -73,7 +73,7 @@ export function RepositoryCard({ name, description, language, stars, forks, open
       trailing={
         <WrapBox childSpacing={12}>
           <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <Icon icon={Star} color="gold" />
+            <Icon icon={Star} color="yellow" />
             <Text variant="caption">{stars}</Text>
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
