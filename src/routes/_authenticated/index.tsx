@@ -2,14 +2,15 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useAuth } from '@/auth/AuthProvider'
 import { useGhCurrentUser, useGhUserRepos, useGhUserContributionMap } from '@api-hooks/gh'
 import { DashboardGrid } from '@gnome-ui/layout/components/DashboardGrid'
-import { CounterCard } from '@gnome-ui/layout/components/CounterCard'
+import { CounterCard, type CounterCardProps } from '@gnome-ui/layout/components/CounterCard'
 import { ContributionGraph } from '@gnome-ui/react/components/ContributionGraph'
 import { Box } from '@gnome-ui/react/components/Box'
 import { Skeleton } from '@gnome-ui/react/components/Skeleton'
 import { GitRepository, Person, Heart, Star } from '@gnome-ui/icons'
 import { SparkAreaChart } from '@gnome-ui/charts'
-import { Icon, Separator } from '@gnome-ui/react'
+import { Icon, Separator, Carousel } from '@gnome-ui/react'
 import { IconBadge, PanelCard } from '@gnome-ui/layout'
+import { useBreakpoint } from '@gnome-ui/hooks/useBreakpoint'
 import { RepositoryCard } from '@/components/RepositoryCard'
 import { GoaPanel } from '@gnome-ui/icons';
 
@@ -20,6 +21,7 @@ export const Route = createFileRoute('/_authenticated/')({
 function Dashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { isMobile } = useBreakpoint()
   const token = user?.githubToken ?? ''
 
   const { data: ghUser } = useGhCurrentUser({ enabled: !!token })
@@ -45,46 +47,32 @@ function Dashboard() {
     w.contributionDays.map((d) => ({ date: d.date, count: d.contributionCount })),
   ) ?? []
 
+  const statCards: (CounterCardProps & { key: string })[] = [
+    { key: 'repos', label: 'Repositorios', value: ghUser?.public_repos ?? 0, icon: GitRepository, accent: true, animated: true },
+    { key: 'followers', label: 'Seguidores', value: ghUser?.followers ?? 0, icon: Person, color: '#3584e4', animated: true },
+    { key: 'following', label: 'Siguiendo', value: ghUser?.following ?? 0, icon: Heart, color: '#e01b24', animated: true },
+    { key: 'stars', label: 'Stars recibidas', value: totalStars, icon: Star, color: '#e5a50a', animated: true },
+  ]
+
   return (
     <DashboardGrid columns={{ sm: 1, md: 2, lg: 4 }} gap="md">
-      <DashboardGrid.Item>
-        <CounterCard
-          label="Repositorios"
-          value={ghUser?.public_repos ?? 0}
-          icon={GitRepository}
-          accent
-          animated
-        />
-      </DashboardGrid.Item>
-      <DashboardGrid.Item>
-        <CounterCard
-          label="Seguidores"
-          value={ghUser?.followers ?? 0}
-          icon={Person}
-          color="#3584e4"
-          animated
-        />
-      </DashboardGrid.Item>
-      <DashboardGrid.Item>
-        <CounterCard
-          label="Siguiendo"
-          value={ghUser?.following ?? 0}
-          icon={Heart}
-          color="#e01b24"
-          animated
-        />
-      </DashboardGrid.Item>
-      <DashboardGrid.Item>
-        <CounterCard
-          label="Stars recibidas"
-          value={totalStars}
-          icon={Star}
-          color="#e5a50a"
-          animated
-        />
-      </DashboardGrid.Item>
+      {isMobile ? (
+        <DashboardGrid.Item>
+          <Carousel label="Estadísticas" indicator="dots" peek={24} spacing={18} infinite autoPlay autoPlayControl={false}>
+            {statCards.map(({ key, ...card }) => (
+              <CounterCard key={key} {...card} />
+            ))}
+          </Carousel>
+        </DashboardGrid.Item>
+      ) : (
+        statCards.map(({ key, ...card }) => (
+          <DashboardGrid.Item key={key}>
+            <CounterCard {...card} />
+          </DashboardGrid.Item>
+        ))
+      )}
 
-      <DashboardGrid.Item span={4}>
+      <DashboardGrid.Item span={{ sm: 1, md: 2, lg: 4 }}>
         <PanelCard title="Contributions" icon={<IconBadge><Icon icon={GoaPanel} /></IconBadge>}>
           <Box orientation="vertical" spacing={24}>
             <Box justify="space-between" align="center">
@@ -113,7 +101,7 @@ function Dashboard() {
       </DashboardGrid.Item>
 
       {topRepos.map((repo) => (
-        <DashboardGrid.Item key={repo.id} span={2}>
+        <DashboardGrid.Item key={repo.id} span={{ sm: 1, md: 2 }}>
           <RepositoryCard
             name={repo.name}
             description={repo.description ?? ''}
