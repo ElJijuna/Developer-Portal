@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.24.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.23.0...v1.24.0) (2026-09-08)
+
+### Features
+
+* enhance Dashboard component with responsive stat cards and carousel for mobile view ([5e177fa](https://github.com/ElJijuna/Developer-Portal/commit/5e177fa57bc92cc312ef6fd36c97bedab7d0b6c7))
+* implement responsive statistics display with Carousel for mobile view in Repositories component ([fc52863](https://github.com/ElJijuna/Developer-Portal/commit/fc52863cd7313fa43782ac93ff9e3b02cb3d598d))
+
 ## [1.23.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.22.0...v1.23.0) (2026-09-08)
 
 ### Features
