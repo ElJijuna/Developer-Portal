@@ -1,5 +1,5 @@
 import { createFileRoute, redirect, Outlet, useNavigate, useRouterState } from '@tanstack/react-router';
-import { auth } from '@/auth/proxy/firebase';
+import { auth, authReady, isAuthReady } from '@/auth/proxy/firebase';
 import { GITHUB_TOKEN_KEY } from '@/auth/constants';
 import { useAuth } from '@/auth/AuthProvider';
 import { AdaptiveLayout, type AdaptiveNavItem } from '@gnome-ui/layout/components/AdaptiveLayout';
@@ -10,7 +10,7 @@ import { Popover } from '@gnome-ui/react/components/Popover';
 import { GoHome, Heart, Applications, Notifications, GitIssueOpened, GitPullRequest, Check, Information, Folder, Lock, SystemUsers } from '@gnome-ui/icons';
 import { GnomeProvider } from '@gnome-ui/react';
 import { DeveloperPortalLogo } from '@/components/DeveloperPortalLogo';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, Suspense, useEffect, useMemo, useState } from 'react';
 import { Box } from '@gnome-ui/react/components/Box';
 import { Button } from '@gnome-ui/react/components/Button';
 import { GhClientProvider } from '@api-hooks/gh';
@@ -22,13 +22,21 @@ import { useSignOut } from '@/auth/hooks';
 import { ApplicationFooter } from '@/components/ApplicationFooter';
 import { AppMonitorControl } from '@/components/AppMonitorControl';
 
+function checkAuthenticated() {
+  const currentUser = auth?.currentUser ?? null
+  if (!currentUser) throw redirect({ to: '/login' })
+  const token = localStorage.getItem(GITHUB_TOKEN_KEY) ?? ''
+  if (!token) throw redirect({ to: '/login' })
+}
+
 export const Route = createFileRoute('/_authenticated')({
-  async beforeLoad() {
-    if (auth) await auth.authStateReady()
-    const currentUser = auth?.currentUser ?? null
-    if (!currentUser) throw redirect({ to: '/login' })
-    const token = localStorage.getItem(GITHUB_TOKEN_KEY) ?? ''
-    if (!token) throw redirect({ to: '/login' })
+  beforeLoad() {
+    // Returning a promise here suspends the route match. Firebase's auth
+    // state is only ever unknown on the very first load, so only that case
+    // needs to wait: every later navigation resolves synchronously and never
+    // triggers the router's Suspense fallback (see src/auth/proxy/firebase.ts).
+    if (auth && !isAuthReady()) return authReady.then(checkAuthenticated)
+    checkAuthenticated()
   },
   component: AuthenticatedLayout,
 })
@@ -168,7 +176,15 @@ function AuthenticatedLayout() {
               footer={<ApplicationFooter />}
             >
               <Box padding={16}>
-                <Outlet />
+                {/* TanStack Router's root Outlet always wraps its child match in a
+                    Suspense boundary (see @tanstack/react-router's Outlet.tsx). Content
+                    that suspends without a closer boundary — e.g. a component calling
+                    React's use() on a data promise — would otherwise be caught there,
+                    which hides this entire authenticated shell (nav, header) rather
+                    than just the routed content. This boundary keeps that contained. */}
+                <Suspense fallback={null}>
+                  <Outlet />
+                </Suspense>
               </Box>
             </AdaptiveLayout>
           </div>

@@ -21,3 +21,17 @@ if (isConfigured) {
   })
   auth = getAuth(app)
 }
+
+// TanStack Router awaits `beforeLoad` on every navigation. Firebase's
+// `authStateReady()` resolves asynchronously even when the state is already
+// known, which is enough of a gap for the router to suspend and briefly hide
+// the whole app shell. Await it only once, on the initial load.
+let authReadyResolved = false
+export const authReady: Promise<void> = auth ? auth.authStateReady() : Promise.resolve()
+authReady.then(() => {
+  authReadyResolved = true
+})
+
+export function isAuthReady(): boolean {
+  return authReadyResolved
+}

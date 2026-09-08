@@ -1,10 +1,28 @@
 import { use, useMemo, type ReactElement } from 'react';
 import { api } from 'code-languages';
-import type { LanguageSlug } from 'code-languages'
+import type { LanguageSlug, LocalizedLanguage } from 'code-languages'
 import { IconBadge } from '@gnome-ui/layout/components/IconBadge';
 import { GitRepository, GitFork, Lock, Star, ViewReveal } from '@gnome-ui/icons';
 import { Badge, Icon, Text, WrapBox, useLocale } from '@gnome-ui/react';
 import { EntityCard } from '@gnome-ui/layout/components/EntityCard';
+
+// `use()` suspends on every unresolved promise it's given, even one that
+// settles almost instantly — and `api.language(...).load()` returns a new
+// promise per call. Without this cache, every remount (e.g. navigating back
+// to a page that lists repositories) re-suspends on the same already-known
+// language, which bubbles up to the nearest Suspense boundary and hides
+// whatever isn't locally guarded against it. Caching by slug means repeat
+// mounts reuse an already-settled promise, so `use()` returns synchronously.
+const languagePromises = new Map<string, Promise<LocalizedLanguage | undefined>>()
+
+function loadLanguage(language: string) {
+  let promise = languagePromises.get(language)
+  if (!promise) {
+    promise = api.language(language as LanguageSlug).locale('en-US').load()
+    languagePromises.set(language, promise)
+  }
+  return promise
+}
 
 export type RepositoryCardProps = {
   name: string
@@ -34,7 +52,7 @@ export function RepositoryCard({ name, description, language, stars, forks, open
   const rtf = useMemo(() => new Intl.RelativeTimeFormat(locale ?? 'en', { numeric: 'auto' }), [locale]);
 
   const langPromise = useMemo(
-    () => language ? api.language(language as LanguageSlug).locale('en-US').load() : null,
+    () => language ? loadLanguage(language) : null,
     [language],
   );
   const lang = langPromise ? use(langPromise) : null;

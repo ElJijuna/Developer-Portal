@@ -139,3 +139,23 @@ It should feel less like a report and more like a cockpit: present, useful, and 
 ## License
 
 MIT
+
+## Authenticated browser tests
+
+Install Chromium once with `npx playwright install chromium`. Stop any server on
+port 5173, then run `npm run test:e2e:auth`. Playwright starts the local app and
+opens GitHub; complete login and any 2FA in that browser. Firebase must allow
+`localhost` as an authorized domain. The setup verifies a successful GitHub user
+request and restores the session in a fresh browser context before saving it.
+
+Run `npm run test:e2e` to exercise all sidebar sections, returning to Dashboard
+five times per section with normal and delayed GitHub requests. Videos, traces,
+and frame observations are available through `npx playwright show-report`.
+The frame probe checks shell continuity; inspect video as well for visual changes
+that do not hide or replace DOM elements. Cached requests are not delayed.
+
+For production comparison, run `npm run build` followed by
+`E2E_PREVIEW=1 npm run test:e2e`. Both modes use `http://localhost:5173` so they
+can reuse the same authentication state. Repeat the auth command if the session
+expires. Credentials in `playwright/.auth/` and diagnostic artifacts stay local
+and are ignored by Git; traces may contain authenticated request data.
