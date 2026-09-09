@@ -30,9 +30,9 @@ test.describe('Safe areas al correr como PWA instalada (standalone)', () => {
     await page.setViewportSize(PORTRAIT_VIEWPORT)
     await page.goto('/')
 
-    // The mobile layout has no header bar: the page background and the
-    // floating user menu both intentionally run under the top safe area
-    // (status bar / Dynamic Island) instead of being pushed below it.
+    // The mobile layout has no header bar: the page background runs edge to
+    // edge under the top safe area, but the page content and the floating
+    // user menu are both pushed below it (status bar / Dynamic Island).
     const header = page.getByRole('button', { name: 'User menu' })
     await expect(header).toBeVisible()
 

@@ -139,8 +139,9 @@ function AuthenticatedLayout() {
   )
 
   // On mobile there's no header bar at all: the page background runs edge to
-  // edge under the status bar / Dynamic Island, and only the user menu floats
-  // over it, offset by the safe area so it isn't obscured by the notch.
+  // edge under the status bar / Dynamic Island, but the page content and the
+  // floating user menu are both pushed below it by the safe area so neither
+  // is obscured by the notch.
   const topBar = isMobile ? undefined : (
     <div style={{ paddingTop: 'env(safe-area-inset-top)', backgroundColor: 'var(--gnome-headerbar-bg-color, #ebebeb)' }}>
       <HeaderBar title="Developer Portal" end={userMenuTrigger} />
@@ -151,7 +152,7 @@ function AuthenticatedLayout() {
     <div
       style={{
         position: 'fixed',
-        top: '8px',
+        top: 'calc(env(safe-area-inset-top) + 8px)',
         right: 'calc(env(safe-area-inset-right) + 12px)',
         zIndex: 40,
       }}
@@ -202,9 +203,11 @@ function AuthenticatedLayout() {
                   React's use() on a data promise — would otherwise be caught there,
                   which hides this entire authenticated shell (nav, header) rather
                   than just the routed content. This boundary keeps that contained. */}
-              <Suspense fallback={null}>
-                <Outlet />
-              </Suspense>
+              <div style={isMobile ? { paddingTop: 'env(safe-area-inset-top)' } : undefined}>
+                <Suspense fallback={null}>
+                  <Outlet />
+                </Suspense>
+              </div>
             </AdaptiveLayout>
           </div>
         </GhClientProvider>
