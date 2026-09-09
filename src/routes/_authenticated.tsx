@@ -144,7 +144,7 @@ function AuthenticatedLayout() {
   // is obscured by the notch.
   const topBar = isMobile ? undefined : (
     <div style={{ paddingTop: 'env(safe-area-inset-top)', backgroundColor: 'var(--gnome-headerbar-bg-color, #ebebeb)' }}>
-      <HeaderBar title="Developer Portal" end={userMenuTrigger} />
+      <HeaderBar title="Developer Portal" end={userMenuTrigger} flat />
     </div>
   )
 
