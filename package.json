@@ -35,7 +35,7 @@
     "@tanstack/react-router": "^1.114.0",
     "code-languages": "^1.28.0",
     "firebase": "^12.12.1",
-    "floaty-widget": "^1.6.0",
+    "floaty-widget": "^1.7.0",
     "idb": "^8.0.3",
     "monitor-api": "^1.1.0",
     "monitor-ui": "^2.0.0",
