@@ -177,17 +177,15 @@ function AuthenticatedLayout() {
               glass={settings.glass}
               footer={<ApplicationFooter />}
             >
-              <Box padding={16}>
-                {/* TanStack Router's root Outlet always wraps its child match in a
-                    Suspense boundary (see @tanstack/react-router's Outlet.tsx). Content
-                    that suspends without a closer boundary — e.g. a component calling
-                    React's use() on a data promise — would otherwise be caught there,
-                    which hides this entire authenticated shell (nav, header) rather
-                    than just the routed content. This boundary keeps that contained. */}
-                <Suspense fallback={null}>
-                  <Outlet />
-                </Suspense>
-              </Box>
+              {/* TanStack Router's root Outlet always wraps its child match in a
+                  Suspense boundary (see @tanstack/react-router's Outlet.tsx). Content
+                  that suspends without a closer boundary — e.g. a component calling
+                  React's use() on a data promise — would otherwise be caught there,
+                  which hides this entire authenticated shell (nav, header) rather
+                  than just the routed content. This boundary keeps that contained. */}
+              <Suspense fallback={null}>
+                <Outlet />
+              </Suspense>
             </AdaptiveLayout>
           </div>
         </GhClientProvider>
