@@ -8,7 +8,7 @@ import {
   useGhRepoGitTree,
 } from '@api-hooks/gh'
 import { useLanguage } from '@/hooks/useLanguage'
-import { CounterCard, ErrorState, PanelCard } from '@gnome-ui/layout'
+import { CounterCard, type CounterCardProps, ErrorState, PanelCard } from '@gnome-ui/layout'
 import { DashboardGrid } from '@gnome-ui/layout/components/DashboardGrid'
 import { Box } from '@gnome-ui/react/components/Box'
 import { Button } from '@gnome-ui/react/components/Button'
@@ -16,6 +16,7 @@ import { Icon } from '@gnome-ui/react/components/Icon'
 import { Spinner } from '@gnome-ui/react/components/Spinner'
 import { TabBar, TabItem } from '@gnome-ui/react/components/Tabs'
 import { Drawer } from '@gnome-ui/react/components/Drawer'
+import { useBreakpoint } from '@gnome-ui/hooks/useBreakpoint'
 import { Folder, Warning, Star, Share, GitIssueOpened, GitWorkflow, GitBranch, Lock, GitDiff } from '@gnome-ui/icons'
 import { Npm } from '@gnome-ui/icons/third-party'
 import { PageHeader } from '@/components/PageHeader'
@@ -30,7 +31,7 @@ import { RepositoryWorkflowRunPanel } from '@/components/repo/RepositoryWorkflow
 import { RepositoryAdvisoryList } from '@/components/repo/RepositoryAdvisoryList'
 import { RepositoryBranchList } from '@/components/repo/RepositoryBranchList'
 import { useAuth } from '@/auth/AuthProvider'
-import { Badge, Skeleton } from '@gnome-ui/react'
+import { Badge, Carousel, Skeleton } from '@gnome-ui/react'
 import {
   GithubBranches,
   GithubCommits,
@@ -57,6 +58,7 @@ function RepoDetail() {
   const { owner, repo: repoName } = Route.useParams();
   const { user } = useAuth();
   const token = user?.githubToken ?? '';
+  const { isMobile } = useBreakpoint();
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [branchFilter, setBranchFilter] = useState<BranchFilter>('all');
   const [npmDrawerOpen, setNpmDrawerOpen] = useState(false);
@@ -118,6 +120,14 @@ function RepoDetail() {
 
   const repoExtras = repo as typeof repo & RepoDetailExtras
 
+  const statCards: (CounterCardProps & { key: string })[] = [
+    { key: 'stars', label: 'Stars', value: repo.stargazers_count, icon: Star, color: '#e5a50a' },
+    { key: 'forks', label: 'Forks', value: repo.forks_count, icon: Folder },
+    { key: 'watchers', label: 'Watchers', value: repo.watchers_count, icon: Warning },
+    { key: 'open-issues', label: 'Open Issues', value: repo.open_issues_count, icon: GitIssueOpened, color: repo.open_issues_count > 0 ? '#e5a50a' : undefined },
+    { key: 'files', label: 'Files', value: totalFiles, icon: GitDiff, color: '#3ec4c2' },
+  ]
+
   return (
     <>
       <PageHeader
@@ -178,13 +188,19 @@ function RepoDetail() {
       <Box orientation="vertical" spacing={16}>
         <RepoHero repo={repo} topics={topics ?? []} repoExtras={repoExtras} />
 
-        <DashboardGrid columns={{ xs: 2, sm: 3, md: 5 }} gap="md">
-          <CounterCard label="Stars" value={repo.stargazers_count} icon={Star} color="#e5a50a" />
-          <CounterCard label="Forks" value={repo.forks_count} icon={Folder} />
-          <CounterCard label="Watchers" value={repo.watchers_count} icon={Warning} />
-          <CounterCard label="Open Issues" value={repo.open_issues_count} icon={GitIssueOpened} color={repo.open_issues_count > 0 ? '#e5a50a' : undefined} />
-          <CounterCard label="Files" value={totalFiles} icon={GitDiff} color="#3ec4c2" />
-        </DashboardGrid>
+        {isMobile ? (
+          <Carousel label="Estadísticas" indicator="dots" peek={24} spacing={18} infinite autoPlay autoPlayControl={false}>
+            {statCards.map(({ key, ...card }) => (
+              <CounterCard key={key} {...card} />
+            ))}
+          </Carousel>
+        ) : (
+          <DashboardGrid columns={{ xs: 2, sm: 3, md: 5 }} gap="md">
+            {statCards.map(({ key, ...card }) => (
+              <CounterCard key={key} {...card} />
+            ))}
+          </DashboardGrid>
+        )}
 
         <Box orientation="vertical" spacing={12}>
           <TabBar aria-label="Repository tabs" inline>
