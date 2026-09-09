@@ -28,6 +28,7 @@ export function AppMonitorControl({ monitor, collapsed = false }: AppMonitorCont
         onClose: () => floaty.close(INSPECTOR_ID),
         onOpenDashboard: openDashboard,
       },
+      mode: 'window',
       size: { width: 520, height: 640 },
       position: { x: 96, y: 72 },
     }, { duplicateStrategy: 'focus' })
@@ -43,6 +44,7 @@ export function AppMonitorControl({ monitor, collapsed = false }: AppMonitorCont
         title: 'Performance Dashboard',
         onBack: openInspector,
       },
+      mode: 'window',
       size: { width: 'min(1120px, calc(100vw - 48px))', height: 'min(760px, calc(100vh - 48px))' },
       position: { x: 72, y: 48 },
     }, { duplicateStrategy: 'focus' })
