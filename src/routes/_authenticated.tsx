@@ -132,6 +132,7 @@ function AuthenticatedLayout() {
           name={user?.displayName ?? user?.email ?? ''}
           src={user?.photoURL ?? undefined}
           size="sm"
+          style={isMobile ? { width: 48, height: 48 } : undefined}
         />
       </Button>
     </Popover>
