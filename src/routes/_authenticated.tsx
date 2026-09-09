@@ -97,58 +97,60 @@ function AuthenticatedLayout() {
   }
 
   const topBar = (
-    <HeaderBar
-      title="Developer Portal"
-      end={
-        <Popover
-          placement="bottom"
-          open={userMenuOpen}
-          onClose={() => setUserMenuOpen(false)}
-          onOpenChange={setUserMenuOpen}
-          content={
-            <UserCard
-              avatarSrc={user?.photoURL ?? undefined}
-              name={user?.displayName ?? user?.email ?? 'Profile'}
-              email={user?.email ?? undefined}
-              avatarSize="md"
-              actions={[
-                { label: 'Profile', onClick: () => go('/profile') },
-                { label: 'Settings', onClick: () => go('/settings') },
-                {
-                  label: signOutPending ? 'Signing out...' : 'Sign out',
-                  variant: 'destructive',
-                  onClick: handleSignOut,
-                },
-              ]}
-            />
-          }
-        >
-          <Button
-            variant="flat"
-            size="sm"
-            aria-label="User menu"
-            style={{ minWidth: 0, padding: 4 }}
+    <div style={{ paddingTop: 'env(safe-area-inset-top)', backgroundColor: 'var(--gnome-headerbar-bg-color, #ebebeb)' }}>
+      <HeaderBar
+        title="Developer Portal"
+        end={
+          <Popover
+            placement="bottom"
+            open={userMenuOpen}
+            onClose={() => setUserMenuOpen(false)}
+            onOpenChange={setUserMenuOpen}
+            content={
+              <UserCard
+                avatarSrc={user?.photoURL ?? undefined}
+                name={user?.displayName ?? user?.email ?? 'Profile'}
+                email={user?.email ?? undefined}
+                avatarSize="md"
+                actions={[
+                  { label: 'Profile', onClick: () => go('/profile') },
+                  { label: 'Settings', onClick: () => go('/settings') },
+                  {
+                    label: signOutPending ? 'Signing out...' : 'Sign out',
+                    variant: 'destructive',
+                    onClick: handleSignOut,
+                  },
+                ]}
+              />
+            }
           >
-            <Avatar
-              name={user?.displayName ?? user?.email ?? ''}
-              src={user?.photoURL ?? undefined}
+            <Button
+              variant="flat"
               size="sm"
-            />
-          </Button>
-        </Popover>
-      }
-    />
+              aria-label="User menu"
+              style={{ minWidth: 0, padding: 4 }}
+            >
+              <Avatar
+                name={user?.displayName ?? user?.email ?? ''}
+                src={user?.photoURL ?? undefined}
+                size="sm"
+              />
+            </Button>
+          </Popover>
+        }
+      />
+    </div>
   )
 
   const AppLogo: FC<{ size?: number }> = ({ size }) => <Box align="center" padding={6}><DeveloperPortalLogo size={size} /></Box>;
   const sidebarFooter = (
-    <Box orientation="vertical" spacing={2}>
+    <Box orientation="vertical" spacing={2} style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <AppMonitorControl monitor={monitor} />
       <PwaUpdateControl />
     </Box>
   )
   const sidebarFooterCollapsed = (
-    <Box orientation="vertical" spacing={2}>
+    <Box orientation="vertical" spacing={2} style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <AppMonitorControl monitor={monitor} collapsed />
       <PwaUpdateControl collapsed />
     </Box>

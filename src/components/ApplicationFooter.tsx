@@ -9,7 +9,7 @@ export function ApplicationFooter() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   return (
-    <WrapBox justify="space-between">
+    <WrapBox justify="space-between" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <Text color="dim" variant="caption">© {new Date().getFullYear()} Developer Portal</Text>
       <Box orientation="horizontal" align="center">
         {widgets.map((widget) => (

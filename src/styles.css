@@ -20,6 +20,20 @@ body {
   background: transparent;
 }
 
+.main {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* AdaptiveLayout's root hardcodes height:100vh, which on mobile Safari is the
+   height with browser chrome (address bar) hidden. While that chrome is
+   visible, 100vh overshoots the real visible area and the bottom nav (pinned
+   by flex layout, clipped by overflow:hidden) ends up rendered off-screen.
+   100dvh tracks the chrome's show/hide state instead. */
+.main > div {
+  height: 100dvh;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     background-image: image-set(
