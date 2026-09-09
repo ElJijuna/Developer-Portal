@@ -12,6 +12,7 @@ import { Icon, Separator, Carousel } from '@gnome-ui/react'
 import { IconBadge, PanelCard } from '@gnome-ui/layout'
 import { useBreakpoint } from '@gnome-ui/hooks/useBreakpoint'
 import { RepositoryCard } from '@/components/RepositoryCard'
+import { PageHeader } from '@/components/PageHeader'
 import { GoaPanel } from '@gnome-ui/icons';
 
 export const Route = createFileRoute('/_authenticated/')({
@@ -55,67 +56,70 @@ function Dashboard() {
   ]
 
   return (
-    <DashboardGrid columns={{ sm: 1, md: 2, lg: 4 }} gap="md">
-      {isMobile ? (
-        <DashboardGrid.Item>
-          <Carousel label="Estadísticas" indicator="dots" peek={24} spacing={18} infinite autoPlay autoPlayControl={false}>
-            {statCards.map(({ key, ...card }) => (
-              <CounterCard key={key} {...card} />
-            ))}
-          </Carousel>
-        </DashboardGrid.Item>
-      ) : (
-        statCards.map(({ key, ...card }) => (
-          <DashboardGrid.Item key={key}>
-            <CounterCard {...card} />
+    <>
+      <PageHeader title="Dashboard" segments={[{ label: 'Dashboard', path: '/' }]} />
+      <DashboardGrid columns={{ sm: 1, md: 2, lg: 4 }} gap="md">
+        {isMobile ? (
+          <DashboardGrid.Item>
+            <Carousel label="Estadísticas" indicator="dots" peek={24} spacing={18} infinite autoPlay autoPlayControl={false}>
+              {statCards.map(({ key, ...card }) => (
+                <CounterCard key={key} {...card} />
+              ))}
+            </Carousel>
           </DashboardGrid.Item>
-        ))
-      )}
+        ) : (
+          statCards.map(({ key, ...card }) => (
+            <DashboardGrid.Item key={key}>
+              <CounterCard {...card} />
+            </DashboardGrid.Item>
+          ))
+        )}
 
-      <DashboardGrid.Item span={{ sm: 1, md: 2, lg: 4 }}>
-        <PanelCard title="Contributions" icon={<IconBadge><Icon icon={GoaPanel} /></IconBadge>}>
-          <Box orientation="vertical" spacing={24}>
-            <Box justify="space-between" align="center">
-              {!contribLoading && contributionDays.length > 0 && (
-                <SparkAreaChart
-                  data={contributionDays.slice(-84).map((d) => d.count)}
-                  height={32}
-                  aria-label="Trend de contribuciones"
-                  gradient
+        <DashboardGrid.Item span={{ sm: 1, md: 2, lg: 4 }}>
+          <PanelCard title="Contributions" icon={<IconBadge><Icon icon={GoaPanel} /></IconBadge>}>
+            <Box orientation="vertical" spacing={24}>
+              <Box justify="space-between" align="center">
+                {!contribLoading && contributionDays.length > 0 && (
+                  <SparkAreaChart
+                    data={contributionDays.slice(-84).map((d) => d.count)}
+                    height={32}
+                    aria-label="Trend de contribuciones"
+                    gradient
+                  />
+                )}
+              </Box>
+              <Separator />
+              {contribLoading ? (
+                <Skeleton height={130} />
+              ) : (
+                <ContributionGraph
+                  cellSize={20}
+                  data={contributionDays}
+                  weekStartDay={1}
+                  tooltipContent={(day) => `${day.count} contribuciones el ${day.date}`}
                 />
               )}
             </Box>
-            <Separator />
-            {contribLoading ? (
-              <Skeleton height={130} />
-            ) : (
-              <ContributionGraph
-                cellSize={20}
-                data={contributionDays}
-                weekStartDay={1}
-                tooltipContent={(day) => `${day.count} contribuciones el ${day.date}`}
-              />
-            )}
-          </Box>
-        </PanelCard>
-      </DashboardGrid.Item>
-
-      {topRepos.map((repo) => (
-        <DashboardGrid.Item key={repo.id} span={{ sm: 1, md: 2 }}>
-          <RepositoryCard
-            name={repo.name}
-            description={repo.description ?? ''}
-            language={repo.language ?? ''}
-            stars={repo.stargazers_count}
-            forks={repo.forks_count}
-            openIssues={repo.open_issues_count}
-            pushedAt={repo.pushed_at ?? repo.updated_at}
-            isPrivate={repo.private}
-            isLoading={false}
-            onClick={() => navigate({ to: '/repositories/$owner/$repo', params: { owner: repo.owner.login, repo: repo.name } })}
-          />
+          </PanelCard>
         </DashboardGrid.Item>
-      ))}
-    </DashboardGrid>
+
+        {topRepos.map((repo) => (
+          <DashboardGrid.Item key={repo.id} span={{ sm: 1, md: 2 }}>
+            <RepositoryCard
+              name={repo.name}
+              description={repo.description ?? ''}
+              language={repo.language ?? ''}
+              stars={repo.stargazers_count}
+              forks={repo.forks_count}
+              openIssues={repo.open_issues_count}
+              pushedAt={repo.pushed_at ?? repo.updated_at}
+              isPrivate={repo.private}
+              isLoading={false}
+              onClick={() => navigate({ to: '/repositories/$owner/$repo', params: { owner: repo.owner.login, repo: repo.name } })}
+            />
+          </DashboardGrid.Item>
+        ))}
+      </DashboardGrid>
+    </>
   )
 }
