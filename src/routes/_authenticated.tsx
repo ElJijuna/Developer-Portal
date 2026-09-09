@@ -151,7 +151,7 @@ function AuthenticatedLayout() {
     <div
       style={{
         position: 'fixed',
-        top: 'calc(env(safe-area-inset-top) + 8px)',
+        top: '8px',
         right: 'calc(env(safe-area-inset-right) + 12px)',
         zIndex: 40,
       }}
