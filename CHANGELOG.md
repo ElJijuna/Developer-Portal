@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.25.1](https://github.com/ElJijuna/Developer-Portal/compare/v1.25.0...v1.25.1) (2026-09-09)
+
+### Bug Fixes
+
+* update floaty-widget to version 1.7.0 and modify icon assets for improved design ([69067bc](https://github.com/ElJijuna/Developer-Portal/commit/69067bc500382dfa038107715aaa17b60301b306))
+
 ## [1.25.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.24.0...v1.25.0) (2026-09-09)
 
 ### Features
