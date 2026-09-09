@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.25.2](https://github.com/ElJijuna/Developer-Portal/compare/v1.25.1...v1.25.2) (2026-09-09)
+
+### Bug Fixes
+
+* remove bottom padding from ApplicationFooter WrapBox ([0a584ef](https://github.com/ElJijuna/Developer-Portal/commit/0a584ef0772d1308b26bc05c986242503b8d056d))
+* update comments for clarity on mobile layout behavior in PWA and AuthenticatedLayout ([624ab26](https://github.com/ElJijuna/Developer-Portal/commit/624ab26e033e14e12c76fcbec159861f20e27b0e))
+* update comments for clarity on mobile layout behavior in PWA and AuthenticatedLayout ([1916f3e](https://github.com/ElJijuna/Developer-Portal/commit/1916f3e14c4da63dea6133bb4eb79ea50546ae08))
+
 ## [1.25.1](https://github.com/ElJijuna/Developer-Portal/compare/v1.25.0...v1.25.1) (2026-09-09)
 
 ### Bug Fixes
