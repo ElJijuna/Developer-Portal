@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.25.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.24.0...v1.25.0) (2026-09-09)
+
+### Features
+
+* add PWA safe area tests and enhance layout with safe area insets for mobile devices ([04c0b77](https://github.com/ElJijuna/Developer-Portal/commit/04c0b7717bed3fc3a4e306dce45e7134c530fb4c))
+* add responsive styling to user avatar in AuthenticatedLayout for mobile view ([d8d8c4a](https://github.com/ElJijuna/Developer-Portal/commit/d8d8c4afa6b096f87f2c77ec5346ad841a0c1b21))
+* enhance AuthenticatedLayout with responsive user menu for mobile devices ([326c811](https://github.com/ElJijuna/Developer-Portal/commit/326c8111fb7538b28647776f7cba240eb412149d))
+* enhance Dashboard component with PageHeader and improve layout for mobile view ([ff94470](https://github.com/ElJijuna/Developer-Portal/commit/ff9447084321b1765e2e4176808f9d98d375ef6f))
+* implement responsive statistics display in RepoDetail for mobile and desktop views ([1f42e0e](https://github.com/ElJijuna/Developer-Portal/commit/1f42e0ebba197d52797caa3dd6a796af6671de3e))
+
+### Bug Fixes
+
+* adjust safe area insets for mobile layout and update test description for clarity ([7a41699](https://github.com/ElJijuna/Developer-Portal/commit/7a416999841b1c55e9a4a61e176d6cd1626236a0))
+* simplify layout structure by removing unnecessary Box wrapper around Outlet in AuthenticatedLayout ([2986b9f](https://github.com/ElJijuna/Developer-Portal/commit/2986b9fe977323bd97c502c51989d67d4aae075b))
+* update floaty-widget to version 1.6.0 and adjust AppMonitorControl to use window mode ([b5a2cee](https://github.com/ElJijuna/Developer-Portal/commit/b5a2cee521bbc0545b946f7d231f5928872c9856))
+
 ## [1.24.0](https://github.com/ElJijuna/Developer-Portal/compare/v1.23.0...v1.24.0) (2026-09-08)
 
 ### Features
