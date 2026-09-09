@@ -3,6 +3,7 @@ import { auth, authReady, isAuthReady } from '@/auth/proxy/firebase';
 import { GITHUB_TOKEN_KEY } from '@/auth/constants';
 import { useAuth } from '@/auth/AuthProvider';
 import { AdaptiveLayout, type AdaptiveNavItem } from '@gnome-ui/layout/components/AdaptiveLayout';
+import { useBreakpoint } from '@gnome-ui/hooks/useBreakpoint';
 import { UserCard } from '@gnome-ui/layout/components/UserCard';
 import { HeaderBar } from '@gnome-ui/react/components/HeaderBar';
 import { Avatar } from '@gnome-ui/react/components/Avatar';
@@ -60,6 +61,7 @@ function AuthenticatedLayout() {
   const navigate = useNavigate()
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const { isMobile } = useBreakpoint()
   const token = user?.githubToken ?? ''
   const ghClient = useMemo(() => new GitHubClient({ token: token || undefined }), [token])
   const monitor = useMemo(() => createMonitor({
@@ -96,51 +98,66 @@ function AuthenticatedLayout() {
     signOut(undefined, { onSuccess: () => void navigate({ to: '/login' }) })
   }
 
-  const topBar = (
+  const userMenuTrigger = (
+    <Popover
+      placement="bottom"
+      open={userMenuOpen}
+      onClose={() => setUserMenuOpen(false)}
+      onOpenChange={setUserMenuOpen}
+      content={
+        <UserCard
+          avatarSrc={user?.photoURL ?? undefined}
+          name={user?.displayName ?? user?.email ?? 'Profile'}
+          email={user?.email ?? undefined}
+          avatarSize="md"
+          actions={[
+            { label: 'Profile', onClick: () => go('/profile') },
+            { label: 'Settings', onClick: () => go('/settings') },
+            {
+              label: signOutPending ? 'Signing out...' : 'Sign out',
+              variant: 'destructive',
+              onClick: handleSignOut,
+            },
+          ]}
+        />
+      }
+    >
+      <Button
+        variant="flat"
+        size="sm"
+        aria-label="User menu"
+        style={{ minWidth: 0, padding: 4 }}
+      >
+        <Avatar
+          name={user?.displayName ?? user?.email ?? ''}
+          src={user?.photoURL ?? undefined}
+          size="sm"
+        />
+      </Button>
+    </Popover>
+  )
+
+  // On mobile there's no header bar at all: the page background runs edge to
+  // edge under the status bar / Dynamic Island, and only the user menu floats
+  // over it, offset by the safe area so it isn't obscured by the notch.
+  const topBar = isMobile ? undefined : (
     <div style={{ paddingTop: 'env(safe-area-inset-top)', backgroundColor: 'var(--gnome-headerbar-bg-color, #ebebeb)' }}>
-      <HeaderBar
-        title="Developer Portal"
-        end={
-          <Popover
-            placement="bottom"
-            open={userMenuOpen}
-            onClose={() => setUserMenuOpen(false)}
-            onOpenChange={setUserMenuOpen}
-            content={
-              <UserCard
-                avatarSrc={user?.photoURL ?? undefined}
-                name={user?.displayName ?? user?.email ?? 'Profile'}
-                email={user?.email ?? undefined}
-                avatarSize="md"
-                actions={[
-                  { label: 'Profile', onClick: () => go('/profile') },
-                  { label: 'Settings', onClick: () => go('/settings') },
-                  {
-                    label: signOutPending ? 'Signing out...' : 'Sign out',
-                    variant: 'destructive',
-                    onClick: handleSignOut,
-                  },
-                ]}
-              />
-            }
-          >
-            <Button
-              variant="flat"
-              size="sm"
-              aria-label="User menu"
-              style={{ minWidth: 0, padding: 4 }}
-            >
-              <Avatar
-                name={user?.displayName ?? user?.email ?? ''}
-                src={user?.photoURL ?? undefined}
-                size="sm"
-              />
-            </Button>
-          </Popover>
-        }
-      />
+      <HeaderBar title="Developer Portal" end={userMenuTrigger} />
     </div>
   )
+
+  const floatingUserMenu = isMobile ? (
+    <div
+      style={{
+        position: 'fixed',
+        top: 'calc(env(safe-area-inset-top) + 8px)',
+        right: 'calc(env(safe-area-inset-right) + 12px)',
+        zIndex: 40,
+      }}
+    >
+      {userMenuTrigger}
+    </div>
+  ) : null
 
   const AppLogo: FC<{ size?: number }> = ({ size }) => <Box align="center" padding={6}><DeveloperPortalLogo size={size} /></Box>;
   const sidebarFooter = (
@@ -161,6 +178,7 @@ function AuthenticatedLayout() {
       <AppSettingsContext.Provider value={appSettings}>
         <GhClientProvider client={ghClient}>
           <div className="main">
+            {floatingUserMenu}
             <AdaptiveLayout
               items={NAV_ITEMS}
               value={pathname}
