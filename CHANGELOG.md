@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.25.3](https://github.com/ElJijuna/Developer-Portal/compare/v1.25.2...v1.25.3) (2026-09-11)
+
+### Bug Fixes
+
+* update login route to prevent redirect loop by checking GitHub token ([b960400](https://github.com/ElJijuna/Developer-Portal/commit/b960400f7fda6d53e8969df6e507bf09e91d3051))
+
 ## [1.25.2](https://github.com/ElJijuna/Developer-Portal/compare/v1.25.1...v1.25.2) (2026-09-09)
 
 ### Bug Fixes
