@@ -23,3 +23,6 @@ coverage
 .tanstack
 
 .crossnote
+
+ios/
+android/
