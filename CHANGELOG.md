@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.25.4](https://github.com/ElJijuna/Developer-Portal/compare/v1.25.3...v1.25.4) (2026-09-12)
+
+### Bug Fixes
+
+* update @gnome-ui/icons and @gnome-ui/react versions to 1.45.0 and 1.67.0 respectively ([4de7bcc](https://github.com/ElJijuna/Developer-Portal/commit/4de7bcc86703dfe98c7d9f59946e1cf4ca8ca535))
+
 ## [1.25.3](https://github.com/ElJijuna/Developer-Portal/compare/v1.25.2...v1.25.3) (2026-09-11)
 
 ### Bug Fixes
